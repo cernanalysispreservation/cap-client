@@ -21,14 +21,9 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
- 
-include COPYING
-include *.rst
-include *.sh
-include *.txt
-include *.yaml
-include pytest.ini
-recursive-include docs *.py
-recursive-include docs *.png
-recursive-include docs *.rst
-recursive-include tests *.py
+
+"""Pytest configuration for CAP client."""
+
+from __future__ import absolute_import, print_function
+
+import pytest

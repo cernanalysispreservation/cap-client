@@ -5,7 +5,7 @@ Issues
 ------
 
 Bug reports, feature requests, and other contributions are welcome. If you find
-a demonstrable problem that is caused by the REANA code, please:
+a demonstrable problem that is caused by the CAP code, please:
 
 1. Search for `already reported problems
    <https://github.com/cernanalysispreservation/cap-client/issues>`_.
