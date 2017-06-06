@@ -39,6 +39,7 @@ tests_require = [
     'check-manifest>=0.25',
     'coverage>=4.0',
     'isort>=4.2.2',
+    'mock>=2.0.0',
     'pydocstyle>=1.0.0',
     'pytest-cache>=1.0',
     'pytest-cov>=1.8.0',
@@ -64,6 +65,10 @@ setup_requires = [
     'pytest-runner>=2.7',
 ]
 
+install_requires = [
+    'click>=6.7',
+]
+
 packages = find_packages()
 
 
@@ -84,6 +89,12 @@ setup(
     url='https://github.com/cernanalysispreservation/cap-client',
     packages=['cap_client', ],
     zip_safe=False,
+    entry_points={
+         'console_scripts': [
+             'cap-client = cap_client.cli:cli',
+         ],
+    },
+    install_requires=install_requires,
     extras_require=extras_require,
     setup_requires=setup_requires,
     tests_require=tests_require,
