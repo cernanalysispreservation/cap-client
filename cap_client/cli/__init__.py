@@ -34,13 +34,14 @@ from cap_client.cap_api import CapAPI
 class Config(object):
     """Configuration object to share across commands."""
 
-    def __init__(self, verbose=False):
+    def __init__(self, access_token=None, verbose=False):
         """Initialize config variables."""
         server = os.environ.get(
             'CAP_SERVER_URL', 'https://analysispreservation.cern.ch')
         apipath = os.environ.get('CAP_SERVER_API_PATH', None)
+        access_token = access_token or os.environ.get('CAP_ACCESS_TOKEN', None)
 
-        self.cap_api = CapAPI(server, apipath)
+        self.cap_api = CapAPI(server, apipath, access_token)
         self.verbose = verbose
 
 
@@ -51,14 +52,19 @@ class Config(object):
     help='Sets log level',
     type=click.Choice(['debug', 'info']),
     default='info')
+@click.option(
+    '--access_token',
+    '-t',
+    help='Sets users access token',)
 @click.pass_context
-def cli(ctx, loglevel):
+def cli(ctx, loglevel, access_token):
     """CAP Client for interacting with CAP Server."""
     logging.basicConfig(
         format='[%(levelname)s] %(message)s',
         stream=sys.stderr,
         level=logging.DEBUG if loglevel == 'debug' else logging.INFO)
-    ctx.obj = Config()
+    ctx.access_token = access_token
+    ctx.obj = Config(access_token=access_token)
 
 
 cli.add_command(ping)

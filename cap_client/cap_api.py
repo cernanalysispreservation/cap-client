@@ -29,16 +29,20 @@ import requests
 class CapAPI(object):
     """CAP API client code."""
 
-    def __init__(self, server_url, apipath='api'):
+    def __init__(self, server_url, apipath='api', access_token=None):
         """Initialize ReanaAPI object."""
         self.server_url = server_url
         self.apipath = apipath
+        self.access_token = access_token
+        self.endpoint = '{server_url}/{apipath}/{url}?access_token={access_token}'
 
     def ping(self):
         """Health check CAP Server."""
-        endpoint = '{server_url}/{apipath}/ping'.format(
+        endpoint = self.endpoint.format(
             server_url=self.server_url,
-            apipath=self.apipath)
+            apipath=self.apipath,
+            url='ping',
+            access_token=self.access_token)
 
         try:
             response = requests.get(endpoint, verify=False)
