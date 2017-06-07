@@ -22,12 +22,15 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+
+"""CAP Client CLI init."""
+
 import click
 import logging
 import sys
 import os
 
-from cap_client.cli.cli import ping
+from cap_client.cli.cli import ping, get
 from cap_client.cap_api import CapAPI
 
 
@@ -63,8 +66,8 @@ def cli(ctx, loglevel, access_token):
         format='[%(levelname)s] %(message)s',
         stream=sys.stderr,
         level=logging.DEBUG if loglevel == 'debug' else logging.INFO)
-    ctx.access_token = access_token
     ctx.obj = Config(access_token=access_token)
 
 
 cli.add_command(ping)
+cli.add_command(get)

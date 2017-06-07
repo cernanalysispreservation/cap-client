@@ -22,6 +22,9 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+"""CAP API Class."""
+
+from urlparse import urljoin
 
 import requests
 
@@ -34,18 +37,38 @@ class CapAPI(object):
         self.server_url = server_url
         self.apipath = apipath
         self.access_token = access_token
-        self.endpoint = '{server_url}/{apipath}/{url}?access_token={access_token}'
+        self.endpoint = '{server_url}/{apipath}/{url}'
+
+    def construct_endpoint(self, url=None,):
+        """Contruct api endpoint."""
+        return self.endpoint.format(server_url=self.server_url,
+                                    apipath=self.apipath,
+                                    url=url,)
 
     def ping(self):
         """Health check CAP Server."""
-        endpoint = self.endpoint.format(
-            server_url=self.server_url,
-            apipath=self.apipath,
-            url='ping',
-            access_token=self.access_token)
-
+        endpoint = self.construct_endpoint(url='ping')
         try:
             response = requests.get(endpoint, verify=False)
+
+            if response.status_code == 200:
+                return response.text
+            else:
+                raise Exception(
+                    "Expected status code 200 but {endpoint} replied with "
+                    "{status_code}".format(
+                        status_code=response.status_code, endpoint=endpoint))
+
+        except Exception:
+            raise
+
+    def get(self, pid=None):
+        """Retrieve one or all analyses from a user."""
+        endpoint = self.construct_endpoint(
+            url=urljoin('deposits/', pid))
+        try:
+            params = {'access_token': self.access_token}
+            response = requests.get(endpoint, verify=False, params=params)
 
             if response.status_code == 200:
                 return response.text

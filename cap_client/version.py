@@ -22,7 +22,9 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+
 """Version information for CAP-client.
+
 This file is imported by ``cap_client.__init__`` and parsed by
 ``setup.py``.
 """

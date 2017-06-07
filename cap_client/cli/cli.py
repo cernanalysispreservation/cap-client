@@ -22,6 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+"""General CAP Client CLI."""
 
 import logging
 
@@ -36,6 +37,26 @@ def ping(ctx):
         logging.info('Connecting to {0}'.format(ctx.obj.cap_api.server_url))
         response = ctx.obj.cap_api.ping()
         logging.info('Server is running.')
+        logging.info('Server response:\n{}'.format(response))
+
+    except Exception as e:
+        logging.info('Something went wrong when trying to connect to {0}'
+                     .format(ctx.obj.cap_api))
+        logging.debug(str(e))
+
+
+@click.command()
+@click.option(
+    '--pid',
+    '-p',
+    help='Get deposit with given pid',
+    default=None)
+@click.pass_context
+def get(ctx, pid):
+    """Retrieve one or all analyses from a user."""
+    try:
+        logging.info('Connecting to {0}'.format(ctx.obj.cap_api.server_url))
+        response = ctx.obj.cap_api.get(pid=pid)
         logging.info('Server response:\n{}'.format(response))
 
     except Exception as e:
