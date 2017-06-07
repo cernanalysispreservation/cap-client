@@ -27,11 +27,11 @@
 
 import click
 import logging
-import sys
 import os
+import sys
 
-from cap_client.cli.cli import ping, get
 from cap_client.cap_api import CapAPI
+from cap_client.cli.cli import create, get, ping
 
 
 class Config(object):
@@ -41,7 +41,7 @@ class Config(object):
         """Initialize config variables."""
         server = os.environ.get(
             'CAP_SERVER_URL', 'https://analysispreservation.cern.ch')
-        apipath = os.environ.get('CAP_SERVER_API_PATH', None)
+        apipath = os.environ.get('CAP_SERVER_API_PATH', 'api')
         access_token = access_token or os.environ.get('CAP_ACCESS_TOKEN', None)
 
         self.cap_api = CapAPI(server, apipath, access_token)
@@ -71,3 +71,4 @@ def cli(ctx, loglevel, access_token):
 
 cli.add_command(ping)
 cli.add_command(get)
+cli.add_command(create)

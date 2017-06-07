@@ -26,57 +26,87 @@
 
 from urlparse import urljoin
 
+import json
 import requests
 
 
 class CapAPI(object):
     """CAP API client code."""
 
-    def __init__(self, server_url, apipath='api', access_token=None):
+    def __init__(self, server_url, apipath, access_token):
         """Initialize ReanaAPI object."""
         self.server_url = server_url
         self.apipath = apipath
         self.access_token = access_token
         self.endpoint = '{server_url}/{apipath}/{url}'
 
-    def construct_endpoint(self, url=None,):
+    def _construct_endpoint(self, url=None):
         """Contruct api endpoint."""
         return self.endpoint.format(server_url=self.server_url,
                                     apipath=self.apipath,
                                     url=url,)
 
-    def ping(self):
-        """Health check CAP Server."""
-        endpoint = self.construct_endpoint(url='ping')
+    def _make_request(self,
+                      url=None,
+                      method='get',
+                      expected_code=200,
+                      *args,
+                      **kwargs):
+        endpoint = self._construct_endpoint(url=url)
         try:
-            response = requests.get(endpoint, verify=False)
+            params = {'access_token': self.access_token}
+            headers = {'Content-type': 'application/json'}
+            method_obj = getattr(requests, method)
+            response = method_obj(endpoint,
+                                  verify=False,
+                                  params=params,
+                                  headers=headers,
+                                  ** kwargs)
 
-            if response.status_code == 200:
-                return response.text
+            if response.status_code == expected_code:
+                return {'status': response.status_code,
+                        'message': response.text,
+                        'data': response.json()}
             else:
                 raise Exception(
-                    "Expected status code 200 but {endpoint} replied with "
-                    "{status_code}".format(
-                        status_code=response.status_code, endpoint=endpoint))
+                    "Expected status code {code} but {endpoint} replied with "
+                    "{status_code}".format(code=expected_code,
+                                           status_code=response.status_code,
+                                           endpoint=endpoint))
 
         except Exception:
             raise
+
+    def _get_available_types(self):
+        """Get available analyses types from server."""
+        ana_types = self._make_request(url='me').get('data', {})
+        try:
+            return [exp['deposit_group'] for exp in
+                    ana_types['deposit_groups']]
+        except KeyError as e:
+            raise e
+
+    def ping(self):
+        """Health check CAP Server."""
+        return self._make_request(url='ping')
 
     def get(self, pid=None):
         """Retrieve one or all analyses from a user."""
-        endpoint = self.construct_endpoint(
-            url=urljoin('deposits/', pid))
-        try:
-            params = {'access_token': self.access_token}
-            response = requests.get(endpoint, verify=False, params=params)
+        return self._make_request(url=urljoin('deposits/', pid))
 
-            if response.status_code == 200:
-                return response.text
-            else:
-                raise Exception(
-                    "Expected status code 200 but {endpoint} replied with "
-                    "{status_code}".format(
-                        status_code=response.status_code, endpoint=endpoint))
+    def create(self, data=None, type=None, version='0.0.1'):
+        """Create an analysis."""
+        types = self._get_available_types()
+        if type not in types:
+            return "Choose one of the available analyses types:\n{}".format(
+                '\n'.join(types)
+            )
 
-        except Exception:
-            raise
+        with open(data) as fp:
+            data = json.load(fp)
+            data['$ana_type'] = type
+
+        return self._make_request(url='deposits/',
+                                  method='post',
+                                  data=json.dumps(data),
+                                  expected_code=201)

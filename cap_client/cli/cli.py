@@ -63,3 +63,40 @@ def get(ctx, pid):
         logging.info('Something went wrong when trying to connect to {0}'
                      .format(ctx.obj.cap_api))
         logging.debug(str(e))
+
+
+@click.command()
+@click.option(
+    '--data',
+    '-d',
+    help='Post data to api ',
+    default=None
+)
+@click.option(
+    '--type',
+    '-t',
+    help='Type of analysis',
+    default=None
+)
+@click.option(
+    '--version',
+    '-v',
+    help='JSON schema version to api ',
+)
+@click.pass_context
+def create(ctx, data, type, version):
+    """Create an analysis."""
+    try:
+        logging.info('Connecting to {0}'.format(
+            ctx.obj.cap_api.server_url))
+        response = ctx.obj.cap_api.create(
+            data=data,
+            type=type,
+            version=version
+        )
+        logging.info('Server response:\n{}'.format(response))
+
+    except Exception as e:
+        logging.info('Something went wrong when trying to connect to {0}'
+                     .format(ctx.obj.cap_api.server_url))
+        logging.debug(str(e))
