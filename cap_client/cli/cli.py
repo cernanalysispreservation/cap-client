@@ -100,3 +100,23 @@ def create(ctx, data, type, version):
         logging.info('Something went wrong when trying to connect to {0}'
                      .format(ctx.obj.cap_api.server_url))
         logging.debug(str(e))
+
+
+@click.command()
+@click.option(
+    '--pid',
+    '-p',
+    help='Delete deposit with given pid',
+    default=None)
+@click.pass_context
+def delete(ctx, pid):
+    """Delete analysis with given pid."""
+    try:
+        logging.info('Connecting to {0}'.format(ctx.obj.cap_api.server_url))
+        response = ctx.obj.cap_api.delete(pid=pid)
+        logging.info('Server response:\n{}'.format(response))
+
+    except Exception as e:
+        logging.info('Something went wrong when trying to connect to {0}'
+                     .format(ctx.obj.cap_api))
+        logging.debug(str(e))

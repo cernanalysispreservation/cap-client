@@ -31,7 +31,7 @@ import os
 import sys
 
 from cap_client.cap_api import CapAPI
-from cap_client.cli.cli import create, get, ping
+from cap_client.cli.cli import create, delete, get, ping
 
 
 class Config(object):
@@ -72,3 +72,4 @@ def cli(ctx, loglevel, access_token):
 cli.add_command(ping)
 cli.add_command(get)
 cli.add_command(create)
+cli.add_command(delete)

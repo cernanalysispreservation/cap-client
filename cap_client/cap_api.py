@@ -64,9 +64,13 @@ class CapAPI(object):
                                   ** kwargs)
 
             if response.status_code == expected_code:
+                try:
+                    data = response.json()
+                except ValueError:
+                    data = None
                 return {'status': response.status_code,
                         'message': response.text,
-                        'data': response.json()}
+                        'data': data}
             else:
                 raise Exception(
                     "Expected status code {code} but {endpoint} replied with "
@@ -110,3 +114,9 @@ class CapAPI(object):
                                   method='post',
                                   data=json.dumps(data),
                                   expected_code=201)
+
+    def delete(self, pid=None):
+        """"Delete an analysis by given pid."""
+        return self._make_request(url=urljoin('deposits/', pid),
+                                  method='delete',
+                                  expected_code=204)
