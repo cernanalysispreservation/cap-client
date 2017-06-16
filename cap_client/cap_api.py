@@ -120,3 +120,13 @@ class CapAPI(object):
         return self._make_request(url=urljoin('deposits/', pid),
                                   method='delete',
                                   expected_code=204)
+
+    def update(self, pid=None, data=None):
+        """"Update an analysis by given pid and data."""
+        with open(data) as fp:
+            data = json.load(fp)
+
+        return self._make_request(url=urljoin('deposits/', pid),
+                                  data=json.dumps(data),
+                                  method='put',
+                                  expected_code=200)
