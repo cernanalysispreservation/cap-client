@@ -130,3 +130,7 @@ class CapAPI(object):
                                   data=json.dumps(data),
                                   method='put',
                                   expected_code=200)
+
+    def types(self):
+        """"Get available analyses types."""
+        return self._get_available_types()

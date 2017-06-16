@@ -148,3 +148,18 @@ def update(ctx, pid, data):
         logging.info('Something went wrong when trying to connect to {0}'
                      .format(ctx.obj.cap_api))
         logging.debug(str(e))
+
+
+@click.command()
+@click.pass_context
+def types(ctx):
+    """Retrieve all types of analyses."""
+    try:
+        logging.info('Connecting to {0}'.format(ctx.obj.cap_api.server_url))
+        response = ctx.obj.cap_api.types()
+        logging.info('Available types:\n{}'.format('\n'.join(response)))
+
+    except Exception as e:
+        logging.info('Something went wrong when trying to connect to {0}'
+                     .format(ctx.obj.cap_api))
+        logging.debug(str(e))
