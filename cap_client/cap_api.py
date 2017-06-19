@@ -62,14 +62,12 @@ class CapAPI(object):
                                   params=params,
                                   headers=headers,
                                   ** kwargs)
-
             if response.status_code == expected_code:
                 try:
                     data = response.json()
                 except ValueError:
                     data = None
                 return {'status': response.status_code,
-                        'message': response.text,
                         'data': data}
             else:
                 raise Exception(
@@ -109,11 +107,12 @@ class CapAPI(object):
         with open(data) as fp:
             data = json.load(fp)
             data['$ana_type'] = type
+        response = self._make_request(url='deposits/',
+                                      method='post',
+                                      data=json.dumps(data),
+                                      expected_code=201)
 
-        return self._make_request(url='deposits/',
-                                  method='post',
-                                  data=json.dumps(data),
-                                  expected_code=201)
+        return json.dumps(response, indent=4)
 
     def delete(self, pid=None):
         """"Delete an analysis by given pid."""

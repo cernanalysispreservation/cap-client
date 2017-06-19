@@ -24,6 +24,7 @@
 
 """General CAP Client CLI."""
 
+import json
 import logging
 
 import click
@@ -37,7 +38,8 @@ def ping(ctx):
         logging.info('Connecting to {0}'.format(ctx.obj.cap_api.server_url))
         response = ctx.obj.cap_api.ping()
         logging.info('Server is running.')
-        logging.info('Server response:\n{}'.format(response))
+        logging.info('Server response:\n{}'.format(
+            json.dumps(response, indent=4)))
 
     except Exception as e:
         logging.info('Something went wrong when trying to connect to {0}'
@@ -57,7 +59,8 @@ def get(ctx, pid):
     try:
         logging.info('Connecting to {0}'.format(ctx.obj.cap_api.server_url))
         response = ctx.obj.cap_api.get(pid=pid)
-        logging.info('Server response:\n{}'.format(response))
+        logging.info('Server response:\n{}'.format(
+            json.dumps(response, indent=4)))
 
     except Exception as e:
         logging.info('Something went wrong when trying to connect to {0}'
@@ -89,11 +92,13 @@ def create(ctx, data, type, version):
     try:
         logging.info('Connecting to {0}'.format(
             ctx.obj.cap_api.server_url))
+
         response = ctx.obj.cap_api.create(
             data=data,
             type=type,
             version=version
         )
+
         logging.info('Server response:\n{}'.format(response))
 
     except Exception as e:
@@ -142,7 +147,8 @@ def update(ctx, pid, data):
     try:
         logging.info('Connecting to {0}'.format(ctx.obj.cap_api.server_url))
         response = ctx.obj.cap_api.update(pid=pid, data=data)
-        logging.info('Server response:\n{}'.format(response))
+        logging.info('Server response:\n{}'.format(
+            json.dumps(response, indent=4)))
 
     except Exception as e:
         logging.info('Something went wrong when trying to connect to {0}'
