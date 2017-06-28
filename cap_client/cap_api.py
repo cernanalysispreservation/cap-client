@@ -30,54 +30,67 @@ import json
 import requests
 
 
+class StatusCodeException(Exception):
+    """Exception for bad status code"""
+
+    def __init__(self,
+                 message=None,
+                 expected_code=None,
+                 status_code=None,
+                 endpoint=None,
+                 data=None,
+                 **kwargs):
+        super(Exception, self).__init__(**kwargs)
+        self.message = message
+        self.expected_code = expected_code
+        self.status_code = status_code
+        self.endpoint = endpoint
+        self.data = data
+
+
 class CapAPI(object):
     """CAP API client code."""
 
     def __init__(self, server_url, apipath, access_token):
-        """Initialize ReanaAPI object."""
+        """Initialize CapAPI object."""
         self.server_url = server_url
         self.apipath = apipath
         self.access_token = access_token
         self.endpoint = '{server_url}/{apipath}/{url}'
 
     def _construct_endpoint(self, url=None):
-        """Contruct api endpoint."""
+        """Construct api endpoint."""
         return self.endpoint.format(server_url=self.server_url,
                                     apipath=self.apipath,
-                                    url=url,)
+                                    url=url, )
 
     def _make_request(self,
                       url=None,
                       method='get',
                       expected_code=200,
-                      *args,
                       **kwargs):
         endpoint = self._construct_endpoint(url=url)
-        try:
-            params = {'access_token': self.access_token}
-            headers = {'Content-type': 'application/json'}
-            method_obj = getattr(requests, method)
-            response = method_obj(endpoint,
-                                  verify=False,
-                                  params=params,
-                                  headers=headers,
-                                  ** kwargs)
-            if response.status_code == expected_code:
-                try:
-                    data = response.json()
-                except ValueError:
-                    data = None
-                return {'status': response.status_code,
-                        'data': data}
-            else:
-                raise Exception(
-                    "Expected status code {code} but {endpoint} replied with "
-                    "{status_code}".format(code=expected_code,
-                                           status_code=response.status_code,
-                                           endpoint=endpoint))
 
-        except Exception:
-            raise
+        params = {'access_token': self.access_token}
+        headers = {'Content-type': 'application/json'}
+        method_obj = getattr(requests, method)
+        response = method_obj(endpoint,
+                              verify=False,
+                              params=params,
+                              headers=headers,
+                              **kwargs)
+        if response.status_code == expected_code:
+            try:
+                data = response.json()
+            except ValueError:
+                data = None
+            return {'status': response.status_code,
+                    'data': data}
+        else:
+            raise StatusCodeException(expected_code=expected_code,
+                                      status_code=response.status_code,
+                                      endpoint=endpoint,
+                                      data=response.json())
 
     def _get_available_types(self):
         """Get available analyses types from server."""
@@ -107,6 +120,15 @@ class CapAPI(object):
         with open(data) as fp:
             data = json.load(fp)
             data['$ana_type'] = type
+
+        try:
+            self._make_request(url='deposit/validator',
+                               method='post',
+                               data=json.dumps(data)
+                               )
+        except StatusCodeException as e:
+            return e.data['errors']
+
         response = self._make_request(url='deposits/',
                                       method='post',
                                       data=json.dumps(data),
