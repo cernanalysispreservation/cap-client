@@ -66,8 +66,8 @@ class CapAPI(object):
                               **kwargs)
 
         # TOFIX for now doesnt work with delete method - problem on server side
-#        if response.headers['Content-Type'] != 'application/json':
-#            raise Exception('Returned content not a JSON')
+        # if response.headers['Content-Type'] != 'application/json':
+        #     raise Exception('Returned content not a JSON')
 
         try:
             response_data = response.json()
@@ -134,9 +134,14 @@ class CapAPI(object):
         """Update an analysis by given pid and data."""
         with open(data) as fp:
             data = json.load(fp)
+            json_data = json.dumps(data)
+
+        self._make_request(url='deposit/validator',
+                           method='post',
+                           data=json_data )
 
         return self._make_request(url=urljoin('deposits/', pid),
-                                  data=json.dumps(data),
+                                  data=json_data,
                                   method='put',
                                   expected_status_code=200)
 
