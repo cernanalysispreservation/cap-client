@@ -54,7 +54,7 @@ class Config(object):
     '-l',
     help='Sets log level',
     type=click.Choice(['debug', 'info']),
-    default='info')
+    default='debug')
 @click.option(
     '--access_token',
     '-t',
@@ -65,7 +65,7 @@ def cli(ctx, loglevel, access_token):
     logging.basicConfig(
         format='[%(levelname)s] %(message)s',
         stream=sys.stderr,
-        level=logging.DEBUG if loglevel == 'debug' else logging.INFO)
+        level=getattr(logging, loglevel.upper()))
     ctx.obj = Config(access_token=access_token)
 
 

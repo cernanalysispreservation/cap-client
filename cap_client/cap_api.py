@@ -24,28 +24,12 @@
 
 """CAP API Class."""
 
+import json
 from urlparse import urljoin
 
-import json
 import requests
 
-
-class StatusCodeException(Exception):
-    """Exception for bad status code"""
-
-    def __init__(self,
-                 message=None,
-                 expected_code=None,
-                 status_code=None,
-                 endpoint=None,
-                 data=None,
-                 **kwargs):
-        super(Exception, self).__init__(**kwargs)
-        self.message = message
-        self.expected_code = expected_code
-        self.status_code = status_code
-        self.endpoint = endpoint
-        self.data = data
+from errors import StatusCodeException
 
 
 class CapAPI(object):
@@ -62,13 +46,14 @@ class CapAPI(object):
         """Construct api endpoint."""
         return self.endpoint.format(server_url=self.server_url,
                                     apipath=self.apipath,
-                                    url=url, )
+                                    url=url)
 
     def _make_request(self,
                       url=None,
                       method='get',
-                      expected_code=200,
+                      expected_status_code=200,
                       **kwargs):
+
         endpoint = self._construct_endpoint(url=url)
 
         params = {'access_token': self.access_token}
@@ -79,27 +64,33 @@ class CapAPI(object):
                               params=params,
                               headers=headers,
                               **kwargs)
-        if response.status_code == expected_code:
-            try:
-                data = response.json()
-            except ValueError:
-                data = None
-            return {'status': response.status_code,
-                    'data': data}
-        else:
-            raise StatusCodeException(expected_code=expected_code,
+
+        # TOFIX for now doesnt work with delete method - problem on server side
+#        if response.headers['Content-Type'] != 'application/json':
+#            raise Exception('Returned content not a JSON')
+
+        try:
+            response_data = response.json()
+        except ValueError:
+            response_data = None
+
+        if response.status_code == expected_status_code:
+            return {
+                'status': response.status_code,
+                'data': response_data,
+            }
+        else:   
+            raise StatusCodeException(endpoint=endpoint,
+                                      expected_status_code=expected_status_code,
                                       status_code=response.status_code,
-                                      endpoint=endpoint,
-                                      data=response.json())
+                                      data=response_data)
 
     def _get_available_types(self):
         """Get available analyses types from server."""
         ana_types = self._make_request(url='me').get('data', {})
-        try:
-            return [exp['deposit_group'] for exp in
-                    ana_types['deposit_groups']]
-        except KeyError as e:
-            raise e
+
+        return [exp['deposit_group'] for exp in
+                ana_types['deposit_groups']]
 
     def ping(self):
         """Health check CAP Server."""
@@ -109,49 +100,46 @@ class CapAPI(object):
         """Retrieve one or all analyses from a user."""
         return self._make_request(url=urljoin('deposits/', pid))
 
-    def create(self, data=None, type=None, version='0.0.1'):
+    def create(self, data=None, ana_type=None, version='0.0.1'):
         """Create an analysis."""
         types = self._get_available_types()
-        if type not in types:
+        if ana_type not in types:
             return "Choose one of the available analyses types:\n{}".format(
                 '\n'.join(types)
             )
 
         with open(data) as fp:
             data = json.load(fp)
-            data['$ana_type'] = type
+            data['$ana_type'] = ana_type
+            json_data = json.dumps(data)
 
-        try:
-            self._make_request(url='deposit/validator',
-                               method='post',
-                               data=json.dumps(data)
-                               )
-        except StatusCodeException as e:
-            return e.data['errors']
+        self._make_request(url='deposit/validator',
+                           method='post',
+                           data=json_data)
 
         response = self._make_request(url='deposits/',
                                       method='post',
-                                      data=json.dumps(data),
-                                      expected_code=201)
+                                      data=json_data,
+                                      expected_status_code=201)
 
         return json.dumps(response, indent=4)
 
     def delete(self, pid=None):
-        """"Delete an analysis by given pid."""
+        """Delete an analysis by given pid."""
         return self._make_request(url=urljoin('deposits/', pid),
                                   method='delete',
-                                  expected_code=204)
+                                  expected_status_code=204)
 
     def update(self, pid=None, data=None):
-        """"Update an analysis by given pid and data."""
+        """Update an analysis by given pid and data."""
         with open(data) as fp:
             data = json.load(fp)
 
         return self._make_request(url=urljoin('deposits/', pid),
                                   data=json.dumps(data),
                                   method='put',
-                                  expected_code=200)
+                                  expected_status_code=200)
 
     def types(self):
-        """"Get available analyses types."""
+        """Get available analyses types."""
         return self._get_available_types()

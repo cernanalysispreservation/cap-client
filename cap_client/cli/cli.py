@@ -35,15 +35,12 @@ import click
 def ping(ctx):
     """Health check CAP Server."""
     try:
-        logging.info('Connecting to {0}'.format(ctx.obj.cap_api.server_url))
         response = ctx.obj.cap_api.ping()
-        logging.info('Server is running.')
         logging.info('Server response:\n{}'.format(
             json.dumps(response, indent=4)))
 
     except Exception as e:
-        logging.info('Something went wrong when trying to connect to {0}'
-                     .format(ctx.obj.cap_api))
+        logging.info('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -57,14 +54,12 @@ def ping(ctx):
 def get(ctx, pid):
     """Retrieve one or all analyses from a user."""
     try:
-        logging.info('Connecting to {0}'.format(ctx.obj.cap_api.server_url))
         response = ctx.obj.cap_api.get(pid=pid)
         logging.info('Server response:\n{}'.format(
             json.dumps(response, indent=4)))
 
     except Exception as e:
-        logging.info('Something went wrong when trying to connect to {0}'
-                     .format(ctx.obj.cap_api))
+        logging.info('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -73,7 +68,8 @@ def get(ctx, pid):
     '--data',
     '-d',
     help='Post data to api ',
-    default=None
+    default=None,
+    required=True,
 )
 @click.option(
     '--type',
@@ -90,20 +86,15 @@ def get(ctx, pid):
 def create(ctx, data, type, version):
     """Create an analysis."""
     try:
-        logging.info('Connecting to {0}'.format(
-            ctx.obj.cap_api.server_url))
-
         response = ctx.obj.cap_api.create(
             data=data,
-            type=type,
+            ana_type=type,
             version=version
         )
-
         logging.info('Server response:\n{}'.format(response))
 
     except Exception as e:
-        logging.info('Something went wrong when trying to connect to {0}'
-                     .format(ctx.obj.cap_api.server_url))
+        logging.info('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -112,19 +103,18 @@ def create(ctx, data, type, version):
     '--pid',
     '-p',
     help='Delete deposit with given pid',
-    default=None
+    default=None,
+    required=True
 )
 @click.pass_context
 def delete(ctx, pid):
     """Delete analysis with given pid."""
     try:
-        logging.info('Connecting to {0}'.format(ctx.obj.cap_api.server_url))
         response = ctx.obj.cap_api.delete(pid=pid)
         logging.info('Server response:\n{}'.format(response))
 
     except Exception as e:
-        logging.info('Something went wrong when trying to connect to {0}'
-                     .format(ctx.obj.cap_api))
+        logging.info('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -133,26 +123,26 @@ def delete(ctx, pid):
     '--pid',
     '-p',
     help='Update deposit with given pid',
-    default=None
+    default=None,
+    required=True
 )
 @click.option(
     '--data',
     '-d',
     help='Data to update.',
-    default=None
+    default=None,
+    required=True
 )
 @click.pass_context
 def update(ctx, pid, data):
     """Update analysis with given pid."""
     try:
-        logging.info('Connecting to {0}'.format(ctx.obj.cap_api.server_url))
         response = ctx.obj.cap_api.update(pid=pid, data=data)
         logging.info('Server response:\n{}'.format(
             json.dumps(response, indent=4)))
 
     except Exception as e:
-        logging.info('Something went wrong when trying to connect to {0}'
-                     .format(ctx.obj.cap_api))
+        logging.info('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -161,11 +151,9 @@ def update(ctx, pid, data):
 def types(ctx):
     """Retrieve all types of analyses."""
     try:
-        logging.info('Connecting to {0}'.format(ctx.obj.cap_api.server_url))
         response = ctx.obj.cap_api.types()
         logging.info('Available types:\n{}'.format('\n'.join(response)))
 
     except Exception as e:
-        logging.info('Something went wrong when trying to connect to {0}'
-                     .format(ctx.obj.cap_api))
+        logging.info('Unexpected error.')
         logging.debug(str(e))
