@@ -27,9 +27,9 @@ from __future__ import absolute_import, print_function
 
 # from cap_client.cap_api import CapAPI
 # from mock import patch
-
-
+#
+#
 # @patch('requests.get')
 # def test_ping(mocked_response):
 #     mocked_response.return_value.status_code = 200
-#     CapAPI('').ping()
+#     CapAPI().ping()

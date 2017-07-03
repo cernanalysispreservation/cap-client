@@ -48,8 +48,8 @@ class StatusCodeException(Exception):
     def __str__(self):
         """Print StatusCodeException details."""
         return "Something went wrong when trying to connect to {endpoint}\n" \
-        "Server replied with:" \
-        "{status}\n" \
-        "{data}\n".format(endpoint=self.endpoint,
-                          status=self.status_code,
-                          data=json.dumps(self.data, indent=4))
+               "Server replied with:" \
+               "{status}\n" \
+               "{data}\n".format(endpoint=self.endpoint,
+                                 status=self.status_code,
+                                 data=json.dumps(self.data, indent=4))

@@ -25,6 +25,7 @@
 """CAP API Class."""
 
 import json
+
 from urlparse import urljoin
 
 import requests
@@ -65,10 +66,6 @@ class CapAPI(object):
                               headers=headers,
                               **kwargs)
 
-        # TOFIX for now doesnt work with delete method - problem on server side
-        # if response.headers['Content-Type'] != 'application/json':
-        #     raise Exception('Returned content not a JSON')
-
         try:
             response_data = response.json()
         except ValueError:
@@ -79,11 +76,12 @@ class CapAPI(object):
                 'status': response.status_code,
                 'data': response_data,
             }
-        else:   
-            raise StatusCodeException(endpoint=endpoint,
-                                      expected_status_code=expected_status_code,
-                                      status_code=response.status_code,
-                                      data=response_data)
+        else:
+            raise StatusCodeException(
+                endpoint=endpoint,
+                expected_status_code=expected_status_code,
+                status_code=response.status_code,
+                data=response_data)
 
     def _get_available_types(self):
         """Get available analyses types from server."""
@@ -138,7 +136,7 @@ class CapAPI(object):
 
         self._make_request(url='deposit/validator',
                            method='post',
-                           data=json_data )
+                           data=json_data)
 
         return self._make_request(url=urljoin('deposits/', pid),
                                   data=json_data,

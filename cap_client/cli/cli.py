@@ -38,7 +38,6 @@ def ping(ctx):
         response = ctx.obj.cap_api.ping()
         logging.info('Server response:\n{}'.format(
             json.dumps(response, indent=4)))
-
     except Exception as e:
         logging.info('Unexpected error.')
         logging.debug(str(e))

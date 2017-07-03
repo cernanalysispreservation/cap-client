@@ -24,17 +24,12 @@
 
 """CAP Client module test cases."""
 
-
 from __future__ import absolute_import, print_function
 
-from click.testing import CliRunner
 
+def test_cli_ping(cli_run):
+    """Test ping method from cli."""
+    res = cli_run('ping')
 
-def test_basic_cli():
-    """Test version import."""
-    from cap_client.cli import cli
-
-    runner = CliRunner()
-
-    res = runner.invoke(cli)
+    assert 'Pong' in res.output
     assert res.exit_code == 0
