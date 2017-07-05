@@ -37,14 +37,14 @@ from cap_client.cli.cli import create, delete, get, ping, types, update
 class Config(object):
     """Configuration object to share across commands."""
 
-    def __init__(self, access_token=None, verbose=False):
+    def __init__(self, access_token=None, verbose=False, insecure=False):
         """Initialize config variables."""
         server = os.environ.get(
             'CAP_SERVER_URL', 'https://analysispreservation.cern.ch')
         apipath = os.environ.get('CAP_SERVER_API_PATH', 'api')
         access_token = access_token or os.environ.get('CAP_ACCESS_TOKEN', None)
 
-        self.cap_api = CapAPI(server, apipath, access_token)
+        self.cap_api = CapAPI(server, apipath, access_token, insecure)
         self.verbose = verbose
 
 
@@ -59,14 +59,21 @@ class Config(object):
     '--access_token',
     '-t',
     help='Sets users access token',)
+@click.option(
+    '--insecure',
+    '-i',
+    help='Insecure connection with server',
+    is_flag=True,
+    default=False,
+)
 @click.pass_context
-def cli(ctx, loglevel, access_token):
+def cli(ctx, loglevel, access_token, insecure):
     """CAP Client for interacting with CAP Server."""
     logging.basicConfig(
         format='[%(levelname)s] %(message)s',
         stream=sys.stderr,
         level=getattr(logging, loglevel.upper()))
-    ctx.obj = Config(access_token=access_token)
+    ctx.obj = Config(access_token=access_token, insecure=insecure)
 
 
 cli.add_command(ping)
