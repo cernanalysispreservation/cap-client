@@ -64,9 +64,9 @@ def get(ctx, pid):
 
 @click.command()
 @click.option(
-    '--data',
-    '-d',
-    help='Post data to api ',
+    '--file',
+    '-f',
+    help='File with JSON data',
     default=None,
     required=True,
 )
@@ -82,11 +82,11 @@ def get(ctx, pid):
     help='JSON schema version to api ',
 )
 @click.pass_context
-def create(ctx, data, type, version):
+def create(ctx, file, type, version):
     """Create an analysis."""
     try:
         response = ctx.obj.cap_api.create(
-            data=data,
+            filename=file,
             ana_type=type,
             version=version
         )
@@ -126,17 +126,17 @@ def delete(ctx, pid):
     required=True
 )
 @click.option(
-    '--data',
-    '-d',
-    help='Data to update.',
+    '--file',
+    '-f',
+    help='File with JSON data.',
     default=None,
     required=True
 )
 @click.pass_context
-def update(ctx, pid, data):
+def update(ctx, pid, file):
     """Update analysis with given pid."""
     try:
-        response = ctx.obj.cap_api.update(pid=pid, data=data)
+        response = ctx.obj.cap_api.update(pid=pid, filename=file)
         logging.info('Server response:\n{}'.format(
             json.dumps(response, indent=4)))
 

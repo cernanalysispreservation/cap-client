@@ -27,8 +27,10 @@
 from __future__ import absolute_import, print_function
 
 import pytest
-
 from click.testing import CliRunner
+from mock import DEFAULT, Mock, patch
+
+from cap_client.cap_api import CapAPI
 from cap_client.cli import cli
 
 
@@ -47,3 +49,69 @@ def cli_run():
         return runner.invoke(cli, params, **kwargs)
 
     yield run
+
+
+@pytest.yield_fixture
+def cap_api():
+    yield CapAPI('https://analysispreservation-dev.cern.ch',
+                 'api', 'accesstoken')
+
+
+@pytest.yield_fixture
+def mocked_cap_api(cap_api):
+    """ Mock all private methods in CapAPI class."""
+    with patch.multiple(cap_api,
+                        _get_available_types=DEFAULT,
+                        _make_request=DEFAULT) as mocks:
+        mocks['_get_available_types'].return_value = ['atlas-workflows',
+                                                      'alice-analysis']
+        mocks['_make_request'].return_value = {}
+
+        yield cap_api
+
+
+@pytest.yield_fixture
+def record_data():
+    data = {
+        "$schema": "https://analysispreservation.cern.ch/schemas/"
+        "deposits/records/cms-analysis-v0.0.1.json",
+        "basic_info": {
+            "analysis_number": "HIN-16-007",
+            "people_info": [
+                {
+                    "name": "John Doe"
+                },
+                {
+                    "name": "Albert Einstein"
+                }
+            ],
+        },
+    }
+
+    yield data
+
+
+@pytest.yield_fixture
+def user_data():
+    user_data = {
+        "collaborations": [
+            "ATLAS",
+            "ALICE"
+        ],
+        "current_experiment": "ATLAS",
+        "deposit_groups": [
+            {
+                "deposit_group": "atlas-workflows",
+                "description": "Create an ATLAS Workflow",
+                "name": "ATLAS Workflow"
+            },
+            {
+                "deposit_group": "alice-analysis",
+                "description": "Create an ALICE Analysis",
+                "name": "ALICE Analysis"
+            }
+        ],
+        "email": "my_mail@cern.ch",
+        "id": 1
+    }
+    yield user_data

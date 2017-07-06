@@ -26,10 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
-
-def test_cli_ping(cli_run):
-    """Test ping method from cli."""
-    res = cli_run('ping')
-
-    assert 'Pong' in res.output
-    assert res.exit_code == 0
+# def test_cli_ping(cli_run):
+#     """Test ping method from cli."""
+#     res = cli_run('ping')
+#     assert 'Pong' in res.output
+#     assert res.exit_code == 0

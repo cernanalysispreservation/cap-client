@@ -98,7 +98,7 @@ class CapAPI(object):
         """Retrieve one or all analyses from a user."""
         return self._make_request(url=urljoin('deposits/', pid))
 
-    def create(self, data=None, ana_type=None, version='0.0.1'):
+    def create(self, filename='', ana_type=None, version='0.0.1'):
         """Create an analysis."""
         types = self._get_available_types()
         if ana_type not in types:
@@ -106,7 +106,7 @@ class CapAPI(object):
                 '\n'.join(types)
             )
 
-        with open(data) as fp:
+        with open(filename) as fp:
             data = json.load(fp)
             data['$ana_type'] = ana_type
             json_data = json.dumps(data)
@@ -128,9 +128,9 @@ class CapAPI(object):
                                   method='delete',
                                   expected_status_code=204)
 
-    def update(self, pid=None, data=None):
-        """Update an analysis by given pid and data."""
-        with open(data) as fp:
+    def update(self, pid=None, filename=''):
+        """Update an analysis by given pid and JSON data from file."""
+        with open(filename) as fp:
             data = json.load(fp)
             json_data = json.dumps(data)
 
