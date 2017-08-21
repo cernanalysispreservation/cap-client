@@ -31,7 +31,7 @@ import os
 import sys
 
 from cap_client.cap_api import CapAPI
-from cap_client.cli.cli import create, delete, get, ping, types, update
+from cap_client.cli.cli import create, delete, get, ping, types, update, patch
 
 
 class Config(object):
@@ -81,4 +81,5 @@ cli.add_command(get)
 cli.add_command(create)
 cli.add_command(delete)
 cli.add_command(update)
+cli.add_command(patch)
 cli.add_command(types)

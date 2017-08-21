@@ -53,12 +53,12 @@ class CapAPI(object):
                       url=None,
                       method='get',
                       expected_status_code=200,
+                      headers={'Content-type': 'application/json'},
                       **kwargs):
 
         endpoint = self._construct_endpoint(url=url)
 
         params = {'access_token': self.access_token}
-        headers = {'Content-type': 'application/json'}
         method_obj = getattr(requests, method)
         response = method_obj(url=endpoint,
                               verify=not self.insecure,
@@ -141,6 +141,20 @@ class CapAPI(object):
         return self._make_request(url=urljoin('deposits/', pid),
                                   data=json_data,
                                   method='put',
+                                  expected_status_code=200)
+
+    def patch(self, pid=None, filename=''):
+        """Patch an analysis by given pid and JSON-patch data from file."""
+        with open(filename) as fp:
+            data = json.load(fp)
+            json_data = json.dumps(data)
+
+        headers = {'Content-Type': 'application/json-patch+json'}
+
+        return self._make_request(url=urljoin('deposits/', pid),
+                                  data=json_data,
+                                  method='patch',
+                                  headers=headers,
                                   expected_status_code=200)
 
     def types(self):

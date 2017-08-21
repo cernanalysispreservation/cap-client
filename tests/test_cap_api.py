@@ -194,3 +194,14 @@ def test_update_method_when_no_file_with_data_given(mocked_cap_api):
 def test_update_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
     with raises(ValueError):
         resp = mocked_cap_api.update(filename='file')
+
+
+def test_patch_method_when_no_file_with_data_given(mocked_cap_api):
+    with raises(IOError):
+        resp = mocked_cap_api.patch(pid='some_pid')
+
+
+@patch('__builtin__.open', new_callable=mock_open, read_data='{,}]')
+def test_patch_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
+    with raises(ValueError):
+        resp = mocked_cap_api.patch(filename='file')

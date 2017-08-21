@@ -1,3 +1,2 @@
 [run]
 source = cap-client
-omit = cap_client/cli/__init__.py
