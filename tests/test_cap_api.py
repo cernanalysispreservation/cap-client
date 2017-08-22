@@ -122,6 +122,62 @@ def test_get_available_types_when_no_available_types(mock_requests, cap_api,
 
 
 @patch('requests.get')
+def test_get_method_with_given_pid(mock_requests, cap_api, record_data):
+    mock_requests.return_value.status_code = 200
+    mock_requests.return_value.json.return_value = record_data
+
+    resp = cap_api.get('some_pid')
+
+    assert resp['data'] == record_data
+
+
+@patch('requests.get')
+def test_ping_method(mock_requests, cap_api):
+    mock_requests.return_value.status_code = 200
+    mock_requests.return_value.json.return_value = 'Pong'
+
+    resp = cap_api.ping()
+
+    assert resp['data'] == 'Pong'
+
+
+@patch('requests.delete')
+def test_delete_method_with_given_pid(mock_requests, cap_api, record_data):
+    mock_requests.return_value.status_code = 204
+    mock_requests.return_value.json.return_value = ''
+
+    resp = cap_api.delete('some_pid')
+
+    assert resp['status'] == 204
+    assert resp['data'] == ''
+
+
+@patch('requests.get')
+def test_types(mock_requests, cap_api, mocked_cap_api):
+    mock_requests.return_value.status_code = 200
+    mock_requests.return_value.json.return_value = ['atlas-workflows',
+                                                    'alice-analysis']
+
+    resp = cap_api.types()
+
+    assert resp == ['atlas-workflows', 'alice-analysis']
+
+
+# @patch('requests.patch')
+# @patch('__builtin__.open', new_callable=mock_open, read_data='[]')
+# def test_patch_with_given_pid(mock_open, mock_requests,
+# cap_api, mocked_cap_api, record_data):
+#     mock_requests.return_value.status_code = 200
+#     mock_requests.return_value.json.return_value = record_data
+
+#     resp = cap_api.patch('some_pid', filename='test')
+
+#     assert resp['status'] == 200
+#     assert resp == record_data
+
+
+# Public methods
+@patch('requests.get')
 def test_get_available_types_returns_all_available_types(mock_requests,
                                                          cap_api, user_data):
     mock_requests.return_value.status_code = 200
