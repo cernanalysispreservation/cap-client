@@ -216,8 +216,7 @@ def test_create_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
                                      ana_type='atlas-workflows')
 
 
-def test_create_method_sets_ana_type_in_sent_data(mocked_cap_api, record_data,
-                                                  user_data):
+def test_create_method_sets_ana_type_in_sent_data(mocked_cap_api, record_data):
     json_data = json.dumps(record_data)
     with patch('__builtin__.open', new_callable=mock_open,
                read_data=json_data):
@@ -229,8 +228,8 @@ def test_create_method_sets_ana_type_in_sent_data(mocked_cap_api, record_data,
         assert data['$ana_type'] == 'atlas-workflows'
 
 
-def test_create_method_when_validate_failed_raises_exception(mocked_cap_api, record_data,  # noqa
-                                                             user_data):
+def test_create_method_when_validate_failed_raises_exception(mocked_cap_api,
+                                                             record_data):
     json_data = json.dumps(record_data)
     with patch('__builtin__.open', new_callable=mock_open,
                read_data=json_data):
@@ -250,6 +249,54 @@ def test_update_method_when_no_file_with_data_given(mocked_cap_api):
 def test_update_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
     with raises(ValueError):
         resp = mocked_cap_api.update(filename='file')
+
+
+def test_update_method_when_validate_failed_raises_exception(mocked_cap_api,
+                                                             record_data):
+    json_data = json.dumps(record_data)
+    with patch('__builtin__.open', new_callable=mock_open,
+               read_data=json_data):
+        mocked_cap_api._make_request.side_effect = [StatusCodeException(),
+                                                    None]
+        with raises(StatusCodeException):
+            resp = mocked_cap_api.update(filename='file',
+                                         pid='some_pid')
+
+
+def test_update_method_when_success_returns_updated_data(mocked_cap_api,
+                                                         record_data):
+    json_data = json.dumps(record_data)
+
+    with patch('__builtin__.open', new_callable=mock_open,
+               read_data=json_data):
+        response = {'status': 200, 'data': record_data}
+        mocked_cap_api._make_request.side_effect = [None,
+                                                    response]
+
+        resp = mocked_cap_api.update(filename='file',
+                                     pid='some_pid')
+
+        assert resp['data'] == record_data
+
+
+def test_patch_method(mocked_cap_api, record_data):
+    json_data = json.dumps(record_data)
+
+    with patch('__builtin__.open', new_callable=mock_open,
+               read_data=json_data):
+        response = {'status': 200, 'data': record_data}
+        mocked_cap_api._make_request.return_value = response
+
+        resp = mocked_cap_api.patch(filename='file',
+                                    pid='some_pid')
+
+        named_args = mocked_cap_api._make_request.call_args[1]
+
+        assert resp['data'] == record_data
+        assert named_args['method'] == 'patch'
+        assert named_args['headers'] == {
+            'Content-Type': 'application/json-patch+json'
+        }
 
 
 def test_patch_method_when_no_file_with_data_given(mocked_cap_api):

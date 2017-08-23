@@ -140,8 +140,7 @@ class CapAPI(object):
 
         return self._make_request(url=urljoin('deposits/', pid),
                                   data=json_data,
-                                  method='put',
-                                  expected_status_code=200)
+                                  method='put')
 
     def patch(self, pid=None, filename=''):
         """Patch an analysis by given pid and JSON-patch data from file."""
@@ -154,8 +153,7 @@ class CapAPI(object):
         return self._make_request(url=urljoin('deposits/', pid),
                                   data=json_data,
                                   method='patch',
-                                  headers=headers,
-                                  expected_status_code=200)
+                                  headers=headers)
 
     def types(self):
         """Get available analyses types."""
