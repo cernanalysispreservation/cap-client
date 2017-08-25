@@ -35,13 +35,12 @@ from errors import StatusCodeException
 class CapAPI(object):
     """CAP API client code."""
 
-    def __init__(self, server_url, apipath, access_token, insecure=False):
+    def __init__(self, server_url, apipath, access_token):
         """Initialize CapAPI object."""
         self.server_url = server_url
         self.apipath = apipath
         self.access_token = access_token
         self.endpoint = '{server_url}/{apipath}/{url}'
-        self.insecure = insecure
 
     def _construct_endpoint(self, url=None):
         """Construct api endpoint."""
@@ -61,7 +60,7 @@ class CapAPI(object):
         params = {'access_token': self.access_token}
         method_obj = getattr(requests, method)
         response = method_obj(url=endpoint,
-                              verify=not self.insecure,
+                              verify=False,
                               params=params,
                               headers=headers,
                               **kwargs)

@@ -38,7 +38,6 @@ from cap_client.errors import StatusCodeException
 def test_make_request_send_request_with_correct_params(mock_requests,
                                                        cap_api, record_data):
     cap_api.access_token = 'random_access_token'
-    cap_api.insecure = True
     endpoint = 'endpoint'
     method = 'delete'
     expected_status = 204
