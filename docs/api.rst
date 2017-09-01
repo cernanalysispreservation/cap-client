@@ -3,6 +3,28 @@ API
 
 .. _types:
 
+Retrieve current user information
+----------
+
+.. code-block:: console
+
+	$ cap-client me
+
+	{
+        "collaborations": [
+        "ATLAS",
+        "LHCb",
+        "CMS",
+        "ALICE"
+    ],
+    "id": 1,
+    "email": "user@cern.ch",
+    }
+
+
+
+
+
 Get all types of analyses available
 ----------
 
@@ -35,7 +57,7 @@ You need to specify
 	E.g $ cap-client get --pid 883090d3c1784aeabe9e23412a81239e
 
 	{   
-		"pid": "883090d3c1784aeabe9e23412a81239e",          
+		"pid": "883090d3c1784aeabe9e23412a81239e",
 	    "basic_info": {
 	        "abstract": "Example abstract",
 	        "people_info": [
@@ -76,7 +98,7 @@ cms-questionnaire.
 	{
 		'status': 200, 
 		'data': {   
-			"pid": "883090d3c1784aeabe9e23412a81239e",          
+			"pid": "883090d3c1784aeabe9e23412a81239e",
 		    "basic_info": {
 		        "abstract": "Example abstract",
 		        "people_info": [
@@ -132,7 +154,7 @@ You can update an existing analysis by specifing
 		{
 		 	'status': 200, 
 		 	'data': {   
-				"pid": "883090d3c1784aeabe9e23412a81239e",          
+				"pid": "883090d3c1784aeabe9e23412a81239e",
 			    "basic_info": {
 			        "abstract": "Example abstract",
 			        "people_info": [
@@ -170,7 +192,7 @@ Example changes in JSON patch format:
 	{
 	 	'status': 200, 
 	 	'data': {   
-			"pid": "883090d3c1784aeabe9e23412a81239e",          
+			"pid": "883090d3c1784aeabe9e23412a81239e",
 		    "basic_info": {
 		        "abstract": "Example abstract",
 		        "people_info": [
@@ -185,4 +207,25 @@ Example changes in JSON patch format:
 		    }
 		}
 	}
+
+
+Metadata
+--------
+You can get existing analyses metadata only if you have at least read access to it.
+
+You need to specify
+
+	--pid  the PID of an analysis.
+
+.. code-block:: console
+
+    $ cap-client metadata get --pid/-p <existing pid>
+
+    E.g $ cap-client metadata get --pid 4b2924db6c32467bb2de6221f4faf167
+
+    {
+        "$ana_type": "lhcb",
+        "$schema": "https://macbook-trzcinska.cern.ch:5000/schemas/deposits/records/lhcb-v0.0.1.json",
+    }
+
 

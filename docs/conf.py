@@ -46,7 +46,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'cap-client'
-copyright = u'2017, Ioannis Tsanaktsidis, Ania Trzcinska'
+copyright = u'2017, CERN'
 author = u'Ioannis Tsanaktsidis, Ania Trzcinska'
 
 # The version info for the project you're documenting, acts as replacement for
