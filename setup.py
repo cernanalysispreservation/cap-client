@@ -67,6 +67,7 @@ setup_requires = [
 
 install_requires = [
     'click>=6.7',
+    'requests>=2.17',
 ]
 
 packages = find_packages()
