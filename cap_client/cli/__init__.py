@@ -31,7 +31,8 @@ import os
 import sys
 
 from cap_client.cap_api import CapAPI
-from cap_client.cli.cli import create, delete, get, ping, types, update, patch
+from cap_client.cli.cli import (create, delete, get, ping,
+                                types, update, patch, upload)
 
 
 class Config(object):
@@ -39,12 +40,12 @@ class Config(object):
 
     def __init__(self, access_token=None, verbose=False):
         """Initialize config variables."""
-        server = os.environ.get(
+        self.server = os.environ.get(
             'CAP_SERVER_URL', 'https://analysispreservation.cern.ch')
         apipath = os.environ.get('CAP_SERVER_API_PATH', 'api')
         access_token = access_token or os.environ.get('CAP_ACCESS_TOKEN', None)
 
-        self.cap_api = CapAPI(server, apipath, access_token)
+        self.cap_api = CapAPI(self.server, apipath, access_token)
         self.verbose = verbose
 
 
@@ -76,3 +77,4 @@ cli.add_command(delete)
 cli.add_command(update)
 cli.add_command(patch)
 cli.add_command(types)
+cli.add_command(upload)

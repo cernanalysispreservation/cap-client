@@ -149,6 +149,40 @@ def update(ctx, pid, file):
 @click.option(
     '--pid',
     '-p',
+    help='Upload file to deposit with given pid',
+    default=None,
+    required=True
+)
+@click.argument('file', type=click.Path(exists=True))
+@click.option(
+    '--output-file',
+    '-o',
+    help='Filename to be given to uploaded file',
+    default=None,
+)
+@click.option(
+    '--yes',
+    is_flag=True,
+    help="Bypasses prompts..Say YES to everything"
+)
+@click.pass_context
+def upload(ctx, pid, file, yes, output_file=None):
+    """Update analysis with given pid."""
+    try:
+        response = ctx.obj.cap_api.upload(
+            pid=pid, filepath=file, output_filename=output_file, yes=yes)
+        logging.info('Server response:\n{}'.format(
+            json.dumps(response, indent=4)))
+
+    except Exception as e:
+        logging.info('Unexpected error.')
+        logging.debug(str(e))
+
+
+@click.command()
+@click.option(
+    '--pid',
+    '-p',
     help='Patch deposit with given pid',
     default=None,
     required=True

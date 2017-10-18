@@ -24,11 +24,15 @@
 
 """CAP API Class."""
 
+import click
+import datetime
 import json
-from urlparse import urljoin
-
+import os
 import requests
 
+from urlparse import urljoin
+
+from utils import make_tarfile
 from errors import StatusCodeException
 
 
@@ -153,6 +157,49 @@ class CapAPI(object):
                                   data=json_data,
                                   method='patch',
                                   headers=headers)
+
+    def upload(self, pid=None, filepath=None, yes=False, output_filename=None):
+        """Upload file or direcotory to deposit by given pid"""
+        try:
+            deposit = self.get(pid)
+        except Exception as e:
+            return {"error": e}
+
+        bucket_url = deposit.get("data", {}).get(
+            "links", {}).get("bucket", None)
+        bucket_id = bucket_url.split("/")[-1:][0]
+
+        files = None
+
+        # Check if filepath is file or DIR
+        if os.path.isdir(filepath):
+            # If it's a DIR alert that it is going to be tarballed
+            # and uploaded
+            if yes or \
+               click.confirm('You are trying to upload a directory.\n'
+                             'Should we upload a tarball of the directory?'):
+                if output_filename is None:
+                    output_filename = "{pid}_{bucket_id}_{time}.tar.gz".format(
+                        pid=pid,
+                        bucket_id=bucket_id,
+                        time=datetime.datetime
+                        .now().strftime('%b-%d-%I%M%p-%G')
+                    )
+                make_tarfile(output_filename, filepath)
+                filepath = output_filename
+        else:
+            if output_filename is None:
+                output_filename = os.path.basename(filepath)
+
+        # data = {'filename': output_filename}
+
+        return self._make_request(
+            url="files/{bucket_id}/{filename}".format(
+                bucket_id=bucket_id,
+                filename=output_filename),
+            data=open(filepath, 'rb'),
+            method='put',
+        )
 
     def types(self):
         """Get available analyses types."""
