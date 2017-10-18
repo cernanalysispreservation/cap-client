@@ -27,10 +27,9 @@ from __future__ import absolute_import, print_function
 
 import json
 
-from mock import DEFAULT, Mock, mock_open, patch
+from mock import mock_open, patch
 from pytest import raises
 
-from cap_client.cap_api import CapAPI
 from cap_client.errors import StatusCodeException
 
 
@@ -43,10 +42,10 @@ def test_make_request_send_request_with_correct_params(mock_requests,
     expected_status = 204
     mock_requests.return_value.status_code = expected_status
 
-    resp = cap_api._make_request(url=endpoint,
-                                 expected_status_code=expected_status,
-                                 method=method,
-                                 data=record_data)
+    cap_api._make_request(url=endpoint,
+                          expected_status_code=expected_status,
+                          method=method,
+                          data=record_data)
 
     # get named args from requests.post call
     named_args = mock_requests.call_args[1]
@@ -64,7 +63,7 @@ def test_make_request_when_request_successful(mock_requests, cap_api,
     mock_requests.return_value.json.return_value = record_data
 
     resp = cap_api._make_request(url='endpoint',
-                                     expected_status_code=200)
+                                 expected_status_code=200)
 
     assert mock_requests.called
     assert resp['status'] == 200
@@ -76,17 +75,17 @@ def test_make_request_when_request_fails(mock_requests, cap_api):
     mock_requests.return_value.status_code = 400
 
     with raises(StatusCodeException):
-        resp = cap_api._make_request(url='endpoint',
-                                         expected_status_code=200)
+        cap_api._make_request(url='endpoint',
+                              expected_status_code=200)
 
 
 @patch('requests.post')
 def test_make_request_when_sending_record_data(mock_requests, cap_api,
                                                record_data):
     with raises(StatusCodeException):
-        resp = cap_api._make_request(url='endpoint',
-                                         method='post',
-                                         data=record_data)
+        cap_api._make_request(url='endpoint',
+                              method='post',
+                              data=record_data)
 
     # get named args from requests.post call
     named_args = mock_requests.call_args[1]
@@ -194,19 +193,6 @@ def test_types(mock_requests, cap_api, mocked_cap_api):
     assert resp == ['atlas-workflows', 'alice-analysis']
 
 
-# @patch('requests.patch')
-# @patch('__builtin__.open', new_callable=mock_open, read_data='[]')
-# def test_patch_with_given_pid(mock_open, mock_requests,
-# cap_api, mocked_cap_api, record_data):
-#     mock_requests.return_value.status_code = 200
-#     mock_requests.return_value.json.return_value = record_data
-
-#     resp = cap_api.patch('some_pid', filename='test')
-
-#     assert resp['status'] == 200
-#     assert resp == record_data
-
-
 # Public methods
 @patch('requests.get')
 def test_get_available_types_returns_all_available_types(mock_requests,
@@ -237,22 +223,22 @@ def test_create_method_when_type_given_not_in_available_options(mocked_cap_api):
 
 def test_create_method_when_no_file_with_data_given(mocked_cap_api):
     with raises(IOError):
-        resp = mocked_cap_api.create(ana_type='atlas-workflows')
+        mocked_cap_api.create(ana_type='atlas-workflows')
 
 
 @patch('__builtin__.open', new_callable=mock_open, read_data='{,}]')
 def test_create_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
     with raises(ValueError):
-        resp = mocked_cap_api.create(filename='file',
-                                     ana_type='atlas-workflows')
+        mocked_cap_api.create(filename='file',
+                              ana_type='atlas-workflows')
 
 
 def test_create_method_sets_ana_type_in_sent_data(mocked_cap_api, record_data):
     json_data = json.dumps(record_data)
     with patch('__builtin__.open', new_callable=mock_open,
                read_data=json_data):
-        resp = mocked_cap_api.create(filename='file',
-                                     ana_type='atlas-workflows')
+        mocked_cap_api.create(filename='file',
+                              ana_type='atlas-workflows')
         named_args = mocked_cap_api._make_request.call_args[1]
         data = json.loads(named_args['data'])
 
@@ -267,19 +253,19 @@ def test_create_method_when_validate_failed_raises_exception(mocked_cap_api,
         mocked_cap_api._make_request.side_effect = [StatusCodeException(),
                                                     None]
         with raises(StatusCodeException):
-            resp = mocked_cap_api.create(filename='file',
-                                         ana_type='atlas-workflows')
+            mocked_cap_api.create(filename='file',
+                                  ana_type='atlas-workflows')
 
 
 def test_update_method_when_no_file_with_data_given(mocked_cap_api):
     with raises(IOError):
-        resp = mocked_cap_api.update(pid='some_pid')
+        mocked_cap_api.update(pid='some_pid')
 
 
 @patch('__builtin__.open', new_callable=mock_open, read_data='{,}]')
 def test_update_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
     with raises(ValueError):
-        resp = mocked_cap_api.update(filename='file')
+        mocked_cap_api.update(filename='file')
 
 
 def test_update_method_when_validate_failed_raises_exception(mocked_cap_api,
@@ -290,8 +276,8 @@ def test_update_method_when_validate_failed_raises_exception(mocked_cap_api,
         mocked_cap_api._make_request.side_effect = [StatusCodeException(),
                                                     None]
         with raises(StatusCodeException):
-            resp = mocked_cap_api.update(filename='file',
-                                         pid='some_pid')
+            mocked_cap_api.update(filename='file',
+                                  pid='some_pid')
 
 
 def test_update_method_when_success_returns_updated_data(mocked_cap_api,
@@ -332,10 +318,51 @@ def test_patch_method(mocked_cap_api, record_data):
 
 def test_patch_method_when_no_file_with_data_given(mocked_cap_api):
     with raises(IOError):
-        resp = mocked_cap_api.patch(pid='some_pid')
+        mocked_cap_api.patch(pid='some_pid')
 
 
 @patch('__builtin__.open', new_callable=mock_open, read_data='{,}]')
 def test_patch_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
     with raises(ValueError):
-        resp = mocked_cap_api.patch(filename='file')
+        mocked_cap_api.patch(filename='file')
+
+
+def test_set_when_setting_string_field(mocked_cap_api, record_data):
+    response = {'status': 200, 'data': record_data}
+    mocked_cap_api._make_request.return_value = response
+
+    mocked_cap_api.set('field_name.nested.nested2', 'field_val', 'some_pid')
+
+    named_args = mocked_cap_api._make_request.call_args[1]
+    sent_json = json.loads(named_args['data'])[0]
+
+    assert sent_json['op'] == 'add'
+    assert sent_json['path'] == '/field_name/nested/nested2'
+    assert sent_json['value'] == 'field_val'
+
+
+def test_set_when_appending_string_field_to_array(mocked_cap_api, record_data):
+    response = {'status': 200, 'data': record_data}
+    mocked_cap_api._make_request.return_value = response
+
+    mocked_cap_api.set('field_name.nested.nested2', 'field_val', 'some_pid',
+                       append=True)
+
+    named_args = mocked_cap_api._make_request.call_args[1]
+    sent_json = json.loads(named_args['data'])[0]
+
+    assert sent_json['op'] == 'add'
+    assert sent_json['path'] == '/field_name/nested/nested2/-'
+    assert sent_json['value'] == 'field_val'
+
+
+# def test_set_when_setting_a_file(cap_api, record_data):
+#     response = {'status': 200, 'data': record_data}
+#     mocked_cap_api._make_request.return_value = response
+#     mocked_cap_api.upload.return_value = response
+#                        filepath='file_path')
+#     named_args = mocked_cap_api._make_request.call_args[1]
+#     sent_json = json.loads(named_args['data'])[0]
+#     assert sent_json['op'] == 'add'
+#     assert sent_json['path'] == '/field_name/nested/nested2/-'
+#     assert sent_json['value'] == 'field_val'

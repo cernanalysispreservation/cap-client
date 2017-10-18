@@ -3,3 +3,4 @@ source = cap-client
 omit = cap_client/cli/__init__.py
 	   cap_client/errors.py
 	   cap_client/cli/cli.py
+	   cap_client/cli/metadata_cli.py

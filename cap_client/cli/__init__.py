@@ -31,9 +31,9 @@ import os
 import sys
 
 from cap_client.cap_api import CapAPI
-
 from cap_client.cli.cli import (create, delete, get, get_metadata, me, ping,
                                 types, update, patch, upload)
+from cap_client.cli.metadata_cli import metadata
 
 
 class Config(object):
@@ -81,3 +81,4 @@ cli.add_command(update)
 cli.add_command(patch)
 cli.add_command(types)
 cli.add_command(upload)
+cli.add_command(metadata)

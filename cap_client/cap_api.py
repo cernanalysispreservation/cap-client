@@ -24,17 +24,17 @@
 
 """CAP API Class."""
 
-import click
 import datetime
 import json
 import os
 import re
 from urlparse import urljoin
 
+import click
 import requests
 
-from utils import make_tarfile
 from errors import StatusCodeException
+from utils import make_tarfile
 
 
 class CapAPI(object):
@@ -117,6 +117,30 @@ class CapAPI(object):
             return dct
         else:
             raise KeyError(str(field) + " not found.")
+
+    def set(self, field_name, field_val, pid, filepath=None, append=False):
+        """Edit analysis field value."""
+        try:
+            val = json.loads(field_val)
+        except ValueError:
+            val = field_val
+
+        json_data = [{
+            "op": "add",
+            "path": '/{}{}'.format(field_name.replace('.', '/'),
+                                   '/-' if append else ''),
+            "value": val,
+        }]
+
+        if filepath:
+            self.upload(pid, filepath, field_val)
+
+        headers = {'Content-Type': 'application/json-patch+json'}
+
+        return self._make_request(url=urljoin('deposits/', pid),
+                                  data=json.dumps(json_data),
+                                  method='patch',
+                                  headers=headers)
 
     def create(self, filename='', ana_type=None, version='0.0.1'):
         """Create an analysis."""
