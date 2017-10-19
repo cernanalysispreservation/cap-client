@@ -28,9 +28,10 @@ import click
 import datetime
 import json
 import os
-import requests
-
+import re
 from urlparse import urljoin
+
+import requests
 
 from utils import make_tarfile
 from errors import StatusCodeException
@@ -100,6 +101,18 @@ class CapAPI(object):
     def get(self, pid=None):
         """Retrieve one or all analyses from a user."""
         return self._make_request(url=urljoin('deposits/', pid))
+
+    def get_metadata_field(self, pid, field=None):
+        dct = self._make_request(url=urljoin('deposits/', pid))
+        dct = dct["data"]["metadata"]
+        if not field:
+            return dct
+        for i, p in re.findall(r'(\d+)|(\w+)', field):
+            dct = dct[p or int(i)]
+        if dct:
+            return dct
+        else:
+            raise KeyError(str(field) + " not found.")
 
     def create(self, filename='', ana_type=None, version='0.0.1'):
         """Create an analysis."""

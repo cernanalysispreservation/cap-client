@@ -73,19 +73,22 @@ def mocked_cap_api(cap_api):
 @pytest.yield_fixture
 def record_data():
     data = {
-        "$schema": "https://analysispreservation.cern.ch/schemas/"
-        "deposits/records/cms-analysis-v0.0.1.json",
-        "basic_info": {
-            "analysis_number": "HIN-16-007",
-            "people_info": [
-                {
-                    "name": "John Doe"
-                },
-                {
-                    "name": "Albert Einstein"
-                }
-            ],
-        },
+        "metadata": {
+            "$schema": "https://analysispreservation.cern.ch/schemas/"
+            "deposits/records/cms-analysis-v0.0.1.json",
+            "basic_info": {
+                "analysis_number": "HIN-16-007",
+                "people_info": [
+                    {
+                        "name": "John Doe"
+                    },
+                    {
+                        "name": "Albert Einstein"
+                    }
+                ],
+            },
+            "general_title": "General relativity",
+        }
     }
 
     yield data
