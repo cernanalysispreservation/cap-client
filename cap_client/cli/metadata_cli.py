@@ -96,3 +96,29 @@ def append(ctx, field_name, field_value, pid, file):
     except Exception as e:
         logging.info('Unexpected error.')
         logging.debug(str(e))
+
+
+@metadata.command()
+@click.argument(
+    'field',
+    default=None,
+    required=False,
+)
+@click.option(
+    '--pid',
+    '-p',
+    help='Get metadata of the deposit with given pid',
+    default=None,
+    required=True,
+)
+@click.pass_context
+def get(ctx, field, pid):
+    """Retrieve one or more fields in analysis metadata."""
+    try:
+        response = ctx.obj.cap_api.get_metadata(pid=pid, field=field)
+        logging.info('Server response:\n{}'.format(
+            json.dumps(response, indent=4)))
+
+    except Exception as e:
+        logging.info('Unexpected error.')
+        logging.debug(str(e))

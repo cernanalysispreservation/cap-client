@@ -31,7 +31,7 @@ import os
 import sys
 
 from cap_client.cap_api import CapAPI
-from cap_client.cli.cli import (create, delete, get, get_metadata, me, ping,
+from cap_client.cli.cli import (create, delete, get, me, ping,
                                 types, update, patch, upload)
 from cap_client.cli.metadata_cli import metadata
 
@@ -73,7 +73,6 @@ def cli(ctx, loglevel, access_token):
 
 cli.add_command(ping)
 cli.add_command(get)
-cli.add_command(get_metadata)
 cli.add_command(me)
 cli.add_command(create)
 cli.add_command(delete)

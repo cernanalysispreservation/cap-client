@@ -130,35 +130,35 @@ def test_get_method_with_given_pid(mock_requests, cap_api, record_data):
 
 
 @patch('requests.get')
-def test_get_metadata_field_when_field_unspecified(mock_requests, cap_api,
-                                                   record_data):
+def test_get_metadata_when_field_unspecified(mock_requests, cap_api,
+                                             record_data):
     mock_requests.return_value.status_code = 200
     mock_requests.return_value.json.return_value = record_data
 
-    resp = cap_api.get_metadata_field('some_pid')
+    resp = cap_api.get_metadata('some_pid')
 
     assert resp == record_data['metadata']
 
 
 @patch('requests.get')
-def test_get_metadata_field_when_field_specified(mock_requests, cap_api,
-                                                 record_data):
+def test_get_metadata_when_field_specified(mock_requests, cap_api,
+                                           record_data):
     mock_requests.return_value.status_code = 200
     mock_requests.return_value.json.return_value = record_data
 
-    resp = cap_api.get_metadata_field('some_pid', 'general_title')
+    resp = cap_api.get_metadata('some_pid', 'general_title')
 
     assert resp == record_data['metadata']['general_title']
 
 
 @patch('requests.get')
-def test_get_metadata_field_when_field_is_incorrect(mock_requests, cap_api,
-                                                    record_data):
+def test_get_metadata_when_field_is_incorrect(mock_requests, cap_api,
+                                              record_data):
     mock_requests.return_value.status_code = 200
     mock_requests.return_value.json.return_value = record_data
 
     with raises(KeyError):
-        cap_api.get_metadata_field('some_pid', 'title')
+        cap_api.get_metadata('some_pid', 'title')
 
 
 @patch('requests.get')

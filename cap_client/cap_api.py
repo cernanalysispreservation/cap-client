@@ -106,7 +106,7 @@ class CapAPI(object):
         """Retrieve one or all analyses from a user."""
         return self._make_request(url=urljoin('deposits/', pid))
 
-    def get_metadata_field(self, pid, field=None):
+    def get_metadata(self, pid, field=None):
         dct = self._make_request(url=urljoin('deposits/', pid))
         dct = dct["data"]["metadata"]
         if not field:
@@ -209,8 +209,6 @@ class CapAPI(object):
         bucket_url = deposit.get("data", {}).get(
             "links", {}).get("bucket", None)
         bucket_id = bucket_url.split("/")[-1:][0]
-
-        files = None
 
         # Check if filepath is file or DIR
         if os.path.isdir(filepath):
