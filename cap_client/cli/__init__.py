@@ -31,8 +31,9 @@ import os
 import sys
 
 from cap_client.cap_api import CapAPI
-from cap_client.cli.cli import create, delete, get, get_metadata, \
-                               ping, types, update, patch, upload
+
+from cap_client.cli.cli import (create, delete, get, get_metadata, me, ping,
+                                types, update, patch, upload)
 
 
 class Config(object):
@@ -59,7 +60,7 @@ class Config(object):
 @click.option(
     '--access_token',
     '-t',
-    help='Sets users access token',)
+    help='Sets users access token', )
 @click.pass_context
 def cli(ctx, loglevel, access_token):
     """CAP Client for interacting with CAP Server."""
@@ -73,6 +74,7 @@ def cli(ctx, loglevel, access_token):
 cli.add_command(ping)
 cli.add_command(get)
 cli.add_command(get_metadata)
+cli.add_command(me)
 cli.add_command(create)
 cli.add_command(delete)
 cli.add_command(update)

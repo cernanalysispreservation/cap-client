@@ -44,6 +44,19 @@ def ping(ctx):
 
 
 @click.command()
+@click.pass_context
+def me(ctx):
+    """Retrieve user info."""
+    try:
+        response = ctx.obj.cap_api.me()
+        logging.info('Server response:\n{}'.format(
+            json.dumps(response, indent=4)))
+    except Exception as e:
+        logging.info('Unexpected error.')
+        logging.debug(str(e))
+
+
+@click.command()
 @click.option(
     '--pid',
     '-p',

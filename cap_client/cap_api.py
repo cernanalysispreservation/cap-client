@@ -98,6 +98,10 @@ class CapAPI(object):
         """Health check CAP Server."""
         return self._make_request(url='ping')
 
+    def me(self):
+        """Retrieve user info."""
+        return self._make_request(url='me')
+
     def get(self, pid=None):
         """Retrieve one or all analyses from a user."""
         return self._make_request(url=urljoin('deposits/', pid))
@@ -189,14 +193,15 @@ class CapAPI(object):
             # If it's a DIR alert that it is going to be tarballed
             # and uploaded
             if yes or \
-               click.confirm('You are trying to upload a directory.\n'
-                             'Should we upload a tarball of the directory?'):
+                    click.confirm('You are trying to upload a directory.\n'
+                                  'Should we upload '
+                                  'a tarball of the directory?'):
                 if output_filename is None:
                     output_filename = "{pid}_{bucket_id}_{time}.tar.gz".format(
                         pid=pid,
                         bucket_id=bucket_id,
-                        time=datetime.datetime
-                        .now().strftime('%b-%d-%I%M%p-%G')
+                        time=datetime.datetime.now().strftime(
+                            '%b-%d-%I%M%p-%G')
                     )
                 make_tarfile(output_filename, filepath)
                 filepath = output_filename
