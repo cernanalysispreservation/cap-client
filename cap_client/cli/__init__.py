@@ -52,22 +52,35 @@ class Config(object):
 
 @click.group()
 @click.option(
+        '--verbose',
+        '-v',
+        help='Verbose output',
+        flag_value=logging.DEBUG,
+        default=False,
+)
+@click.option(
     '--loglevel',
     '-l',
     help='Sets log level',
-    type=click.Choice(['debug', 'info']),
-    default='debug')
+    type=click.Choice(['error', 'debug', 'info']),
+    default='info'
+)
 @click.option(
     '--access_token',
     '-t',
-    help='Sets users access token', )
+    help='Sets users access token',
+)
 @click.pass_context
-def cli(ctx, loglevel, access_token):
+def cli(ctx, loglevel, verbose, access_token):
     """CAP Client for interacting with CAP Server."""
+    if verbose:
+        lvl = verbose
+    else:
+        lvl = getattr(logging, loglevel.upper())
     logging.basicConfig(
         format='[%(levelname)s] %(message)s',
         stream=sys.stderr,
-        level=getattr(logging, loglevel.upper()))
+        level=lvl)
     ctx.obj = Config(access_token=access_token)
 
 

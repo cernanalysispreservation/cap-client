@@ -26,7 +26,6 @@
 
 import json
 import logging
-
 import click
 
 
@@ -36,10 +35,9 @@ def ping(ctx):
     """Health check CAP Server."""
     try:
         response = ctx.obj.cap_api.ping()
-        logging.info('Server response:\n{}'.format(
-            json.dumps(response, indent=4)))
+        click.echo(json.dumps(response, indent=4))
     except Exception as e:
-        logging.info('Unexpected error.')
+        logging.error('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -49,10 +47,9 @@ def me(ctx):
     """Retrieve user info."""
     try:
         response = ctx.obj.cap_api.me()
-        logging.info('Server response:\n{}'.format(
-            json.dumps(response, indent=4)))
+        click.echo(json.dumps(response, indent=4))
     except Exception as e:
-        logging.info('Unexpected error.')
+        logging.error('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -67,11 +64,10 @@ def get(ctx, pid):
     """Retrieve one or all analyses from a user."""
     try:
         response = ctx.obj.cap_api.get(pid=pid)
-        logging.info('Server response:\n{}'.format(
-            json.dumps(response, indent=4)))
+        click.echo(json.dumps(response, indent=4))
 
     except Exception as e:
-        logging.info('Unexpected error.')
+        logging.error('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -91,7 +87,6 @@ def get(ctx, pid):
 )
 @click.option(
     '--version',
-    '-v',
     help='JSON schema version to api ',
 )
 @click.pass_context
@@ -103,10 +98,10 @@ def create(ctx, file, type, version):
             ana_type=type,
             version=version
         )
-        logging.info('Server response:\n{}'.format(response))
+        click.echo(json.dumps(response, indent=4))
 
     except Exception as e:
-        logging.info('Unexpected error.')
+        logging.error('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -123,10 +118,10 @@ def delete(ctx, pid):
     """Delete analysis with given pid."""
     try:
         response = ctx.obj.cap_api.delete(pid=pid)
-        logging.info('Server response:\n{}'.format(response))
+        click.echo(response)
 
     except Exception as e:
-        logging.info('Unexpected error.')
+        logging.error('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -150,11 +145,10 @@ def update(ctx, pid, file):
     """Update analysis with given pid."""
     try:
         response = ctx.obj.cap_api.update(pid=pid, filename=file)
-        logging.info('Server response:\n{}'.format(
-            json.dumps(response, indent=4)))
+        click.echo(json.dumps(response, indent=4))
 
     except Exception as e:
-        logging.info('Unexpected error.')
+        logging.error('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -184,11 +178,10 @@ def upload(ctx, pid, file, yes, output_file=None):
     try:
         response = ctx.obj.cap_api.upload(
             pid=pid, filepath=file, output_filename=output_file, yes=yes)
-        logging.info('Server response:\n{}'.format(
-            json.dumps(response, indent=4)))
+        click.echo(json.dumps(response, indent=4))
 
     except Exception as e:
-        logging.info('Unexpected error.')
+        logging.error('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -212,11 +205,10 @@ def patch(ctx, pid, file):
     """Patch analysis with given pid."""
     try:
         response = ctx.obj.cap_api.patch(pid=pid, filename=file)
-        logging.info('Server response:\n{}'.format(
-            json.dumps(response, indent=4)))
+        click.echo(json.dumps(response, indent=4))
 
     except Exception as e:
-        logging.info('Unexpected error.')
+        logging.error('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -226,8 +218,8 @@ def types(ctx):
     """Retrieve all types of analyses."""
     try:
         response = ctx.obj.cap_api.types()
-        logging.info('Available types:\n{}'.format('\n'.join(response)))
+        click.echo('Available types:\n{}'.format('\n'.join(response)))
 
     except Exception as e:
-        logging.info('Unexpected error.')
+        logging.error('Unexpected error.')
         logging.debug(str(e))

@@ -26,7 +26,6 @@
 
 import json
 import logging
-
 import click
 
 
@@ -58,11 +57,10 @@ def set(ctx, field_name, field_value, pid, file):
     """Edit analysis field value."""
     try:
         response = ctx.obj.cap_api.set(field_name, field_value, pid, file)
-        logging.info('Server response:\n{}'.format(
-            json.dumps(response, indent=4)))
+        click.echo(json.dumps(response, indent=4))
 
     except Exception as e:
-        logging.info('Unexpected error.')
+        logging.error('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -90,11 +88,10 @@ def append(ctx, field_name, field_value, pid, file):
     try:
         response = ctx.obj.cap_api.set(field_name, field_value, pid, file,
                                        append=True)
-        logging.info('Server response:\n{}'.format(
-            json.dumps(response, indent=4)))
+        click.echo(json.dumps(response, indent=4))
 
     except Exception as e:
-        logging.info('Unexpected error.')
+        logging.error('Unexpected error.')
         logging.debug(str(e))
 
 
@@ -116,9 +113,8 @@ def get(ctx, field, pid):
     """Retrieve one or more fields in analysis metadata."""
     try:
         response = ctx.obj.cap_api.get_metadata(pid=pid, field=field)
-        logging.info('Server response:\n{}'.format(
-            json.dumps(response, indent=4)))
+        click.echo(json.dumps(response, indent=4))
 
     except Exception as e:
-        logging.info('Unexpected error.')
+        logging.error('Unexpected error.')
         logging.debug(str(e))

@@ -28,6 +28,6 @@ import os
 
 
 def make_tarfile(output_filename, source_dir):
-    """Makes a tarball out of {source_dir} into {output_filename}"""
+    """Make a tarball out of {source_dir} into {output_filename}."""
     with tarfile.open(output_filename, "w:gz") as tar:
         tar.add(source_dir, arcname=os.path.basename(source_dir))

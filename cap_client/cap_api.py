@@ -107,6 +107,7 @@ class CapAPI(object):
         return self._make_request(url=urljoin('deposits/', pid))
 
     def get_metadata(self, pid, field=None):
+        """Return metadata on analysis."""
         dct = self._make_request(url=urljoin('deposits/', pid))
         dct = dct["data"]["metadata"]
         if not field:
@@ -200,7 +201,7 @@ class CapAPI(object):
                                   headers=headers)
 
     def upload(self, pid=None, filepath=None, yes=False, output_filename=None):
-        """Upload file or direcotory to deposit by given pid"""
+        """Upload file or direcotory to deposit by given pid."""
         try:
             deposit = self.get(pid)
         except Exception as e:
