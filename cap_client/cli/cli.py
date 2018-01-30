@@ -73,7 +73,7 @@ def get(ctx, pid):
 
 @click.command()
 @click.option(
-    '--file',
+    '--json-file',
     '-f',
     help='File with JSON data',
     default=None,
@@ -90,11 +90,11 @@ def get(ctx, pid):
     help='JSON schema version to api ',
 )
 @click.pass_context
-def create(ctx, file, type, version):
+def create(ctx, json_file, type, version):
     """Create an analysis."""
     try:
         response = ctx.obj.cap_api.create(
-            filename=file,
+            filename=json_file,
             ana_type=type,
             version=version
         )
@@ -134,17 +134,17 @@ def delete(ctx, pid):
     required=True
 )
 @click.option(
-    '--file',
+    '--json-file',
     '-f',
     help='File with JSON data.',
     default=None,
     required=True
 )
 @click.pass_context
-def update(ctx, pid, file):
+def update(ctx, pid, json_file):
     """Update analysis with given pid."""
     try:
-        response = ctx.obj.cap_api.update(pid=pid, filename=file)
+        response = ctx.obj.cap_api.update(pid=pid, filename=json_file)
         click.echo(json.dumps(response, indent=4))
 
     except Exception as e:
@@ -194,17 +194,17 @@ def upload(ctx, pid, file, yes, output_file=None):
     required=True
 )
 @click.option(
-    '--file',
+    '--json-file',
     '-f',
     help='File with JSON data.',
     default=None,
     required=True
 )
 @click.pass_context
-def patch(ctx, pid, file):
+def patch(ctx, pid, json_file):
     """Patch analysis with given pid."""
     try:
-        response = ctx.obj.cap_api.patch(pid=pid, filename=file)
+        response = ctx.obj.cap_api.patch(pid=pid, filename=json_file)
         click.echo(json.dumps(response, indent=4))
 
     except Exception as e:

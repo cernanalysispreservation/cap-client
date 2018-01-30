@@ -150,11 +150,14 @@ class CapAPI(object):
             return "Choose one of the available analyses types:\n{}".format(
                 '\n'.join(types)
             )
+        try:
+            data = json.loads(filename)
+        except ValueError:
+            with open(filename) as fp:
+                data = json.load(fp)
 
-        with open(filename) as fp:
-            data = json.load(fp)
-            data['$ana_type'] = ana_type
-            json_data = json.dumps(data)
+        data['$ana_type'] = ana_type
+        json_data = json.dumps(data)
 
         self._make_request(url='deposit/validator',
                            method='post',
@@ -175,9 +178,13 @@ class CapAPI(object):
 
     def update(self, pid=None, filename=''):
         """Update an analysis by given pid and JSON data from file."""
-        with open(filename) as fp:
-            data = json.load(fp)
-            json_data = json.dumps(data)
+        try:
+            data = json.loads(filename)
+        except ValueError:
+            with open(filename) as fp:
+                data = json.load(fp)
+
+        json_data = json.dumps(data)
 
         self._make_request(url='deposit/validator',
                            method='post',
@@ -189,9 +196,13 @@ class CapAPI(object):
 
     def patch(self, pid=None, filename=''):
         """Patch an analysis by given pid and JSON-patch data from file."""
-        with open(filename) as fp:
-            data = json.load(fp)
-            json_data = json.dumps(data)
+        try:
+            data = json.loads(filename)
+        except ValueError:
+            with open(filename) as fp:
+                data = json.load(fp)
+
+        json_data = json.dumps(data)
 
         headers = {'Content-Type': 'application/json-patch+json'}
 
