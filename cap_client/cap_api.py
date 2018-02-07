@@ -125,6 +125,11 @@ class CapAPI(object):
         else:
             raise KeyError(str(field) + " not found.")
 
+    def get_permissions(self, pid):
+        headers = {'Accept': 'application/permissions+json'}
+        return self._make_request(url=urljoin('deposits/', pid),
+                                  headers=headers)
+
     def set(self, field_name, field_val, pid, filepath=None, append=False):
         """Edit analysis field value."""
         try:

@@ -34,7 +34,7 @@ from cap_client.cap_api import CapAPI
 from cap_client.cli.cli import (create, delete, get, me, ping,
                                 types, update, patch, upload)
 from cap_client.cli.metadata_cli import metadata
-
+from cap_client.cli.permissions_cli import permissions
 
 class Config(object):
     """Configuration object to share across commands."""
@@ -94,3 +94,4 @@ cli.add_command(patch)
 cli.add_command(types)
 cli.add_command(upload)
 cli.add_command(metadata)
+cli.add_command(permissions)
