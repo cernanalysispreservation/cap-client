@@ -100,8 +100,8 @@ def test_make_request_when_no_json_in_resp(mock_requests, cap_api):
     mock_requests.return_value.status_code = 204
 
     resp = cap_api._make_request(url='endpoint',
-                                     expected_status_code=204,
-                                     method='delete')
+                                 expected_status_code=204,
+                                 method='delete')
 
     # when no json in resp no error raised, just no data returned
     assert resp['data'] is None
@@ -206,7 +206,21 @@ def test_get_available_types_returns_all_available_types(mock_requests,
     assert 'alice-analysis' in types
 
 
-def test_create_method_when_no_type_given_returns_list_of_options(mocked_cap_api):   # noqa
+@patch('requests.get')
+def test_get_permissions(mock_requests, cap_api,
+                         record_data):
+    mock_requests.return_value.status_code = 200
+    mock_requests.return_value.json.return_value = record_data
+
+    resp = cap_api.get_permissions('some_pid')
+
+    assert resp['status'] == 200
+    assert 'alice@inveniosoftware.org' in resp.get('data', {}).get(
+        'metadata'
+    ).get('_access').get('deposit-read').get('user')[0]
+
+
+def test_create_method_when_no_type_given_returns_list_of_options(mocked_cap_api):  # noqa
     resp = mocked_cap_api.create(ana_type=None)
 
     assert 'atlas-workflows' in resp
@@ -354,7 +368,6 @@ def test_set_when_appending_string_field_to_array(mocked_cap_api, record_data):
     assert sent_json['op'] == 'add'
     assert sent_json['path'] == '/field_name/nested/nested2/-'
     assert sent_json['value'] == 'field_val'
-
 
 # def test_set_when_setting_a_file(cap_api, record_data):
 #     response = {'status': 200, 'data': record_data}

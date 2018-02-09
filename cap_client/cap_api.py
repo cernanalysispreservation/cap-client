@@ -69,7 +69,6 @@ class CapAPI(object):
                               params=params,
                               headers=headers,
                               **kwargs)
-
         try:
             response_data = response.json()
         except ValueError:
@@ -93,6 +92,22 @@ class CapAPI(object):
 
         return [exp['deposit_group'] for exp in
                 ana_types['deposit_groups']]
+
+    def _get_permissions_data(self, rights, email, operation=None):
+        """Get data for setting/removing permissions."""
+        permissions = [{'action': 'deposit-{}'.format(r),
+                        'op': operation} for r in rights]
+        data = {
+            "permissions": [
+                {
+                    "type": "user",
+                    "identity": "{}".format(email),
+                    "permissions": permissions
+                }
+            ]
+        }
+
+        return data
 
     def ping(self):
         """Health check CAP Server."""
@@ -126,9 +141,38 @@ class CapAPI(object):
             raise KeyError(str(field) + " not found.")
 
     def get_permissions(self, pid):
+        """Return deposit user permissions."""
         headers = {'Accept': 'application/permissions+json'}
         return self._make_request(url=urljoin('deposits/', pid),
                                   headers=headers)
+
+    def add_permissions(self, pid=None, email=None,
+                        rights=None):
+        """Assigns access right to users in a deposit."""
+        data = self._get_permissions_data(rights, email, operation='add')
+        url = urljoin('deposits/', pid + '/actions/permissions')
+        return self._make_request(url=url,
+                                  data=json.dumps(data),
+                                  method='post',
+                                  expected_status_code=201,
+                                  headers={
+                                      'Content-type': 'application/json',
+                                      'Accept': 'application/permissions+json'
+                                  })
+
+    def remove_permissions(self, pid=None, email=None,
+                           rights=None):
+        """Removes access right to users in a deposit."""
+        data = self._get_permissions_data(rights, email, operation='remove')
+        url = urljoin('deposits/', pid + '/actions/permissions')
+        return self._make_request(url=url,
+                                  data=json.dumps(data),
+                                  method='post',
+                                  expected_status_code=201,
+                                  headers={
+                                      'Content-type': 'application/json',
+                                      'Accept': 'application/permissions+json'
+                                  })
 
     def set(self, field_name, field_val, pid, filepath=None, append=False):
         """Edit analysis field value."""

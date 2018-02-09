@@ -36,6 +36,7 @@ from cap_client.cli.cli import (create, delete, get, me, ping,
 from cap_client.cli.metadata_cli import metadata
 from cap_client.cli.permissions_cli import permissions
 
+
 class Config(object):
     """Configuration object to share across commands."""
 
@@ -52,11 +53,11 @@ class Config(object):
 
 @click.group()
 @click.option(
-        '--verbose',
-        '-v',
-        help='Verbose output',
-        flag_value=logging.DEBUG,
-        default=False,
+    '--verbose',
+    '-v',
+    help='Verbose output',
+    flag_value=logging.DEBUG,
+    default=False,
 )
 @click.option(
     '--loglevel',

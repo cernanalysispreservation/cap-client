@@ -74,8 +74,26 @@ def mocked_cap_api(cap_api):
 def record_data():
     data = {
         "metadata": {
-            "$schema": "https://analysispreservation.cern.ch/schemas/"
-            "deposits/records/cms-analysis-v0.0.1.json",
+            "$schema": "https://localhost:5000/schemas/"
+                       "deposits/records/cms-analysis-v0.0.1.json",
+            "_access": {
+                "deposit-admin": {
+                    "roles": [],
+                    "user": []
+                },
+                "deposit-read": {
+                    "roles": [],
+                    "user": [
+                        "alice@inveniosoftware.org"
+                    ]
+                },
+                "deposit-update": {
+                    "roles": [],
+                    "user": [
+                        "alice@inveniosoftware.org"
+                    ]
+                }
+            },
             "basic_info": {
                 "analysis_number": "HIN-16-007",
                 "people_info": [

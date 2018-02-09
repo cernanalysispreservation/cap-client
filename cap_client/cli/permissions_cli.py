@@ -22,7 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Metadata CAP Client CLI."""
+"""Permissions CAP Client CLI."""
 
 import json
 import logging
@@ -34,32 +34,80 @@ def permissions():
     """Permissions managing commands."""
 
 
-# @permissions.command()
-# @click.option(
-#     '--pid',
-#     '-p',
-#     help='PID of draft to update.',
-#     default=None,
-#     required=True
-# )
-# @click.option(
-#     '--file',
-#     '-f',
-#     type=click.Path(),
-#     help='Path to file to upload.',
-#     default=None,
-#     required=False
-# )
-# @click.pass_context
-# def set(ctx, field_name, field_value, pid, file):
-#     """Edit analysis field value."""
-#     try:
-#         response = ctx.obj.cap_api.set(field_name, field_value, pid, file)
-#         click.echo(json.dumps(response, indent=4))
-#
-#     except Exception as e:
-#         logging.error('Unexpected error.')
-#         logging.debug(str(e))
+@permissions.command()
+@click.option(
+    '--pid',
+    '-p',
+    help='PID of draft to update.',
+    default=None,
+    required=True
+)
+@click.option(
+    '--email',
+    '-e',
+    help='User to assign permissions.',
+    default=None,
+    required=True
+)
+@click.option('--rights',
+              '-r',
+              required=True,
+              type=click.Choice(
+                  ['read',
+                   'update',
+                   'admin']),
+              multiple=True)
+@click.pass_context
+def add(ctx, pid, email, rights):
+    """Set analysis user permissions."""
+    try:
+        response = ctx.obj.cap_api.add_permissions(pid=pid,
+                                                   email=email,
+                                                   rights=rights,
+                                                   )
+        click.echo(json.dumps(response, indent=4))
+
+    except Exception as e:
+        logging.error('Unexpected error.')
+        logging.debug(str(e))
+
+
+@permissions.command()
+@click.option(
+    '--pid',
+    '-p',
+    help='PID of draft to update.',
+    default=None,
+    required=True
+)
+@click.option(
+    '--email',
+    '-e',
+    help='User to assign permissions.',
+    default=None,
+    required=True
+)
+@click.option('--rights',
+              '-r',
+              required=True,
+              type=click.Choice(
+                  ['read',
+                   'update',
+                   'admin']),
+              multiple=True)
+@click.pass_context
+def remove(ctx, pid, email, rights):
+    """Set analysis user permissions."""
+    try:
+        response = ctx.obj.cap_api.remove_permissions(pid=pid,
+                                                      email=email,
+                                                      rights=rights,
+                                                      )
+        click.echo(json.dumps(response, indent=4))
+
+    except Exception as e:
+        logging.error('Unexpected error.')
+        logging.debug(str(e))
 
 
 @permissions.command()
@@ -79,5 +127,3 @@ def get(ctx, pid):
     except Exception as e:
         logging.error('Unexpected error.')
         logging.debug(str(e))
-
-
