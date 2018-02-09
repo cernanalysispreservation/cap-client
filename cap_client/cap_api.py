@@ -102,9 +102,15 @@ class CapAPI(object):
         """Retrieve user info."""
         return self._make_request(url='me')
 
-    def get(self, pid=None):
+    def get(self, pid=None, all=False):
         """Retrieve one or all analyses from a user."""
-        return self._make_request(url=urljoin('deposits/', pid))
+        user_id = self.me().get('data', {}).get('id', '')
+        if user_id and not pid:
+            url = urljoin('deposits/', '?q=_deposit.created_by:{}'.format(
+                user_id))
+        elif all or pid:
+            url = urljoin('deposits/', pid)
+        return self._make_request(url=url)
 
     def get_metadata(self, pid, field=None):
         """Return metadata on analysis."""

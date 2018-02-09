@@ -59,11 +59,16 @@ def me(ctx):
     '-p',
     help='Get deposit with given pid',
     default=None)
+@click.option(
+    '--all',
+    is_flag=True,
+    help="Retrieve all analyses you can access."
+)
 @click.pass_context
-def get(ctx, pid):
+def get(ctx, pid, all):
     """Retrieve one or all analyses from a user."""
     try:
-        response = ctx.obj.cap_api.get(pid=pid)
+        response = ctx.obj.cap_api.get(pid=pid, all=all)
         click.echo(json.dumps(response, indent=4))
 
     except Exception as e:
