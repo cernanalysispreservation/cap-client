@@ -26,7 +26,10 @@
 
 import json
 import logging
+
 import click
+
+from cap_client.errors import StatusCodeException, UnknownAnalysisType
 
 
 @click.command()
@@ -35,7 +38,11 @@ def ping(ctx):
     """Health check CAP Server."""
     try:
         response = ctx.obj.cap_api.ping()
-        click.echo(json.dumps(response, indent=4))
+        click.echo(response)
+
+    except StatusCodeException as e:
+        logging.error(str(e))
+
     except Exception as e:
         logging.error('Unexpected error.')
         logging.debug(str(e))
@@ -47,7 +54,12 @@ def me(ctx):
     """Retrieve user info."""
     try:
         response = ctx.obj.cap_api.me()
-        click.echo(json.dumps(response, indent=4))
+        click.echo(json.dumps(response,
+                              indent=4))
+
+    except StatusCodeException as e:
+        logging.error(str(e))
+
     except Exception as e:
         logging.error('Unexpected error.')
         logging.debug(str(e))
@@ -69,7 +81,11 @@ def get(ctx, pid, all):
     """Retrieve one or all analyses from a user."""
     try:
         response = ctx.obj.cap_api.get(pid=pid, all=all)
-        click.echo(json.dumps(response, indent=4))
+        click.echo(json.dumps(response,
+                              indent=4))
+
+    except StatusCodeException as e:
+        logging.error(str(e))
 
     except Exception as e:
         logging.error('Unexpected error.')
@@ -79,8 +95,7 @@ def get(ctx, pid, all):
 @click.command()
 @click.option(
     '--json-file',
-    '-f',
-    help='File with JSON data',
+    help='JSON data from file or command line',
     default=None,
     required=True,
 )
@@ -99,11 +114,19 @@ def create(ctx, json_file, type, version):
     """Create an analysis."""
     try:
         response = ctx.obj.cap_api.create(
-            filename=json_file,
+            json_=json_file,
             ana_type=type,
             version=version
         )
-        click.echo(json.dumps(response, indent=4))
+
+        click.echo(json.dumps(response,
+                              indent=4))
+
+    except UnknownAnalysisType as e:
+        logging.error(str(e))
+
+    except StatusCodeException as e:
+        logging.error(str(e))
 
     except Exception as e:
         logging.error('Unexpected error.')
@@ -122,99 +145,45 @@ def create(ctx, json_file, type, version):
 def delete(ctx, pid):
     """Delete analysis with given pid."""
     try:
-        response = ctx.obj.cap_api.delete(pid=pid)
-        click.echo(response)
+        ctx.obj.cap_api.delete(pid=pid)
+        click.echo('Analysis {} deleted.'.format(pid))
+
+    except StatusCodeException as e:
+        logging.error(str(e))
 
     except Exception as e:
         logging.error('Unexpected error.')
         logging.debug(str(e))
 
 
-@click.command()
-@click.option(
-    '--pid',
-    '-p',
-    help='Update deposit with given pid',
-    default=None,
-    required=True
-)
-@click.option(
-    '--json-file',
-    '-f',
-    help='File with JSON data.',
-    default=None,
-    required=True
-)
-@click.pass_context
-def update(ctx, pid, json_file):
-    """Update analysis with given pid."""
-    try:
-        response = ctx.obj.cap_api.update(pid=pid, filename=json_file)
-        click.echo(json.dumps(response, indent=4))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
-
-
-@click.command()
-@click.option(
-    '--pid',
-    '-p',
-    help='Upload file to deposit with given pid',
-    default=None,
-    required=True
-)
-@click.argument('file', type=click.Path(exists=True))
-@click.option(
-    '--output-file',
-    '-o',
-    help='Filename to be given to uploaded file',
-    default=None,
-)
-@click.option(
-    '--yes',
-    is_flag=True,
-    help="Bypasses prompts..Say YES to everything"
-)
-@click.pass_context
-def upload(ctx, pid, file, yes, output_file=None):
-    """Update analysis with given pid."""
-    try:
-        response = ctx.obj.cap_api.upload(
-            pid=pid, filepath=file, output_filename=output_file, yes=yes)
-        click.echo(json.dumps(response, indent=4))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
-
-
-@click.command()
-@click.option(
-    '--pid',
-    '-p',
-    help='Patch deposit with given pid',
-    default=None,
-    required=True
-)
-@click.option(
-    '--json-file',
-    '-f',
-    help='File with JSON data.',
-    default=None,
-    required=True
-)
-@click.pass_context
-def patch(ctx, pid, json_file):
-    """Patch analysis with given pid."""
-    try:
-        response = ctx.obj.cap_api.patch(pid=pid, filename=json_file)
-        click.echo(json.dumps(response, indent=4))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+#@click.command()
+#@click.option(
+#    '--pid',
+#    '-p',
+#    help='Patch deposit with given pid',
+#    default=None,
+#    required=True
+#)
+#@click.option(
+#    '--json-file',
+#    '-f',
+#    help='File with JSON data.',
+#    default=None,
+#    required=True
+#)
+#@click.pass_context
+#def patch(ctx, pid, json_file):
+#    """Patch analysis with given pid."""
+#    try:
+#        response = ctx.obj.cap_api.patch(pid=pid, filename=json_file)
+#        click.echo(json.dumps(response, indent=4))
+#
+#    except StatusCodeException as e:
+#        logging.error(str(e))
+#
+#    except Exception as e:
+#        logging.error('Unexpected error.')
+#        logging.debug(str(e))
 
 
 @click.command()
@@ -224,6 +193,9 @@ def types(ctx):
     try:
         response = ctx.obj.cap_api.types()
         click.echo('Available types:\n{}'.format('\n'.join(response)))
+
+    except StatusCodeException as e:
+        logging.error(str(e))
 
     except Exception as e:
         logging.error('Unexpected error.')

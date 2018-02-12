@@ -26,6 +26,7 @@
 
 import json
 import logging
+
 import click
 
 
@@ -43,9 +44,9 @@ def permissions():
     required=True
 )
 @click.option(
-    '--email',
-    '-e',
-    help='User to assign permissions.',
+    '--user',
+    '-u',
+    help='User mail to assign permissions.',
     default=None,
     required=True
 )
@@ -58,11 +59,11 @@ def permissions():
                    'admin']),
               multiple=True)
 @click.pass_context
-def add(ctx, pid, email, rights):
+def add(ctx, pid, user, rights):
     """Set analysis user permissions."""
     try:
         response = ctx.obj.cap_api.add_permissions(pid=pid,
-                                                   email=email,
+                                                   email=user,
                                                    rights=rights,
                                                    )
         click.echo(json.dumps(response, indent=4))
@@ -81,9 +82,9 @@ def add(ctx, pid, email, rights):
     required=True
 )
 @click.option(
-    '--email',
-    '-e',
-    help='User to assign permissions.',
+    '--user',
+    '-u',
+    help='User email to assign permissions.',
     default=None,
     required=True
 )
@@ -96,11 +97,11 @@ def add(ctx, pid, email, rights):
                    'admin']),
               multiple=True)
 @click.pass_context
-def remove(ctx, pid, email, rights):
+def remove(ctx, pid, user, rights):
     """Set analysis user permissions."""
     try:
         response = ctx.obj.cap_api.remove_permissions(pid=pid,
-                                                      email=email,
+                                                      email=user,
                                                       rights=rights,
                                                       )
         click.echo(json.dumps(response, indent=4))

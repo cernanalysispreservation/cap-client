@@ -27,10 +27,9 @@ from __future__ import absolute_import, print_function
 
 import json
 
+from cap_client.errors import StatusCodeException, UnknownAnalysisType
 from mock import mock_open, patch
 from pytest import raises
-
-from cap_client.errors import StatusCodeException
 
 
 @patch('requests.delete')
@@ -66,8 +65,7 @@ def test_make_request_when_request_successful(mock_requests, cap_api,
                                  expected_status_code=200)
 
     assert mock_requests.called
-    assert resp['status'] == 200
-    assert resp['data'] == record_data
+    assert resp == record_data
 
 
 @patch('requests.get')
@@ -104,7 +102,7 @@ def test_make_request_when_no_json_in_resp(mock_requests, cap_api):
                                  method='delete')
 
     # when no json in resp no error raised, just no data returned
-    assert resp['data'] is None
+    assert resp is None
 
 
 @patch('requests.get')
@@ -126,7 +124,7 @@ def test_get_method_with_given_pid(mock_requests, cap_api, record_data):
 
     resp = cap_api.get('some_pid')
 
-    assert resp['data'] == record_data
+    assert resp == record_data
 
 
 @patch('requests.get')
@@ -168,7 +166,7 @@ def test_ping_method(mock_requests, cap_api):
 
     resp = cap_api.ping()
 
-    assert resp['data'] == 'Pong'
+    assert resp == 'Pong'
 
 
 @patch('requests.delete')
@@ -178,8 +176,7 @@ def test_delete_method_with_given_pid(mock_requests, cap_api, record_data):
 
     resp = cap_api.delete('some_pid')
 
-    assert resp['status'] == 204
-    assert resp['data'] == ''
+    assert resp == ''
 
 
 @patch('requests.get')
@@ -214,25 +211,17 @@ def test_get_permissions(mock_requests, cap_api,
 
     resp = cap_api.get_permissions('some_pid')
 
-    assert resp['status'] == 200
-    assert 'alice@inveniosoftware.org' in resp.get('data', {}).get(
-        'metadata'
-    ).get('_access').get('deposit-read').get('user')[0]
+    assert 'alice@inveniosoftware.org' in resp['metadata']['_access']['deposit-read']['user'][0]  # noqa
 
 
 def test_create_method_when_no_type_given_returns_list_of_options(mocked_cap_api):  # noqa
-    resp = mocked_cap_api.create(ana_type=None)
-
-    assert 'atlas-workflows' in resp
-    assert 'alice-analysis' in resp
+    with raises(UnknownAnalysisType):
+        mocked_cap_api.create(ana_type=None)
 
 
 def test_create_method_when_type_given_not_in_available_options(mocked_cap_api):  # noqa
-    resp = mocked_cap_api.create(ana_type='non-atlas-workflows')
-
-    # returns list of available options
-    assert 'atlas-workflows' in resp
-    assert 'alice-analysis' in resp
+    with raises(UnknownAnalysisType):
+        mocked_cap_api.create(ana_type='non-atlas-workflows')
 
 
 def test_create_method_when_no_file_with_data_given(mocked_cap_api):
@@ -243,7 +232,7 @@ def test_create_method_when_no_file_with_data_given(mocked_cap_api):
 @patch('__builtin__.open', new_callable=mock_open, read_data='{,}]')
 def test_create_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
     with raises(ValueError):
-        mocked_cap_api.create(filename='file',
+        mocked_cap_api.create(json_='file',
                               ana_type='atlas-workflows')
 
 
@@ -251,7 +240,7 @@ def test_create_method_sets_ana_type_in_sent_data(mocked_cap_api, record_data):
     json_data = json.dumps(record_data)
     with patch('__builtin__.open', new_callable=mock_open,
                read_data=json_data):
-        mocked_cap_api.create(filename='file',
+        mocked_cap_api.create(json_='file',
                               ana_type='atlas-workflows')
         named_args = mocked_cap_api._make_request.call_args[1]
         data = json.loads(named_args['data'])
@@ -267,7 +256,7 @@ def test_create_method_when_validate_failed_raises_exception(mocked_cap_api,
         mocked_cap_api._make_request.side_effect = [StatusCodeException(),
                                                     None]
         with raises(StatusCodeException):
-            mocked_cap_api.create(filename='file',
+            mocked_cap_api.create(json_='file',
                                   ana_type='atlas-workflows')
 
 
@@ -300,14 +289,13 @@ def test_update_method_when_success_returns_updated_data(mocked_cap_api,
 
     with patch('__builtin__.open', new_callable=mock_open,
                read_data=json_data):
-        response = {'status': 200, 'data': record_data}
         mocked_cap_api._make_request.side_effect = [None,
-                                                    response]
+                                                    record_data]
 
         resp = mocked_cap_api.update(filename='file',
                                      pid='some_pid')
 
-        assert resp['data'] == record_data
+        assert resp == record_data
 
 
 def test_patch_method(mocked_cap_api, record_data):
@@ -315,15 +303,14 @@ def test_patch_method(mocked_cap_api, record_data):
 
     with patch('__builtin__.open', new_callable=mock_open,
                read_data=json_data):
-        response = {'status': 200, 'data': record_data}
-        mocked_cap_api._make_request.return_value = response
+        mocked_cap_api._make_request.return_value = record_data
 
         resp = mocked_cap_api.patch(filename='file',
                                     pid='some_pid')
 
         named_args = mocked_cap_api._make_request.call_args[1]
 
-        assert resp['data'] == record_data
+        assert resp == record_data
         assert named_args['method'] == 'patch'
         assert named_args['headers'] == {
             'Content-Type': 'application/json-patch+json'
@@ -342,8 +329,7 @@ def test_patch_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
 
 
 def test_set_when_setting_string_field(mocked_cap_api, record_data):
-    response = {'status': 200, 'data': record_data}
-    mocked_cap_api._make_request.return_value = response
+    mocked_cap_api._make_request.return_value = record_data
 
     mocked_cap_api.set('field_name.nested.nested2', 'field_val', 'some_pid')
 
@@ -356,8 +342,7 @@ def test_set_when_setting_string_field(mocked_cap_api, record_data):
 
 
 def test_set_when_appending_string_field_to_array(mocked_cap_api, record_data):
-    response = {'status': 200, 'data': record_data}
-    mocked_cap_api._make_request.return_value = response
+    mocked_cap_api._make_request.return_value = record_data
 
     mocked_cap_api.set('field_name.nested.nested2', 'field_val', 'some_pid',
                        append=True)
@@ -368,14 +353,3 @@ def test_set_when_appending_string_field_to_array(mocked_cap_api, record_data):
     assert sent_json['op'] == 'add'
     assert sent_json['path'] == '/field_name/nested/nested2/-'
     assert sent_json['value'] == 'field_val'
-
-# def test_set_when_setting_a_file(cap_api, record_data):
-#     response = {'status': 200, 'data': record_data}
-#     mocked_cap_api._make_request.return_value = response
-#     mocked_cap_api.upload.return_value = response
-#                        filepath='file_path')
-#     named_args = mocked_cap_api._make_request.call_args[1]
-#     sent_json = json.loads(named_args['data'])[0]
-#     assert sent_json['op'] == 'add'
-#     assert sent_json['path'] == '/field_name/nested/nested2/-'
-#     assert sent_json['value'] == 'field_val'

@@ -22,7 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Metadata CAP Client CLI."""
+"""Files CAP Client CLI."""
 
 import json
 import logging
@@ -33,95 +33,61 @@ from cap_client.errors import StatusCodeException
 
 
 @click.group()
-def metadata():
-    """Metadata managing commands."""
+def files():
+    """Files managing commands."""
 
 
-@metadata.command()
+@files.command()
 @click.option(
     '--pid',
     '-p',
-    help='PID of draft to update.',
+    help='Upload file to deposit with given pid',
     default=None,
     required=True
 )
+@click.argument('file', type=click.Path(exists=True))
 @click.option(
-    '--file',
-    '-f',
-    type=click.Path(),
-    help='Path to file to upload.',
+    '--output-file',
+    '-o',
+    help='Filename to be given to uploaded file',
     default=None,
-    required=False
 )
-@click.argument('field_name')
-@click.argument('field_value')
+@click.option(
+    '--yes',
+    is_flag=True,
+    help="Bypasses prompts..Say YES to everything"
+)
 @click.pass_context
-def set(ctx, field_name, field_value, pid, file):
-    """Edit analysis field value."""
+def upload(ctx, pid, file, yes, output_file=None):
+    """Upload file to deposit with given pid."""
     try:
-        response = ctx.obj.cap_api.set(field_name, field_value, pid, file)
-        click.echo(json.dumps(response, indent=4))
+        ctx.obj.cap_api.upload(
+            pid=pid, filepath=file, output_filename=output_file, yes=yes)
+        click.echo("File uploaded successfully.")
+
+    except StatusCodeException as e:
+        logging.error(str(e))
 
     except Exception as e:
         logging.error('Unexpected error.')
         logging.debug(str(e))
 
 
-@metadata.command()
+@files.command()
 @click.option(
     '--pid',
     '-p',
-    help='Append value to metadata array field',
+    help='Get files of deposit with given pid',
     default=None,
     required=True
 )
-@click.option(
-    '--file',
-    '-f',
-    type=click.Path(),
-    help='Path to file to upload.',
-    default=None,
-    required=False
-)
-@click.argument('field_name')
-@click.argument('field_value')
 @click.pass_context
-def append(ctx, field_name, field_value, pid, file):
-    """Edit analysis field adding a new value to an array."""
+def get(ctx, pid):
+    """Get list of files associated with deposit with given pid."""
     try:
-        response = ctx.obj.cap_api.set(field_name, field_value, pid, file,
-                                       append=True)
-        click.echo(json.dumps(response, indent=4))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
-
-
-@metadata.command()
-@click.argument(
-    'field',
-    default=None,
-    required=False,
-)
-@click.option(
-    '--pid',
-    '-p',
-    help='Get metadata of the deposit with given pid',
-    default=None,
-    required=True,
-)
-@click.pass_context
-def get(ctx, field, pid):
-    """Retrieve one or more fields in analysis metadata."""
-    try:
-        response = ctx.obj.cap_api.get_metadata(pid=pid, field=field)
+        response = ctx.obj.cap_api.get_files(pid=pid)
         click.echo(json.dumps(response,
                               indent=4))
-
-    except KeyError:
-        logging.error('Field {} doesn\'t exist'
-                      .format(field))
 
     except StatusCodeException as e:
         logging.error(str(e))
