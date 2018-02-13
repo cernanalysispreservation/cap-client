@@ -31,7 +31,7 @@ import os
 import sys
 
 from cap_client.cap_api import CapAPI
-from cap_client.cli.cli import (create, publish, delete, get, me, ping,
+from cap_client.cli.cli import (create, clone, publish, delete, get, me, ping,
                                 types)
 from cap_client.cli.metadata_cli import metadata
 from cap_client.cli.files_cli import files
@@ -92,10 +92,8 @@ cli.add_command(me)
 cli.add_command(create)
 cli.add_command(delete)
 cli.add_command(publish)
-#cli.add_command(update)
-#cli.add_command(patch)
+cli.add_command(clone)
 cli.add_command(types)
-#cli.add_command(upload)
 cli.add_command(files)
 cli.add_command(metadata)
 cli.add_command(permissions)

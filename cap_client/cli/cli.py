@@ -180,34 +180,28 @@ def publish(ctx, pid):
         logging.debug(str(e))
 
 
-#@click.command()
-#@click.option(
-#    '--pid',
-#    '-p',
-#    help='Patch deposit with given pid',
-#    default=None,
-#    required=True
-#)
-#@click.option(
-#    '--json-file',
-#    '-f',
-#    help='File with JSON data.',
-#    default=None,
-#    required=True
-#)
-#@click.pass_context
-#def patch(ctx, pid, json_file):
-#    """Patch analysis with given pid."""
-#    try:
-#        response = ctx.obj.cap_api.patch(pid=pid, filename=json_file)
-#        click.echo(json.dumps(response, indent=4))
-#
-#    except StatusCodeException as e:
-#        logging.error(str(e))
-#
-#    except Exception as e:
-#        logging.error('Unexpected error.')
-#        logging.debug(str(e))
+@click.command()
+@click.option(
+    '--pid',
+    '-p',
+    help='Clone deposit with given pid',
+    default=None,
+    required=True
+)
+@click.pass_context
+def clone(ctx, pid):
+    """Clone analysis with given pid."""
+    try:
+        response = ctx.obj.cap_api.clone(pid=pid)
+        click.echo(json.dumps(response,
+                              indent=4))
+
+    except StatusCodeException as e:
+        logging.error(str(e))
+
+    except Exception as e:
+        logging.error('Unexpected error.')
+        logging.debug(str(e))
 
 
 @click.command()

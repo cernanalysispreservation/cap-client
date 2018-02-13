@@ -360,8 +360,15 @@ class CapAPI(object):
         return self._get_available_types()
 
     def publish(self, pid):
-        return self._make_request(url='deposits/{}/actions/publish'.format(pid),
+        return self._make_request(url='deposits/{}/actions/publish'.format(pid),  # noqa
                                   expected_status_code=202,
+                                  method='post',
+                                  headers={'Content-Type': 'application/json',
+                                           'Accept': 'application/basic+json'})
+
+    def clone(self, pid):
+        return self._make_request(url='deposits/{}/actions/clone'.format(pid),
+                                  expected_status_code=201,
                                   method='post',
                                   headers={'Content-Type': 'application/json',
                                            'Accept': 'application/basic+json'})
