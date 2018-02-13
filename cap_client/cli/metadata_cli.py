@@ -62,6 +62,33 @@ def set(ctx, field_name, field_value, pid, file):
         response = ctx.obj.cap_api.set(field_name, field_value, pid, file)
         click.echo(json.dumps(response, indent=4))
 
+    except StatusCodeException as e:
+        logging.error(str(e))
+
+    except Exception as e:
+        logging.error('Unexpected error.')
+        logging.debug(str(e))
+
+
+@metadata.command()
+@click.option(
+    '--pid',
+    '-p',
+    help='PID of draft to update.',
+    default=None,
+    required=True
+)
+@click.argument('field_name')
+@click.pass_context
+def remove(ctx, field_name, pid):
+    """Remove analysis field."""
+    try:
+        response = ctx.obj.cap_api.remove_field(field_name, pid)
+        click.echo(json.dumps(response, indent=4))
+
+    except StatusCodeException as e:
+        logging.error(str(e))
+
     except Exception as e:
         logging.error('Unexpected error.')
         logging.debug(str(e))
@@ -92,6 +119,9 @@ def append(ctx, field_name, field_value, pid, file):
         response = ctx.obj.cap_api.set(field_name, field_value, pid, file,
                                        append=True)
         click.echo(json.dumps(response, indent=4))
+
+    except StatusCodeException as e:
+        logging.error(str(e))
 
     except Exception as e:
         logging.error('Unexpected error.')
