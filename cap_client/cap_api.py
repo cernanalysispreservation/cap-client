@@ -347,7 +347,6 @@ class CapAPI(object):
                 output_filename = os.path.basename(filepath)
 
         # data = {'filename': output_filename}
-
         return self._make_request(
             url="files/{bucket_id}/{filename}".format(
                 bucket_id=bucket_id,
@@ -359,3 +358,10 @@ class CapAPI(object):
     def types(self):
         """Get available analyses types."""
         return self._get_available_types()
+
+    def publish(self, pid):
+        return self._make_request(url='deposits/{}/actions/publish'.format(pid),
+                                  expected_status_code=202,
+                                  method='post',
+                                  headers={'Content-Type': 'application/json',
+                                           'Accept': 'application/basic+json'})

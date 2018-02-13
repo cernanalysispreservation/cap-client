@@ -156,6 +156,30 @@ def delete(ctx, pid):
         logging.debug(str(e))
 
 
+@click.command()
+@click.option(
+    '--pid',
+    '-p',
+    help='Publish deposit with given pid',
+    default=None,
+    required=True
+)
+@click.pass_context
+def publish(ctx, pid):
+    """Publish analysis with given pid."""
+    try:
+        response = ctx.obj.cap_api.publish(pid=pid)
+        click.echo(json.dumps(response,
+                              indent=4))
+
+    except StatusCodeException as e:
+        logging.error(str(e))
+
+    except Exception as e:
+        logging.error('Unexpected error.')
+        logging.debug(str(e))
+
+
 #@click.command()
 #@click.option(
 #    '--pid',
