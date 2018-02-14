@@ -199,23 +199,6 @@ class CapAPI(object):
                                       })
         return response['metadata']
 
-    def remove_field(self, field_name, pid):
-        """Remove analysis field."""
-
-        json_data = [{
-            "op": "remove",
-            "path": '/{}'.format(field_name.replace('.', '/'))
-        }]
-
-        headers = {'Content-Type': 'application/json-patch+json',
-                   'Accept': 'application/basic+json'}
-
-        response = self._make_request(url=urljoin('deposits/', pid),
-                                      data=json.dumps(json_data),
-                                      method='patch',
-                                      headers=headers)
-        return response['data']['metadata']
-
     def set(self, field_name, field_val, pid, filepath=None, append=False):
         """Edit analysis field value."""
         try:
