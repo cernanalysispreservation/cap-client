@@ -45,7 +45,7 @@ def files():
     default=None,
     required=True
 )
-@click.argument('file', type=click.Path(exists=True))
+@click.argument('file', type=click.Path(exists=False))
 @click.option(
     '--output-file',
     '-o',
@@ -57,12 +57,22 @@ def files():
     is_flag=True,
     help="Bypasses prompts..Say YES to everything"
 )
+@click.option(
+    '--docker',
+    is_flag=True,
+    help="Uploads docker image."
+)
 @click.pass_context
-def upload(ctx, pid, file, yes, output_file=None):
+def upload(ctx, pid, file, yes, output_file=None, docker=False):
     """Upload file to deposit with given pid."""
     try:
-        ctx.obj.cap_api.upload_file(
-            pid=pid, filepath=file, output_filename=output_file, yes=yes)
+        if docker:
+            ctx.obj.cap_api.upload_docker_img(pid=pid, img_name=file,
+                                              output_img_name=output_file)
+        else:
+            ctx.obj.cap_api.upload_file(
+                pid=pid, filepath=file,
+                output_filename=output_file, yes=yes)
         click.echo("File uploaded successfully.")
 
     except BadStatusCode as e:

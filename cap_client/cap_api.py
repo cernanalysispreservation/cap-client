@@ -391,6 +391,16 @@ class CapAPI(object):
             method='put',
         )
 
+    def upload_docker_img(self, pid=None, img_name=None, output_img_name=None):
+        """Uploads docker image."""
+        if output_img_name is None:
+            output_img_name = img_name
+        from subprocess import check_call
+        check_call(["docker", "save", "-o", "{}.tar".format(output_img_name),
+                    img_name])
+        self.upload_file(pid=pid, filepath="{}.tar".format(output_img_name))
+        check_call(["rm", "{}.tar".format(output_img_name)])
+
     def publish(self, pid):
         return self._make_request(url='deposits/{}/actions/publish'.format(pid),  # noqa
                                   expected_status_code=202,

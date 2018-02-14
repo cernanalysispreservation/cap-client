@@ -524,6 +524,45 @@ You need to specify
     File uploaded successfully.
 
 
+Upload Docker image
+-----------
+
+With the client, you can upload a Docker image that is associated to the analysis. Make sure that the image is present in the system by running the command `docker images` in the command line. The image name should be in the list. In the examples below we use an image called `hello-world`.
+
+You need to specify
+
+    --pid  the PID of the analysis.
+    --docker  (with no additional arguments)
+
+To upload the image use the command:
+
+.. code-block:: console
+
+    $ cap-client files upload hello-world --docker --pid 1ed645539e08435ea1bd4aad1360e87b
+
+Optionally you can specify
+
+    --output-file  the output file name of the image; by default it is the same as the original image name
+
+To upload the image with an output file name use the command:
+
+.. code-block:: console
+
+    $ cap-client files upload hello-world --docker --pid 1ed645539e08435ea1bd4aad1360e87b --output-file newname
+
+For troubleshooting use the verbose mode:
+
+.. code-block:: console
+
+    $ cap-client -v files upload hello-world --docker --pid 1ed645539e08435ea1bd4aad1360e87b --output-file newname
+
+This is an example command for downloading the image:
+
+.. code-block:: console
+
+    $ cap-client files download newname.tar --pid 1ed645539e08435ea1bd4aad1360e87b
+
+
 Download file
 -----------
 
