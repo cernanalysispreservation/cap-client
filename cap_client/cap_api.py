@@ -33,7 +33,7 @@ import click
 import requests
 import urllib3
 
-from cap_client.errors import StatusCodeException, UnknownAnalysisType
+from cap_client.errors import BadStatusCode, UnknownAnalysisType
 from utils import make_tarfile
 
 # @TOFIX
@@ -82,7 +82,7 @@ class CapAPI(object):
         if response.status_code == expected_status_code:
             return response_data
         else:
-            raise StatusCodeException(
+            raise BadStatusCode(
                 endpoint=endpoint,
                 expected_status_code=expected_status_code,
                 status_code=response.status_code,

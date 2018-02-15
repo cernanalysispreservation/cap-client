@@ -29,7 +29,7 @@ import logging
 
 import click
 
-from cap_client.errors import StatusCodeException, UnknownAnalysisType
+from cap_client.errors import BadStatusCode, UnknownAnalysisType
 
 
 @click.command()
@@ -40,7 +40,7 @@ def ping(ctx):
         response = ctx.obj.cap_api.ping()
         click.echo(response)
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -57,7 +57,7 @@ def me(ctx):
         click.echo(json.dumps(response,
                               indent=4))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -84,7 +84,7 @@ def get_shared(ctx, pid, all):
         click.echo(json.dumps(response,
                               indent=4))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -111,7 +111,7 @@ def get(ctx, pid, all):
         click.echo(json.dumps(response,
                               indent=4))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -152,7 +152,7 @@ def create(ctx, json_file, type, version):
     except UnknownAnalysisType as e:
         logging.error(str(e))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -175,7 +175,7 @@ def delete(ctx, pid):
         ctx.obj.cap_api.delete(pid=pid)
         click.echo('Analysis {} deleted.'.format(pid))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -199,7 +199,7 @@ def publish(ctx, pid):
         click.echo(json.dumps(response,
                               indent=4))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -223,7 +223,7 @@ def clone(ctx, pid):
         click.echo(json.dumps(response,
                               indent=4))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -239,7 +239,7 @@ def types(ctx):
         response = ctx.obj.cap_api.types()
         click.echo('Available types:\n{}'.format('\n'.join(response)))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:

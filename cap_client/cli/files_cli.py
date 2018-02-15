@@ -29,7 +29,7 @@ import logging
 
 import click
 
-from cap_client.errors import StatusCodeException
+from cap_client.errors import BadStatusCode
 
 
 @click.group()
@@ -65,7 +65,7 @@ def upload(ctx, pid, file, yes, output_file=None):
             pid=pid, filepath=file, output_filename=output_file, yes=yes)
         click.echo("File uploaded successfully.")
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -95,7 +95,7 @@ def download(ctx, pid, output_file, filename):
         ctx.obj.cap_api.download_file(pid, filename, output_file)
         click.echo("File saved as {}".format(output_file or filename))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -119,7 +119,7 @@ def list(ctx, pid):
         click.echo(json.dumps(response,
                               indent=4))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -143,7 +143,7 @@ def remove(ctx, pid, filename):
         ctx.obj.cap_api.remove_file(pid=pid, filename=filename)
         click.echo("File {} removed.".format(filename))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:

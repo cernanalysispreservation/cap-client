@@ -29,7 +29,7 @@ import logging
 
 import click
 
-from cap_client.errors import StatusCodeException
+from cap_client.errors import BadStatusCode
 
 
 @click.group()
@@ -63,7 +63,7 @@ def set(ctx, field_name, field_value, pid, file):
                                              file)
         click.echo(json.dumps(response, indent=4))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -87,7 +87,7 @@ def remove(ctx, field_name, pid):
         response = ctx.obj.cap_api.remove_field(field_name, pid)
         click.echo(json.dumps(response, indent=4))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -121,7 +121,7 @@ def append(ctx, field_name, field_value, pid, file):
                                              file, append=True)
         click.echo(json.dumps(response, indent=4))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -154,7 +154,7 @@ def get(ctx, field, pid):
         logging.error('Field {} doesn\'t exist'
                       .format(field))
 
-    except StatusCodeException as e:
+    except BadStatusCode as e:
         logging.error(str(e))
 
     except Exception as e:

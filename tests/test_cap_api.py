@@ -30,7 +30,7 @@ import json
 from mock import mock_open, patch
 from pytest import raises
 
-from cap_client.errors import StatusCodeException, UnknownAnalysisType
+from cap_client.errors import BadStatusCode, UnknownAnalysisType
 
 
 @patch('requests.delete')
@@ -73,7 +73,7 @@ def test_make_request_when_request_successful(mock_requests, cap_api,
 def test_make_request_when_request_fails(mock_requests, cap_api):
     mock_requests.return_value.status_code = 400
 
-    with raises(StatusCodeException):
+    with raises(BadStatusCode):
         cap_api._make_request(url='endpoint',
                               expected_status_code=200)
 
@@ -81,7 +81,7 @@ def test_make_request_when_request_fails(mock_requests, cap_api):
 @patch('requests.post')
 def test_make_request_when_sending_record_data(mock_requests, cap_api,
                                                record_data):
-    with raises(StatusCodeException):
+    with raises(BadStatusCode):
         cap_api._make_request(url='endpoint',
                               method='post',
                               data=record_data)
@@ -254,9 +254,9 @@ def test_create_method_when_validate_failed_raises_exception(mocked_cap_api,
     json_data = json.dumps(record_data)
     with patch('__builtin__.open', new_callable=mock_open,
                read_data=json_data):
-        mocked_cap_api._make_request.side_effect = [StatusCodeException(),
+        mocked_cap_api._make_request.side_effect = [BadStatusCode(),
                                                     None]
-        with raises(StatusCodeException):
+        with raises(BadStatusCode):
             mocked_cap_api.create(json_='file',
                                   ana_type='atlas-workflows')
 
@@ -277,9 +277,9 @@ def test_update_method_when_validate_failed_raises_exception(mocked_cap_api,
     json_data = json.dumps(record_data)
     with patch('__builtin__.open', new_callable=mock_open,
                read_data=json_data):
-        mocked_cap_api._make_request.side_effect = [StatusCodeException(),
+        mocked_cap_api._make_request.side_effect = [BadStatusCode(),
                                                     None]
-        with raises(StatusCodeException):
+        with raises(BadStatusCode):
             mocked_cap_api.update(filename='file',
                                   pid='some_pid')
 

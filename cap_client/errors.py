@@ -27,7 +27,7 @@
 import json
 
 
-class StatusCodeException(Exception):
+class BadStatusCode(Exception):
     """Exception for status code different than expected."""
 
     def __init__(self,
@@ -37,7 +37,7 @@ class StatusCodeException(Exception):
                  endpoint=None,
                  data=None,
                  **kwargs):
-        """Initialize StatusCodeException."""
+        """Initialize BadStatusCode."""
         super(Exception, self)
         self.message = message
         self.expected_status_code = expected_status_code
@@ -46,7 +46,7 @@ class StatusCodeException(Exception):
         self.data = data
 
     def __str__(self):
-        """Print StatusCodeException details."""
+        """Print BadStatusCode exception's details."""
         return "Something went wrong when trying to connect to {endpoint}\n" \
                "Server replied with:\n" \
                "{data}" .format(endpoint=self.endpoint,
@@ -66,6 +66,6 @@ class UnknownAnalysisType(Exception):
         self.types = types
 
     def __str__(self):
-        """Print StatusCodeException details."""
+        """Print UnknownAnalysisType exception's details."""
         return "Choose one of the available analyses types:\n{}".format(
                 '\n'.join(self.types))
