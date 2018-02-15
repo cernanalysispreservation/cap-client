@@ -144,6 +144,12 @@ class CapAPI(object):
 
         return response if pid else response['hits']['hits']
 
+    def get_shared(self, pid=None):
+        """Retrieve one or all shared analyses from a user."""
+        response = self._make_request(url=urljoin('records/', pid))
+
+        return response if pid else response['hits']['hits']
+
     def create(self, json_='', ana_type=None, version='0.0.1'):
         """Create an analysis."""
         types = self._get_available_types()

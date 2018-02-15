@@ -65,6 +65,33 @@ def me(ctx):
         logging.debug(str(e))
 
 
+@click.command('get-shared')
+@click.option(
+    '--pid',
+    '-p',
+    help='Get record with given pid',
+    default=None)
+@click.option(
+    '--all',
+    is_flag=True,
+    help="Retrieve all shared analyses you can access."
+)
+@click.pass_context
+def get_shared(ctx, pid, all):
+    """Retrieve one or all shared analyses from a user."""
+    try:
+        response = ctx.obj.cap_api.get_shared(pid=pid)
+        click.echo(json.dumps(response,
+                              indent=4))
+
+    except StatusCodeException as e:
+        logging.error(str(e))
+
+    except Exception as e:
+        logging.error('Unexpected error.')
+        logging.debug(str(e))
+
+
 @click.command()
 @click.option(
     '--pid',
