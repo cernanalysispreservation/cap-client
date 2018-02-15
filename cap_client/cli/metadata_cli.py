@@ -59,7 +59,8 @@ def metadata():
 def set(ctx, field_name, field_value, pid, file):
     """Edit analysis field value."""
     try:
-        response = ctx.obj.cap_api.set(field_name, field_value, pid, file)
+        response = ctx.obj.cap_api.set_field(field_name, field_value, pid,
+                                             file)
         click.echo(json.dumps(response, indent=4))
 
     except StatusCodeException as e:
@@ -116,8 +117,8 @@ def remove(ctx, field_name, pid):
 def append(ctx, field_name, field_value, pid, file):
     """Edit analysis field adding a new value to an array."""
     try:
-        response = ctx.obj.cap_api.set(field_name, field_value, pid, file,
-                                       append=True)
+        response = ctx.obj.cap_api.set_field(field_name, field_value, pid,
+                                             file, append=True)
         click.echo(json.dumps(response, indent=4))
 
     except StatusCodeException as e:
@@ -145,7 +146,7 @@ def append(ctx, field_name, field_value, pid, file):
 def get(ctx, field, pid):
     """Retrieve one or more fields in analysis metadata."""
     try:
-        response = ctx.obj.cap_api.get_metadata(pid=pid, field=field)
+        response = ctx.obj.cap_api.get_field(pid=pid, field=field)
         click.echo(json.dumps(response,
                               indent=4))
 

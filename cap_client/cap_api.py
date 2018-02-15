@@ -61,6 +61,7 @@ class CapAPI(object):
                       method='get',
                       expected_status_code=200,
                       headers={'Content-type': 'application/json'},
+                      stream=False,
                       **kwargs):
 
         endpoint = self._construct_endpoint(url=url)
@@ -71,9 +72,10 @@ class CapAPI(object):
                               verify=False,
                               params=params,
                               headers=headers,
+                              stream=stream,
                               **kwargs)
         try:
-            response_data = response.json()
+            response_data = response if stream else response.json()
         except ValueError:
             response_data = None
 
@@ -117,9 +119,15 @@ class CapAPI(object):
         """Retrieve user info."""
         response = self._make_request(url='me')
 
-        return {x: response[x] for x in ('id',
-                                         'collaborations',
-                                         'email')}
+        return {x: response[x] for x in ('id', 'collaborations', 'email')}
+
+    def types(self):
+        """Get available analyses types."""
+        return self._get_available_types()
+
+    ##############
+    # CRUD
+    ##############
 
     def get(self, pid=None, all=False):
         """Retrieve one or all analyses from a user."""
@@ -135,95 +143,6 @@ class CapAPI(object):
         response = self._make_request(url=url, headers=headers)
 
         return response if pid else response['hits']['hits']
-
-    def get_metadata(self, pid, field=None):
-        """Return metadata on analysis."""
-        dct = self._make_request(url=urljoin('deposits/', pid),
-                                 headers={
-                                     'Accept': 'application/basic+json'
-                                 })
-        dct = dct["metadata"]
-        fields = field.split('.') if field else []
-        for x in fields:
-            dct = dct[x or int(x)]
-        return dct
-
-    def get_permissions(self, pid):
-        """Return deposit user permissions."""
-        return self._make_request(url=urljoin('deposits/', pid),
-                                  headers={
-                                      'Accept': 'application/permissions+json'
-                                  })
-
-    def add_permissions(self, pid=None, email=None,
-                        rights=None):
-        """Assigns access right to users in a deposit."""
-        data = self._get_permissions_data(rights, email, operation='add')
-        url = urljoin('deposits/', pid + '/actions/permissions')
-        return self._make_request(url=url,
-                                  data=json.dumps(data),
-                                  method='post',
-                                  expected_status_code=201,
-                                  headers={
-                                      'Content-type': 'application/json',
-                                      'Accept': 'application/permissions+json'
-                                  })
-
-    def remove_permissions(self, pid=None, email=None,
-                           rights=None):
-        """Removes access right to users in a deposit."""
-        data = self._get_permissions_data(rights, email, operation='remove')
-        url = urljoin('deposits/', pid + '/actions/permissions')
-        return self._make_request(url=url,
-                                  data=json.dumps(data),
-                                  method='post',
-                                  expected_status_code=201,
-                                  headers={
-                                      'Content-type': 'application/json',
-                                      'Accept': 'application/permissions+json'
-                                  })
-
-    def remove_field(self, field_name, pid):
-        """Remove analysis field."""
-        json_data = [{
-            "op": "remove",
-            "path": '/{}'.format(field_name.replace('.', '/'))
-        }]
-
-        response = self._make_request(url=urljoin('deposits/', pid),
-                                      data=json.dumps(json_data),
-                                      method='patch',
-                                      headers={
-                                          'Content-Type': 'application/json-patch+json',  # noqa
-                                          'Accept': 'application/basic+json'
-                                      })
-        return response['metadata']
-
-    def set(self, field_name, field_val, pid, filepath=None, append=False):
-        """Edit analysis field value."""
-        try:
-            val = json.loads(field_val)
-        except ValueError:
-            val = field_val
-
-        json_data = [{
-            "op": "add",
-            "path": '/{}{}'.format(field_name.replace('.', '/'),
-                                   '/-' if append else ''),
-            "value": val,
-        }]
-
-        if filepath:
-            self.upload(pid, filepath, field_val)
-
-        response = self._make_request(url=urljoin('deposits/', pid),
-                                      data=json.dumps(json_data),
-                                      method='patch',
-                                      headers={
-                                          'Content-Type': 'application/json-patch+json',  # noqa
-                                          'Accept': 'application/basic+json'
-                                      })
-        return response['metadata']
 
     def create(self, json_='', ana_type=None, version='0.0.1'):
         """Create an analysis."""
@@ -295,18 +214,144 @@ class CapAPI(object):
                                       'Content-Type': 'application/json-patch+json'  # noqa
                                   })
 
-    def get_files(self, pid):
+    ##############
+    # METADATA
+    ##############
+    def get_field(self, pid, field=None):
+        """Return metadata on analysis."""
+        dct = self._make_request(url=urljoin('deposits/', pid),
+                                 headers={
+                                     'Accept': 'application/basic+json'
+                                 })['metadata']
+        fields = field.split('.') if field else []
+        for x in fields:
+            dct = dct[x or int(x)]
+        return dct
+
+    def set_field(self, field_name, field_val, pid, filepath=None,
+                  append=False):
+        """Edit analysis field value."""
+        try:
+            val = json.loads(field_val)
+        except ValueError:
+            val = field_val
+
+        json_data = [{
+            "op": "add",
+            "path": '/{}{}'.format(field_name.replace('.', '/'),
+                                   '/-' if append else ''),
+            "value": val,
+        }]
+
+        if filepath:
+            self.upload_file(pid, filepath, field_val)
+
+        response = self._make_request(url=urljoin('deposits/', pid),
+                                      data=json.dumps(json_data),
+                                      method='patch',
+                                      headers={
+                                          'Content-Type': 'application/json-patch+json',  # noqa
+                                          'Accept': 'application/basic+json'
+                                      })
+        return response['metadata']
+
+    def remove_field(self, field_name, pid):
+        """Remove analysis field."""
+        json_data = [{
+            "op": "remove",
+            "path": '/{}'.format(field_name.replace('.', '/'))
+        }]
+
+        response = self._make_request(url=urljoin('deposits/', pid),
+                                      data=json.dumps(json_data),
+                                      method='patch',
+                                      headers={
+                                          'Content-Type': 'application/json-patch+json',  # noqa
+                                          'Accept': 'application/basic+json'
+                                      })
+        return response['metadata']
+
+    ##############
+    # PERMISSIONS
+    ##############
+    def get_permissions(self, pid):
+        """Return deposit user permissions."""
+        return self._make_request(url=urljoin('deposits/', pid),
+                                  headers={
+                                      'Accept': 'application/permissions+json'
+                                  })
+
+    def add_permissions(self, pid=None, email=None,
+                        rights=None):
+        """Assigns access right to users in a deposit."""
+        data = self._get_permissions_data(rights, email, operation='add')
+        url = urljoin('deposits/', pid + '/actions/permissions')
+        return self._make_request(url=url,
+                                  data=json.dumps(data),
+                                  method='post',
+                                  expected_status_code=201,
+                                  headers={
+                                      'Content-type': 'application/json',
+                                      'Accept': 'application/permissions+json'
+                                  })
+
+    def remove_permissions(self, pid=None, email=None,
+                           rights=None):
+        """Removes access right to users in a deposit."""
+        data = self._get_permissions_data(rights, email, operation='remove')
+        url = urljoin('deposits/', pid + '/actions/permissions')
+        return self._make_request(url=url,
+                                  data=json.dumps(data),
+                                  method='post',
+                                  expected_status_code=201,
+                                  headers={
+                                      'Content-type': 'application/json',
+                                      'Accept': 'application/permissions+json'
+                                  })
+
+    ##############
+    # FILES
+    ##############
+
+    def _get_bucket_id(self, pid):
+        deposit = self._make_request(url='deposits/{}'.format(pid))
+        return deposit['links']['bucket'].split("/")[-1:][0]
+
+    def list_files(self, pid):
         return self._make_request(url='deposits/{}/files'.format(pid))
 
-    def upload(self, pid=None, filepath=None, yes=False, output_filename=None):
-        """Upload file or directory to deposit by given pid."""
-        try:
-            deposit = self._make_request(url='deposits/{}'.format(pid))
-        except Exception as e:
-            return {"error": e}
+    def download_file(self, pid, filename, output_filename=None):
+        bucket_id = self._get_bucket_id(pid)
+        output = output_filename or filename
 
-        bucket_url = deposit.get("links", {}).get("bucket", None)
-        bucket_id = bucket_url.split("/")[-1:][0]
+        response = self._make_request(
+            url="files/{bucket_id}/{filename}".format(
+                bucket_id=bucket_id,
+                filename=filename),
+            method='get',
+            stream=True
+        )
+
+        with open(output, 'wb') as f:
+            f.write(response.content)
+
+        return response
+
+    def remove_file(self, pid, filename):
+        bucket_id = self._get_bucket_id(pid)
+
+        return self._make_request(
+            url="files/{bucket_id}/{filename}".format(
+                bucket_id=bucket_id,
+                filename=filename),
+            expected_status_code=204,
+            method='delete'
+        )
+
+    def upload_file(self, pid=None, filepath=None, yes=False,
+                    output_filename=None):
+        """Upload file or directory to deposit by given pid."""
+        bucket_id = self._get_bucket_id(pid)
 
         # Check if filepath is file or DIR
         if os.path.isdir(filepath):
@@ -337,10 +382,6 @@ class CapAPI(object):
             data=open(filepath, 'rb'),
             method='put',
         )
-
-    def types(self):
-        """Get available analyses types."""
-        return self._get_available_types()
 
     def publish(self, pid):
         return self._make_request(url='deposits/{}/actions/publish'.format(pid),  # noqa

@@ -61,7 +61,7 @@ def files():
 def upload(ctx, pid, file, yes, output_file=None):
     """Upload file to deposit with given pid."""
     try:
-        ctx.obj.cap_api.upload(
+        ctx.obj.cap_api.upload_file(
             pid=pid, filepath=file, output_filename=output_file, yes=yes)
         click.echo("File uploaded successfully.")
 
@@ -77,17 +77,71 @@ def upload(ctx, pid, file, yes, output_file=None):
 @click.option(
     '--pid',
     '-p',
-    help='Get files of deposit with given pid',
+    help='Get file uploaded with deposit with given pid',
+    default=None,
+    required=True
+)
+@click.option(
+    '--output-file',
+    '-o',
+    help='Filename to be given to uploaded file',
+    default=None,
+)
+@click.argument('filename')
+@click.pass_context
+def download(ctx, pid, output_file, filename):
+    """Download file uploaded with given deposit."""
+    try:
+        ctx.obj.cap_api.download_file(pid, filename, output_file)
+        click.echo("File saved as {}".format(output_file or filename))
+
+    except StatusCodeException as e:
+        logging.error(str(e))
+
+    except Exception as e:
+        logging.error('Unexpected error.')
+        logging.debug(str(e))
+
+
+@files.command()
+@click.option(
+    '--pid',
+    '-p',
+    help='List files of deposit with given pid',
     default=None,
     required=True
 )
 @click.pass_context
-def get(ctx, pid):
-    """Get list of files associated with deposit with given pid."""
+def list(ctx, pid):
+    """List files associated with deposit with given pid."""
     try:
-        response = ctx.obj.cap_api.get_files(pid=pid)
+        response = ctx.obj.cap_api.list_files(pid=pid)
         click.echo(json.dumps(response,
                               indent=4))
+
+    except StatusCodeException as e:
+        logging.error(str(e))
+
+    except Exception as e:
+        logging.error('Unexpected error.')
+        logging.debug(str(e))
+
+
+@files.command()
+@click.option(
+    '--pid',
+    '-p',
+    help='Remove file from deposit with given pid',
+    default=None,
+    required=True
+)
+@click.argument('filename')
+@click.pass_context
+def remove(ctx, pid, filename):
+    """Removefile from deposit with given pid."""
+    try:
+        ctx.obj.cap_api.remove_file(pid=pid, filename=filename)
+        click.echo("File {} removed.".format(filename))
 
     except StatusCodeException as e:
         logging.error(str(e))

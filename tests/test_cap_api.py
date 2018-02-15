@@ -27,9 +27,10 @@ from __future__ import absolute_import, print_function
 
 import json
 
-from cap_client.errors import StatusCodeException, UnknownAnalysisType
 from mock import mock_open, patch
 from pytest import raises
+
+from cap_client.errors import StatusCodeException, UnknownAnalysisType
 
 
 @patch('requests.delete')
@@ -128,35 +129,35 @@ def test_get_method_with_given_pid(mock_requests, cap_api, record_data):
 
 
 @patch('requests.get')
-def test_get_metadata_when_field_unspecified(mock_requests, cap_api,
-                                             record_data):
+def test_get_field_when_field_unspecified(mock_requests, cap_api,
+                                          record_data):
     mock_requests.return_value.status_code = 200
     mock_requests.return_value.json.return_value = record_data
 
-    resp = cap_api.get_metadata('some_pid')
+    resp = cap_api.get_field('some_pid')
 
     assert resp == record_data['metadata']
 
 
 @patch('requests.get')
-def test_get_metadata_when_field_specified(mock_requests, cap_api,
-                                           record_data):
+def test_get_field_when_field_specified(mock_requests, cap_api,
+                                        record_data):
     mock_requests.return_value.status_code = 200
     mock_requests.return_value.json.return_value = record_data
 
-    resp = cap_api.get_metadata('some_pid', 'general_title')
+    resp = cap_api.get_field('some_pid', 'general_title')
 
     assert resp == record_data['metadata']['general_title']
 
 
 @patch('requests.get')
-def test_get_metadata_when_field_is_incorrect(mock_requests, cap_api,
-                                              record_data):
+def test_get_field_when_field_is_incorrect(mock_requests, cap_api,
+                                           record_data):
     mock_requests.return_value.status_code = 200
     mock_requests.return_value.json.return_value = record_data
 
     with raises(KeyError):
-        cap_api.get_metadata('some_pid', 'title')
+        cap_api.get_field('some_pid', 'title')
 
 
 @patch('requests.get')
@@ -328,10 +329,11 @@ def test_patch_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
         mocked_cap_api.patch(filename='file')
 
 
-def test_set_when_setting_string_field(mocked_cap_api, record_data):
+def test_set_field_when_setting_string_field(mocked_cap_api, record_data):
     mocked_cap_api._make_request.return_value = record_data
 
-    mocked_cap_api.set('field_name.nested.nested2', 'field_val', 'some_pid')
+    mocked_cap_api.set_field('field_name.nested.nested2',
+                             'field_val', 'some_pid')
 
     named_args = mocked_cap_api._make_request.call_args[1]
     sent_json = json.loads(named_args['data'])[0]
@@ -341,11 +343,12 @@ def test_set_when_setting_string_field(mocked_cap_api, record_data):
     assert sent_json['value'] == 'field_val'
 
 
-def test_set_when_appending_string_field_to_array(mocked_cap_api, record_data):
+def test_set_field_when_appending_string_field_to_array(mocked_cap_api,
+                                                        record_data):
     mocked_cap_api._make_request.return_value = record_data
 
-    mocked_cap_api.set('field_name.nested.nested2', 'field_val', 'some_pid',
-                       append=True)
+    mocked_cap_api.set_field('field_name.nested.nested2',
+                             'field_val', 'some_pid', append=True)
 
     named_args = mocked_cap_api._make_request.call_args[1]
     sent_json = json.loads(named_args['data'])[0]
