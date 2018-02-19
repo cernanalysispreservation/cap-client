@@ -131,8 +131,6 @@ class CapAPI(object):
 
     def get(self, pid=None, all=False):
         """Retrieve one or all analyses from a user."""
-        headers = {} if not pid else {'Accept': 'application/basic+json'}
-
         if pid or all:
             url = urljoin('deposits/', pid)
         else:
@@ -140,13 +138,17 @@ class CapAPI(object):
             url = urljoin('deposits/', '?q=_deposit.created_by:{}'.format(
                 user_id))
 
-        response = self._make_request(url=url, headers=headers)
+        response = self._make_request(url=url, headers={
+            'Accept': 'application/basic+json'})
 
         return response if pid else response['hits']['hits']
 
     def get_shared(self, pid=None):
         """Retrieve one or all shared analyses from a user."""
-        response = self._make_request(url=urljoin('records/', pid))
+        response = self._make_request(url=urljoin('records/', pid),
+                                      headers={
+                                          'Accept': 'application/basic+json'
+                                      })
 
         return response if pid else response['hits']['hits']
 
