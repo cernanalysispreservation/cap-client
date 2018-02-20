@@ -9,7 +9,9 @@ Welcome to cap-client's documentation!
 Installation
 ======
 
-To install cap-client you just need to do the following.
+This is to detail the cap-client installation with the package manager pip. Please refer to the `pip installation instructions <https://pip.pypa.io/en/stable/installing/>`_ if you do not yet have the package management system installed.
+
+To install cap-client:
 
 .. code-block:: console
 
@@ -21,11 +23,11 @@ Usage
 
 This guide assumes that you have successfully installed cap-client package already. If not, please follow the  :doc:`installation` instructions first.
 
-To use cap-client you need a running CAP server, you can use the `CERN Production server <https://analysispreservation.cern.ch/>`_.
+The cap-client is designed to communicate with a CERN Analysis Preservation (CAP) server instance. You can use the `CERN Production server <https://analysispreservation.cern.ch/>`_, which comes with the most stable version of CAP. All further descriptions and references link to this production instance. 
 
-Next step is to generate an access token through the CAP server. For CERN Production server this can be done by following this `link <https://analysispreservation.cern.ch/profile/applications>`_.
+In order to communicate with the server, you first need to generate a personal access token `here <https://analysispreservation.cern.ch/profile/applications>`_.
 
-Finally you need to set the required environment variables for the cap-client.
+Afterwards, set the required environment variables for the cap-client. If you like to select a CAP server different than the production instance, you can change the URL here.
 
 .. code-block:: console
 
@@ -74,7 +76,7 @@ Get all types of analyses available
 Get analysis with given PID
 ----------
 
-You can get existing analysis details only if you have at least read access to it.
+You can retrieve analysis details if you have read or write access to the analysis.
 
 You need to specify 
  
@@ -109,15 +111,9 @@ Create analysis
 You can create a new analysis by specifing
 
 	--file  a file with the json data corresponding to the analysis JSON Schema.
-	--type  the type of analysis you want to create.
+	--type  the type of analysis you want to create. Refer to the :ref:`analysis type section <types>` to see an overview of all the options.
 
-If you don't know what is the type of analysis you want to create use this
-:ref:`link <types>`.
-
-You can only choose to create the type of analysis that you are affiliated.
-E.g if you are a CMS member you can only create analysis with type cms-analysis or 
-cms-questionnaire.
-
+You can create analyses that correspond to your affiliation with a collaboration. For example: if you are a member of the CMS collaboration, you can create analyses with type cms-analysis or cms-questionnaire.
 
 .. code-block:: console
 
