@@ -108,7 +108,7 @@ You need to specify
 Create analysis
 ----------
 
-You can create a new analysis by specifing
+You can create a new analysis by specifying
 
 	--file  a file with the json data corresponding to the analysis JSON Schema.
 	--type  the type of analysis you want to create. Refer to the :ref:`analysis type section <types>` to see an overview of all the options.
@@ -145,7 +145,7 @@ You can create analyses that correspond to your affiliation with a collaboration
 Delete analysis
 ----------
 
-You can delete an existing analysis by specifing
+You can delete an existing analysis by specifying
 
 	--pid  the PID as a parameter.
 
@@ -165,7 +165,7 @@ You can delete an existing analysis by specifing
 Patch analysis
 ----------
 
-You can patch an existing analysis by specifing
+You can patch an existing analysis by specifying
 
 	--pid  the PID as a parameter.
 	--file  a file with the changes in `JSON patch format <http://jsonpatch.com/>`_.
@@ -204,7 +204,8 @@ Example changes in JSON patch format:
 Publish analysis
 ----------------
 
-You can publish an existing analysis by specifing
+By publishing your analysis, you are allowing your collaboration to access its resources on CAP (internal access only).
+This is done by using the command `publish` and specifying
 
     --pid  the PID of the analysis you want to share.
 
@@ -241,7 +242,7 @@ You can publish an existing analysis by specifing
 Clone analysis
 ----------------
 
-You can clone an existing analysis by specifing
+You can clone an existing analysis by specifying
 
     --pid  the PID of the analysis you want to share.
 
@@ -328,6 +329,7 @@ You need to specify
         }
     }
 
+
 Remove Metadata
 -------------
 
@@ -350,7 +352,6 @@ You need to specify
             "description": "Very Interesting Description"
         }
     }
-
 
 
 Permissions
