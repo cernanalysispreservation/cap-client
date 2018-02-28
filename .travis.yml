@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of CERN Analysis Preservation Framework.
-# Copyright (C) 2017 CERN.
+# Copyright (C) 2018 CERN.
 #
 # CERN Analysis Preservation Framework is free software; you can redistribute
 # it and/or modify it under the terms of the GNU General Public License as
@@ -23,6 +23,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 
+
 notifications:
   email: false
 
@@ -34,7 +35,7 @@ cache:
   - pip
 
 python:
-  - "2.7"
+  - '2.7'
 
 before_install:
   - travis_retry pip install --upgrade pip setuptools py
@@ -44,7 +45,19 @@ install:
   - travis_retry pip install -e .[all]
 
 script:
-  - ./run-tests.sh
+  - "./run-tests.sh"
 
 after_success:
   - coveralls
+
+deploy:
+  provider: pypi
+  user: anthropoid
+  password:
+    secure: sDUOi/SuzJjfjCUeaWlW15ZXGgWbcCGVXuiMCf6zfSeqBaVmPA2U+tK8zZPc4VARt2K2AxYXzoSaQJajzy2Ke77QuAJ6nQtMarIrr9xY54YZ02czLmqRgapNEWkcZVwqtRJj/DH92B4JSLrppidPnVpu+oADKUzgcNLZgWnQfNJevJV+uBs9AMx62lv99MV5mx2hjqrKxf9M1L3a4CDoIR2HKDi4mQgyriG3kPG3vvj0qvj9MDYFlOhdS1api9E7Hel08POq9h5NkA6C2VqFdscVCAGL20cDIKWgQqrnx5gwL56qHvduCwZCi5K+3UzGUYc92Gb1yehSf+qMavIfCi3Cj6xybnpVJe9/F/flpGJGLMIgBA+MHmZUpR/sa7mu7n1o3hCUteurVyzl6qc/3/MzBlGBvSqgrxJwidL8XjHaYFo2KoA2DHw6gA8xNKJJyuh4iFi4p9Lw+cOFycdbwx9mnKqv2Vhwrona8qqCgJOIf6WxidyM2TYoTbU4i25HUphshhTDAM4iGPzOtkS8BdILLH14CvoY2TQIsvhCHXYo3y/LOaCiqBKSrAghGNkckt6VoSxXiNAwakdl84dyxO+FaOrnfdjhWywRJGbP89Bs0hjk8KO/0mhGNkkDCMgWA4Nz974AjZDLooeBUdNnNNX0S2spSOVElBuEnY8ym+Q=
+  distributions: compile_catalog sdist bdist_wheel
+  on:
+    tags: true
+    python: '2.7'
+    branch: master
+
