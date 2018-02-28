@@ -34,7 +34,7 @@ cache:
   - pip
 
 python:
-  - "2.7"
+  - '2.7'
 
 before_install:
   - travis_retry pip install --upgrade pip setuptools py
@@ -44,7 +44,18 @@ install:
   - travis_retry pip install -e .[all]
 
 script:
-  - ./run-tests.sh
+  - "./run-tests.sh"
 
 after_success:
   - coveralls
+
+deploy:
+  provider: pypi
+  user: anthropoid
+  password:
+    secure: iBv1YPVyGhY50Pfhct4GnHPI7StRlWFh+EFahb17JYsx6zw8U3CQ0r3r8mv3SQcs08lFG6cFHSh24xsoNm4RI+e508k4TpDOo/rsdY19hwsdPVhMMzPIkuOq0+IxeuM2ZAFqXU+Dnhe4BExp2dVAjOHlMB04c4zpIFBqSwFnaPtTX8gnYGK8L0V5vHuGn7HMp91aG4JOauDlRlW9JHbwhgEU/eoNu+5fyM68b2ciaMI1h+jSFcSRyzXVKJj9/grulkyNmgSpSU+PGZno0mwdgwXS3YuK+Z/kixQu5hxZpIQSvIK/u697lTH0xtuNuXkCfgaWnSJ/Xg3xw1P6G8pWOHruqrlXO0IjMEn3RH0EcfcJNLeTp8OeHPwl5VTNtmdcN9F93T0EzwB9BKlBR8DOSESDAIFD5U1/CeUeMgy/7XxdokVUwGt5kh37eh84DI6oFL2NLEiTshNA2UAmN1n/xa8lKXfNBJKIxiol9DNjbyZ6wWIiBhHd8F9YNPihdZtRT4SEkJlp+7QGmSv/orfraCJSK8GUZTBEQgsdAY2mkSHkAtWuZCM8tLs2CrMHifSJTDoG+jVZIkvJJNyfvxIZeypiLLg0KPrcOFBDzwXIZjlvGomF2cutHR95PAdbwmjXsdnjzuyhqYq8D7OmYwKxv9KL+gcPNteie0CzvonQzds=
+  distributions: "sdist bdist_wheel"
+  on:
+    tags: true
+    python: '2.7'
+    branch: master

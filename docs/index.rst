@@ -86,9 +86,9 @@ You need to specify
 
 .. code-block:: console
 
-	$ cap-client get-schema --type/t <type of analysis>
+    $ cap-client get-schema --type/t <type of analysis>
 
-	E.g $cap-client get-schema --type lhcb
+    E.g $cap-client get-schema --type lhcb
 
     {
         "general_title": {

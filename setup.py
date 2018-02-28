@@ -88,7 +88,7 @@ setup(
     author='CAP',
     author_email='info@cap.io',
     url='https://github.com/cernanalysispreservation/cap-client',
-    packages=['cap_client', ],
+    packages=packages,
     zip_safe=False,
     entry_points={
          'console_scripts': [
