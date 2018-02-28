@@ -69,3 +69,13 @@ class UnknownAnalysisType(Exception):
         """Print UnknownAnalysisType exception's details."""
         return "Choose one of the available analyses types:\n{}".format(
                 '\n'.join(self.types))
+
+
+class MissingJsonFile(Exception):
+    """Json file not provided."""
+
+    def __str__(self):
+        """Print MissingJsonFile exception's details."""
+        return "Please provide a JSON file for the analysis. " \
+               "If you don't know the analysis fields, first call " \
+               "cap-client get-schema --type <analysis-type> ."

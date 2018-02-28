@@ -33,7 +33,8 @@ import click
 import requests
 import urllib3
 
-from cap_client.errors import BadStatusCode, UnknownAnalysisType
+from cap_client.errors import BadStatusCode, UnknownAnalysisType, \
+    MissingJsonFile
 from utils import make_tarfile
 
 # @TOFIX
@@ -152,12 +153,32 @@ class CapAPI(object):
 
         return response if pid else response['hits']['hits']
 
+    def get_schema(self, ana_type=None, version='0.0.1'):
+        """Retrieve schema according to type of analysis."""
+        types = self._get_available_types()
+
+        if ana_type not in types:
+            raise UnknownAnalysisType(types)
+
+        response = self._make_request(
+            url='schemas/deposits/records/{}-v{}.json'.format(
+                ana_type, version
+            ))
+
+        schema = {k: v for k, v in response.get('properties', {}).items()
+                  if not k.startswith('_')}
+
+        return schema
+
     def create(self, json_='', ana_type=None, version='0.0.1'):
         """Create an analysis."""
         types = self._get_available_types()
 
         if ana_type not in types:
             raise UnknownAnalysisType(types)
+
+        if not json_:
+            raise MissingJsonFile()
 
         try:
             data = json.loads(json_)

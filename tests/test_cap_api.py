@@ -30,7 +30,8 @@ import json
 from mock import mock_open, patch
 from pytest import raises
 
-from cap_client.errors import BadStatusCode, UnknownAnalysisType
+from cap_client.errors import BadStatusCode, UnknownAnalysisType, \
+    MissingJsonFile
 
 
 @patch('requests.delete')
@@ -226,7 +227,7 @@ def test_create_method_when_type_given_not_in_available_options(mocked_cap_api):
 
 
 def test_create_method_when_no_file_with_data_given(mocked_cap_api):
-    with raises(IOError):
+    with raises(MissingJsonFile):
         mocked_cap_api.create(ana_type='atlas-workflows')
 
 

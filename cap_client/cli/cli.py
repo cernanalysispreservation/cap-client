@@ -29,7 +29,8 @@ import logging
 
 import click
 
-from cap_client.errors import BadStatusCode, UnknownAnalysisType
+from cap_client.errors import BadStatusCode, UnknownAnalysisType, \
+    MissingJsonFile
 
 
 @click.command()
@@ -124,13 +125,12 @@ def get(ctx, pid, all):
     '--json-file',
     help='JSON data from file or command line',
     default=None,
-    required=True,
 )
 @click.option(
     '--type',
     '-t',
     help='Type of analysis',
-    default=None
+    default=None,
 )
 @click.option(
     '--version',
@@ -153,6 +153,9 @@ def create(ctx, json_file, type, version):
         logging.error(str(e))
 
     except BadStatusCode as e:
+        logging.error(str(e))
+
+    except MissingJsonFile as e:
         logging.error(str(e))
 
     except Exception as e:
@@ -238,6 +241,32 @@ def types(ctx):
     try:
         response = ctx.obj.cap_api.types()
         click.echo('Available types:\n{}'.format('\n'.join(response)))
+
+    except BadStatusCode as e:
+        logging.error(str(e))
+
+    except Exception as e:
+        logging.error('Unexpected error.')
+        logging.debug(str(e))
+
+
+@click.command('get-schema')
+@click.option(
+    '--type',
+    '-t',
+    help='Type of analysis',
+    default=None,
+    required=True
+)
+@click.pass_context
+def get_schema(ctx, type):
+    """Retrieve analysis schema."""
+    try:
+        response = ctx.obj.cap_api.get_schema(ana_type=type)
+        click.echo(json.dumps(response,
+                              indent=4))
+    except UnknownAnalysisType as e:
+        logging.error(str(e))
 
     except BadStatusCode as e:
         logging.error(str(e))

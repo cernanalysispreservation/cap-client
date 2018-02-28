@@ -32,7 +32,7 @@ import sys
 
 from cap_client.cap_api import CapAPI
 from cap_client.cli.cli import (create, clone, publish, delete, get, me, ping,
-                                types, get_shared)
+                                types, get_shared, get_schema)
 from cap_client.cli.metadata_cli import metadata
 from cap_client.cli.files_cli import files
 from cap_client.cli.permissions_cli import permissions
@@ -89,6 +89,7 @@ def cli(ctx, loglevel, verbose, access_token):
 cli.add_command(ping)
 cli.add_command(get)
 cli.add_command(get_shared)
+cli.add_command(get_schema)
 cli.add_command(me)
 cli.add_command(create)
 cli.add_command(delete)
