@@ -193,14 +193,28 @@ class CapAPI(object):
                            method='post',
                            data=json_data)
 
-        return self._make_request(url='deposits/',
-                                  method='post',
-                                  data=json_data,
-                                  expected_status_code=201,
-                                  headers={
-                                      'Content-Type': 'application/json',
-                                      'Accept': 'application/basic+json'
-                                  })
+        response = self._make_request(url='deposits/',
+                                      method='post',
+                                      data=json_data,
+                                      expected_status_code=201,
+                                      headers={
+                                          'Content-Type': 'application/json'
+                                      })
+        del response['metadata']['$ana_type']
+
+        return self._make_request(
+            url='deposits/{}'.format(
+                response.get(
+                    'metadata', {}).get(
+                    '_deposit', {}).get(
+                    'id', '')),
+            method='put',
+            data=json.dumps(response.get('metadata', {})),
+            expected_status_code=200,
+            headers={
+                'Content-Type': 'application/json',
+                'Accept': 'application/basic+json'
+            })
 
     def delete(self, pid=None):
         """Delete an analysis by given pid."""

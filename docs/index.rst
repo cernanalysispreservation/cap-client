@@ -73,6 +73,30 @@ Get all types of analyses available
 		cms-analysis
 
 
+Get schema of analyses type
+----------
+
+You can retrieve analysis schema details if you have read or write access to the analysis.
+For more information about JSON schema you can visit this `link <http://json-schema.org/>`_
+
+You need to specify
+
+    --type  the type of an analysis.
+
+
+.. code-block:: console
+
+	$ cap-client get-schema --type/t <type of analysis>
+
+	E.g $cap-client get-schema --type lhcb
+
+    {
+        "general_title": {
+            "type": "string"
+        }
+    }
+
+
 Get analysis with given PID
 ----------
 
@@ -114,6 +138,49 @@ You can create a new analysis by specifying
 	--type  the type of analysis you want to create. Refer to the :ref:`analysis type section <types>` to see an overview of all the options.
 
 You can create analyses that correspond to your affiliation with a collaboration. For example: if you are a member of the CMS collaboration, you can create analyses with type cms-analysis or cms-questionnaire.
+
+**NOTE** In order to upload a file or a repository in your analysis you should specify it according to schema. Let's say for example you have this schema
+
+.. code-block:: console
+
+    "user_analysis": {
+        "type": "object",
+        "properties": {
+            "basic_script": {
+                "x-cap-file": {
+                    "fetch_from": "/url",
+                    "file_key": "/key"
+                },
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "pattern": "^(http|https|root)://",
+                        "type": "string"
+                    },
+                    "version_id": {
+                        "type": "string"
+                    },
+                    "key": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "title": "User Analysis"
+    }
+
+In your JSON file you should specify the link like this:
+
+.. code-block:: console
+
+    {
+        "user_analysis": {
+            "basic_script": {
+                "url": "https://gitlab.cern.ch/itsanakt/testing"
+            }
+        }
+    }
+
 
 .. code-block:: console
 
@@ -161,44 +228,6 @@ You can delete an existing analysis by specifying
 			 	'data': None
 			}
 
-
-Patch analysis
-----------
-
-You can patch an existing analysis by specifying
-
-	--pid  the PID as a parameter.
-	--file  a file with the changes in `JSON patch format <http://jsonpatch.com/>`_.
-
-Example changes in JSON patch format:
-
-	.. code-block:: javascript
-		[ { "op": "add", "path": "/basic_info/analysis_number", "value": "22" }]
-
-.. code-block:: console
-
-	$ cap-client patch --pid/-p <existing pid> --file/-f <file with JSON data>
-
-	E.g $ cap-client patch --pid 883090d3c1784aeabe9e23412a81239e --file test.json
-	
-	{
-	 	'status': 200, 
-	 	'data': {   
-			"pid": "883090d3c1784aeabe9e23412a81239e",
-		    "basic_info": {
-		        "abstract": "Example abstract",
-		        "people_info": [
-		            {
-		                "name": "John doe"
-		            },
-		            {
-		                "name": "J doe"
-		            }
-		        ],
-		        "analysis_number": "test"
-		    }
-		}
-	}
 
 
 Publish analysis
