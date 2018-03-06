@@ -96,8 +96,24 @@ You need to specify
         }
     }
 
+Retrieve analyses
+----------
 
-Get analysis with given PID
+You can retrieve all analyses, for which you have either write or read access.
+
+For all analyses with write access:
+
+.. code-block:: console
+
+	$ cap-client get
+	
+For all analyses with read access:
+
+.. code-block:: console
+
+	$ cap-client get --all
+
+Retrieve analysis with given PID
 ----------
 
 You can retrieve analysis details if you have read or write access to the analysis.
