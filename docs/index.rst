@@ -1,10 +1,9 @@
-.. cap-client documentation master file, created by
-sphinx-quickstart on Fri Aug 25 14:52:59 2017.
-You can adapt this file completely to your liking, but it should at least
-contain the root `toctree` directive.
-
 Welcome to cap-client's documentation!
 ======================================
+
+CAP-client is the Python client library for the `CERN Analysis Preservation (CAP) <https://analysispreservation.cern.ch>`_ API. It is a command-line tool that facilitates preservation of physics data analyses, by allowing analysts to capture and store their analysis resources. The CAP-client is a free and open source project developed at `CERN <https://home.cern>`_.
+
+For more information about CAP, please proceed to the `full documentation <https://cernanalysispreservation.readthedocs.io/en/latest/index.html>`_.
 
 Installation
 ======

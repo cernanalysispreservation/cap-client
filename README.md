@@ -1,2 +1,3 @@
-# CAP Client
-This repository provides the CAP command-line client that researchers could use to talk to some CAP server in order to preserve and manage their analyses.
+# CERN Analysis Preservation: CAP-Client
+
+CAP-client is the Python client library for the [CERN Analysis Preservation (CAP)](https://analysispreservation.cern.ch) API. It is a command-line tool that facilitates preservation of physics data analyses, by allowing analysts to capture and store their analysis resources. The CAP-client is a free and open source project developed at [CERN](https://home.cern).
