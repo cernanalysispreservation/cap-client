@@ -374,6 +374,22 @@ You need to specify
     }
 
 
+Clone and archive git repository
+-------------
+
+You can clone your git repository and save it on CAP by adding its URL to the metadata in the following way:
+
+.. code-block:: console
+    cap-client metadata set user_analysis.basic_script.url <git repository URL> --pid <existing pid>
+
+For example:
+
+.. code-block:: console
+    cap-client metadata set user_analysis.basic_script.url https://gitlab.cern.ch/atrisovi/d2pimumu-analysis --pid 1ed645539e08435ea1bd4aad1360e87b
+
+This command will initiate cloning and saving of the git repository and it will be available on CAP as a tarball archive.
+
+
 Remove Metadata
 -------------
 
