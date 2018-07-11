@@ -558,7 +558,7 @@ You can upload a file to an analysis only if you have at least read access to it
 
 You need to specify
 
-    --pid  the PID of an analysis you want to set permissions.
+    --pid  the PID of the analysis.
 
 .. code-block:: console
 
@@ -611,11 +611,11 @@ This is an example command for downloading the image:
 Download file
 -----------
 
-You can download a file to an analysis only if you have at least read access to it.
+You can download a file of an analysis only if you have at least read access to it.
 
 You need to specify
 
-    --pid  the PID of an analysis you want to set permissions.
+    --pid  the PID of the analysis.
     --output-file  save the downloaded file as <desired file name>.
 
 .. code-block:: console
@@ -632,11 +632,11 @@ You need to specify
 Remove file
 -----------
 
-You can remove a file to an analysis only if you have at least read access to it.
+You can remove a file of an analysis only if you have at least read access to it.
 
 You need to specify
 
-    --pid  the PID of an analysis you want to set permissions.
+    --pid the PID of the analysis.
 
 .. code-block:: console
 
