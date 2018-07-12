@@ -26,12 +26,17 @@
 from __future__ import absolute_import, print_function
 
 import json
+import sys
 
 from mock import mock_open, patch
 from pytest import raises
-
 from cap_client.errors import BadStatusCode, UnknownAnalysisType, \
     MissingJsonFile
+
+if sys.version_info.major == 3:
+    builtin_module_name = 'builtins'
+else:
+    builtin_module_name = '__builtin__'
 
 
 @patch('requests.delete')
@@ -231,7 +236,7 @@ def test_create_method_when_no_file_with_data_given(mocked_cap_api):
         mocked_cap_api.create(ana_type='atlas-workflows')
 
 
-@patch('__builtin__.open', new_callable=mock_open, read_data='{,}]')
+@patch('{}.open'.format(builtin_module_name), new_callable=mock_open, read_data='{,}]')
 def test_create_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
     with raises(ValueError):
         mocked_cap_api.create(json_='file',
@@ -241,7 +246,7 @@ def test_create_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
 def test_create_method_when_validate_failed_raises_exception(mocked_cap_api,
                                                              record_data):
     json_data = json.dumps(record_data)
-    with patch('__builtin__.open', new_callable=mock_open,
+    with patch('{}.open'.format(builtin_module_name), new_callable=mock_open,
                read_data=json_data):
         mocked_cap_api._make_request.side_effect = [BadStatusCode(),
                                                     None]
@@ -255,7 +260,7 @@ def test_update_method_when_no_file_with_data_given(mocked_cap_api):
         mocked_cap_api.update(pid='some_pid')
 
 
-@patch('__builtin__.open', new_callable=mock_open, read_data='{,}]')
+@patch('{}.open'.format(builtin_module_name), new_callable=mock_open, read_data='{,}]')
 def test_update_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
     with raises(ValueError):
         mocked_cap_api.update(filename='file')
@@ -264,7 +269,7 @@ def test_update_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
 def test_update_method_when_validate_failed_raises_exception(mocked_cap_api,
                                                              record_data):
     json_data = json.dumps(record_data)
-    with patch('__builtin__.open', new_callable=mock_open,
+    with patch('{}.open'.format(builtin_module_name), new_callable=mock_open,
                read_data=json_data):
         mocked_cap_api._make_request.side_effect = [BadStatusCode(),
                                                     None]
@@ -277,7 +282,7 @@ def test_update_method_when_success_returns_updated_data(mocked_cap_api,
                                                          record_data):
     json_data = json.dumps(record_data)
 
-    with patch('__builtin__.open', new_callable=mock_open,
+    with patch('{}.open'.format(builtin_module_name), new_callable=mock_open,
                read_data=json_data):
         mocked_cap_api._make_request.side_effect = [record_data]
 
@@ -290,7 +295,7 @@ def test_update_method_when_success_returns_updated_data(mocked_cap_api,
 def test_patch_method(mocked_cap_api, record_data):
     json_data = json.dumps(record_data)
 
-    with patch('__builtin__.open', new_callable=mock_open,
+    with patch('{}.open'.format(builtin_module_name), new_callable=mock_open,
                read_data=json_data):
         mocked_cap_api._make_request.return_value = record_data
 
@@ -311,7 +316,7 @@ def test_patch_method_when_no_file_with_data_given(mocked_cap_api):
         mocked_cap_api.patch(pid='some_pid')
 
 
-@patch('__builtin__.open', new_callable=mock_open, read_data='{,}]')
+@patch('{}.open'.format(builtin_module_name), new_callable=mock_open, read_data='{,}]')
 def test_patch_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
     with raises(ValueError):
         mocked_cap_api.patch(filename='file')

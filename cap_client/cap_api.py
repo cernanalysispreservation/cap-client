@@ -24,10 +24,12 @@
 
 """CAP API Class."""
 
+from future.moves.urllib.parse import urljoin
+
 import datetime
 import json
 import os
-from urlparse import urljoin
+
 
 import click
 import requests
@@ -35,7 +37,7 @@ import urllib3
 
 from cap_client.errors import BadStatusCode, UnknownAnalysisType, \
     MissingJsonFile
-from utils import make_tarfile
+from .utils import make_tarfile
 
 # @TOFIX
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
