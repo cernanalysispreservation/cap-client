@@ -395,36 +395,42 @@ class CapAPI(object):
                     output_filename=None):
         """Upload file or directory to deposit by given pid."""
         bucket_id = self._get_bucket_id(pid)
-
+        made_tarball = False
         # Check if filepath is file or DIR
-        if os.path.isdir(filepath):
-            # If it's a DIR alert that it is going to be tarballed
-            # and uploaded
-            if yes or \
-                    click.confirm('You are trying to upload a directory.\n'
-                                  'Should we upload '
-                                  'a tarball of the directory?'):
+        try:
+            if os.path.isdir(filepath):
+                # If it's a DIR alert that it is going to be tarballed
+                # and uploaded
+                if yes or \
+                        click.confirm('You are trying to upload a directory.\n'
+                                      'Should we upload '
+                                      'a tarball of the directory?'):
+                    if output_filename is None:
+                        output_filename = "{pid}_{bucket_id}_{time}.tar.gz".format(
+                            pid=pid,
+                            bucket_id=bucket_id,
+                            time=datetime.datetime.now().strftime(
+                                '%b-%d-%I%M%p-%G')
+                        )
+                    make_tarfile(output_filename, filepath)
+                    made_tarball = True
+                    filepath = output_filename
+            else:
                 if output_filename is None:
-                    output_filename = "{pid}_{bucket_id}_{time}.tar.gz".format(
-                        pid=pid,
-                        bucket_id=bucket_id,
-                        time=datetime.datetime.now().strftime(
-                            '%b-%d-%I%M%p-%G')
-                    )
-                make_tarfile(output_filename, filepath)
-                filepath = output_filename
-        else:
-            if output_filename is None:
-                output_filename = os.path.basename(filepath)
+                    output_filename = os.path.basename(filepath)
 
-        # data = {'filename': output_filename}
-        return self._make_request(
-            url="files/{bucket_id}/{filename}".format(
-                bucket_id=bucket_id,
-                filename=output_filename),
-            data=open(filepath, 'rb'),
-            method='put',
-        )
+            # data = {'filename': output_filename}
+            res = self._make_request(
+                url="files/{bucket_id}/{filename}".format(
+                    bucket_id=bucket_id,
+                    filename=output_filename),
+                data=open(filepath, 'rb'),
+                method='put',
+                )
+        finally:
+            if made_tarball:
+                os.remove(output_filename)
+        return res
 
     def upload_docker_img(self, pid=None, img_name=None, output_img_name=None):
         """Uploads docker image."""
