@@ -45,7 +45,7 @@ def files():
     default=None,
     required=True
 )
-@click.argument('file', type=click.Path(exists=False))
+@click.argument('file', type=click.Path(exists=False), nargs=-1)
 @click.option(
     '--output-file',
     '-o',
@@ -69,11 +69,13 @@ def upload(ctx, pid, file, yes, output_file=None, docker=False):
         if docker:
             ctx.obj.cap_api.upload_docker_img(pid=pid, img_name=file,
                                               output_img_name=output_file)
+            click.echo("Docker image uploaded successfully.")
         else:
-            ctx.obj.cap_api.upload_file(
-                pid=pid, filepath=file,
-                output_filename=output_file, yes=yes)
-        click.echo("File uploaded successfully.")
+            for _file in file:
+                ctx.obj.cap_api.upload_file(
+                    pid=pid, filepath=_file,
+                    output_filename=output_file, yes=yes)
+                click.echo(_file + " uploaded successfully.")
 
     except BadStatusCode as e:
         logging.error(str(e))

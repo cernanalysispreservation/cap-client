@@ -554,7 +554,7 @@ You need to specify
 Upload file
 -----------
 
-You can upload a file to an analysis only if you have at least read access to it.
+You can upload a file (or multiple files) to an analysis only if you have at least read access to it.
 
 You need to specify
 
@@ -566,7 +566,15 @@ You need to specify
 
     $ cap-client files upload file.json -p 89b593c498874ec8bcafc88944c458a7
 
-    File uploaded successfully.
+    file.json uploaded successfully.
+
+    $ cap-client files upload config.txt history.txt dict.json -p bf6b8501822c4d2ba46028611354df7e
+
+    config.txt uploaded successfully.
+
+    history.txt uploaded successfully.
+
+    dict.json uploaded successfully.
 
 
 Upload Docker image
