@@ -150,7 +150,7 @@ def get(ctx, field, pid):
         click.echo(json.dumps(response,
                               indent=4))
 
-    except KeyError:
+    except (KeyError, TypeError):
         logging.error('Field {} doesn\'t exist'
                       .format(field))
 

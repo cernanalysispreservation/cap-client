@@ -45,7 +45,7 @@ def files():
     default=None,
     required=True
 )
-@click.argument('file', type=click.Path(exists=False))
+@click.argument('files', type=click.Path(exists=False), nargs=-1)
 @click.option(
     '--output-file',
     '-o',
@@ -63,17 +63,26 @@ def files():
     help="Uploads docker image."
 )
 @click.pass_context
-def upload(ctx, pid, file, yes, output_file=None, docker=False):
+def upload(ctx, pid, files, yes, output_file=None, docker=False):
     """Upload file to deposit with given pid."""
+    # disable file naming when uploading multiple files
+    if output_file and len(files) > 1:
+        click.echo("Output file name parameter is ignored when uploading "
+                   "multiple files. The files will be saved with their "
+                   "original file names, i.e. " + ', '.join(files) + ".")
     try:
         if docker:
-            ctx.obj.cap_api.upload_docker_img(pid=pid, img_name=file,
-                                              output_img_name=output_file)
+            for _file in files:
+                ctx.obj.cap_api.upload_docker_img(
+                    pid=pid, img_name=_file,
+                    output_img_name=output_file)
+                click.echo("Docker image " + _file + " uploaded successfully.")
         else:
-            ctx.obj.cap_api.upload_file(
-                pid=pid, filepath=file,
-                output_filename=output_file, yes=yes)
-        click.echo("File uploaded successfully.")
+            for _file in files:
+                ctx.obj.cap_api.upload_file(
+                    pid=pid, filepath=_file,
+                    output_filename=output_file, yes=yes)
+                click.echo(_file + " uploaded successfully.")
 
     except BadStatusCode as e:
         logging.error(str(e))

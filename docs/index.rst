@@ -335,6 +335,10 @@ You need to specify
 
     "Very Interesting Description"
 
+    cap-client metadata get basic_info.analysis_proponents.2 -p bf6b8501822c4d2ba46028611354df7e
+
+    "John Doe"
+
 
 Edit Metadata
 -------------
@@ -372,6 +376,17 @@ You need to specify
             "description": "Very Interesting Description"
         }
     }
+
+    $ cap-client metadata set stripping_turbo_selection.0.stripping_turbo_line D2XMuMu_PiOSLine -p bf6b8501822c4d2ba46028611354df7e
+
+    {
+        "$ana_type": "lhcb",
+        "$schema": "https://analysispreservation.cern.ch/schemas/deposits/records/lhcb-v0.0.1.json",
+        "stripping_turbo_selection": [
+            {
+                "dataset_type": "mc_data",
+                "stripping_turbo_line": "D2XMuMu_PiOSLine",
+                "name": "MC-set",...
 
 
 Remove Metadata
@@ -554,7 +569,7 @@ You need to specify
 Upload file
 -----------
 
-You can upload a file to an analysis only if you have at least read access to it.
+You can upload a file (or multiple files) to an analysis only if you have at least read access to it.
 
 You need to specify
 
@@ -566,13 +581,21 @@ You need to specify
 
     $ cap-client files upload file.json -p 89b593c498874ec8bcafc88944c458a7
 
-    File uploaded successfully.
+    file.json uploaded successfully.
+
+    $ cap-client files upload config.txt history.txt dict.json -p bf6b8501822c4d2ba46028611354df7e
+
+    config.txt uploaded successfully.
+
+    history.txt uploaded successfully.
+
+    dict.json uploaded successfully.
 
 
 Upload Docker image
 -----------
 
-With the client, you can upload a Docker image that is associated to the analysis. Make sure that the image is present in the system by running the command `docker images` in the command line. The image name should be in the list. In the examples below we use an image called `hello-world`.
+With the client, you can upload Docker images that are associated to the analysis. Make sure that the image is present in the system by running the command `docker images` in the command line. The image name should be in the list. In the examples below we use an image called `hello-world`.
 
 You need to specify
 
@@ -585,9 +608,17 @@ To upload the image use the command:
 
     $ cap-client files upload hello-world --docker --pid 1ed645539e08435ea1bd4aad1360e87b
 
+    Docker image hello-world uploaded successfully.
+
+    $ cap-client files upload hello-world centos --docker -p bf6b8501822c4d2ba46028611354df7e
+
+    Docker image hello-world uploaded successfully.
+
+    Docker image centos uploaded successfully.
+
 Optionally you can specify
 
-    --output-file  the output file name of the image; by default it is the same as the original image name
+    --output-file  the output file name of an image; by default it is the same as the original image name
 
 To upload the image with an output file name use the command:
 

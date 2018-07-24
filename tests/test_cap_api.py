@@ -141,6 +141,44 @@ def test_get_field_when_field_unspecified(mock_requests, cap_api,
 
 
 @patch('requests.get')
+def test_get_field_when_field_is_number(mock_requests, cap_api,
+                                        record_data):
+    mock_requests.return_value.status_code = 200
+    mock_requests.return_value.json.return_value = record_data
+
+    resp = cap_api.get_field('some_pid', '_access.deposit-read.user.0')
+
+    assert resp == \
+        record_data["metadata"]["_access"]["deposit-read"]["user"][0]
+
+
+@patch('requests.get')
+def test_get_field_when_field_is_number_in_middle(mock_requests, cap_api,
+                                                  record_data):
+    mock_requests.return_value.status_code = 200
+    mock_requests.return_value.json.return_value = record_data
+
+    resp = cap_api.get_field('some_pid',
+                             'basic_info.people_info.0.name')
+
+    assert resp == \
+        record_data["metadata"]["basic_info"]["people_info"][0]["name"]
+
+
+@patch('requests.get')
+def test_get_field_when_field_is_negative_number(mock_requests, cap_api,
+                                                 record_data):
+    mock_requests.return_value.status_code = 200
+    mock_requests.return_value.json.return_value = record_data
+
+    resp = cap_api.get_field('some_pid',
+                             'basic_info.people_info.1.name')
+
+    assert resp == \
+        record_data["metadata"]["basic_info"]["people_info"][1]["name"]
+
+
+@patch('requests.get')
 def test_get_field_when_field_specified(mock_requests, cap_api,
                                         record_data):
     mock_requests.return_value.status_code = 200
@@ -172,7 +210,7 @@ def test_ping_method(mock_requests, cap_api):
 
 
 @patch('requests.delete')
-def test_delete_method_with_given_pid(mock_requests, cap_api, record_data):
+def test_delete_method_with_given_pid(mock_requests, cap_api):
     mock_requests.return_value.status_code = 204
     mock_requests.return_value.json.return_value = ''
 
@@ -206,8 +244,7 @@ def test_get_available_types_returns_all_available_types(mock_requests,
 
 
 @patch('requests.get')
-def test_get_permissions(mock_requests, cap_api,
-                         record_data):
+def test_get_permissions(mock_requests, cap_api, record_data):
     mock_requests.return_value.status_code = 200
     mock_requests.return_value.json.return_value = record_data
 

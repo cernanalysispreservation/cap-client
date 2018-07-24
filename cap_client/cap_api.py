@@ -268,7 +268,9 @@ class CapAPI(object):
                                  })['metadata']
         fields = field.split('.') if field else []
         for x in fields:
-            dct = dct[x or int(x)]
+            if x.isdigit():
+                x = int(x)
+            dct = dct[x]
         return dct
 
     def set_field(self, field_name, field_val, pid, filepath=None,
