@@ -33,20 +33,20 @@ from cap_client.errors import BadStatusCode, UnknownAnalysisType, \
     MissingJsonFile
 
 
-@click.command()
-@click.pass_context
-def ping(ctx):
-    """Health check CAP Server."""
-    try:
-        response = ctx.obj.cap_api.ping()
-        click.echo(response)
+# @click.command()
+# @click.pass_context
+# def ping(ctx):
+#     """Health check CAP Server."""
+#     try:
+#         response = ctx.obj.cap_api.ping()
+#         click.echo(response)
 
-    except BadStatusCode as e:
-        logging.error(str(e))
+#     except BadStatusCode as e:
+#         logging.error(str(e))
 
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+#     except Exception as e:
+#         logging.error('Unexpected error.')
+#         logging.debug(str(e))
 
 
 @click.command()

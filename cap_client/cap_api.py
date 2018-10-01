@@ -75,6 +75,7 @@ class CapAPI(object):
                               headers=headers,
                               stream=stream,
                               **kwargs)
+
         try:
             response_data = response if stream else response.json()
         except ValueError:
@@ -112,15 +113,14 @@ class CapAPI(object):
 
         return data
 
-    def ping(self):
-        """Health check CAP Server."""
-        return self._make_request(url='ping')
+    # def ping(self):
+    #     """Health check CAP Server."""
+    #     return self._make_request(url='ping')
 
     def me(self):
         """Retrieve user info."""
         response = self._make_request(url='me')
-
-        return {x: response[x] for x in ('id', 'collaborations', 'email')}
+        return {x: response[x] for x in ('id', 'email')}
 
     def types(self):
         """Get available analyses types."""
@@ -149,7 +149,7 @@ class CapAPI(object):
         response = self._make_request(url=urljoin('records/', pid),
                                       headers={
                                           'Accept': 'application/basic+json'
-                                      })
+        })
 
         return response if pid else response['hits']['hits']
 
@@ -189,10 +189,6 @@ class CapAPI(object):
         data['$ana_type'] = ana_type
         json_data = json.dumps(data)
 
-        self._make_request(url='deposit/validator',
-                           method='post',
-                           data=json_data)
-
         response = self._make_request(url='deposits/',
                                       method='post',
                                       data=json_data,
@@ -200,7 +196,6 @@ class CapAPI(object):
                                       headers={
                                           'Content-Type': 'application/json'
                                       })
-        del response['metadata']['$ana_type']
 
         return self._make_request(
             url='deposits/{}'.format(
@@ -232,10 +227,6 @@ class CapAPI(object):
 
         json_data = json.dumps(data)
 
-        self._make_request(url='deposit/validator',
-                           method='post',
-                           data=json_data)
-
         return self._make_request(url=urljoin('deposits/', pid),
                                   data=json_data,
                                   method='put')
@@ -265,7 +256,7 @@ class CapAPI(object):
         dct = self._make_request(url=urljoin('deposits/', pid),
                                  headers={
                                      'Accept': 'application/basic+json'
-                                 })['metadata']
+        })['metadata']
         fields = field.split('.') if field else []
         for x in fields:
             dct = dct[x or int(x)]
@@ -322,7 +313,7 @@ class CapAPI(object):
         return self._make_request(url=urljoin('deposits/', pid),
                                   headers={
                                       'Accept': 'application/permissions+json'
-                                  })
+        })
 
     def add_permissions(self, pid=None, email=None,
                         rights=None):

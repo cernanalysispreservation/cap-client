@@ -31,7 +31,7 @@ import os
 import sys
 
 from cap_client.cap_api import CapAPI
-from cap_client.cli.cli import (create, clone, publish, delete, get, me, ping,
+from cap_client.cli.cli import (create, clone, publish, delete, get, me,
                                 types, get_shared, get_schema)
 from cap_client.cli.metadata_cli import metadata
 from cap_client.cli.files_cli import files
@@ -86,7 +86,7 @@ def cli(ctx, loglevel, verbose, access_token):
     ctx.obj = Config(access_token=access_token)
 
 
-cli.add_command(ping)
+# cli.add_command(ping)
 cli.add_command(get)
 cli.add_command(get_shared)
 cli.add_command(get_schema)

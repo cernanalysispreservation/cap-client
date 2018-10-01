@@ -161,14 +161,14 @@ def test_get_field_when_field_is_incorrect(mock_requests, cap_api,
         cap_api.get_field('some_pid', 'title')
 
 
-@patch('requests.get')
-def test_ping_method(mock_requests, cap_api):
-    mock_requests.return_value.status_code = 200
-    mock_requests.return_value.json.return_value = 'Pong'
+# @patch('requests.get')
+# def test_ping_method(mock_requests, cap_api):
+#     mock_requests.return_value.status_code = 200
+#     mock_requests.return_value.json.return_value = 'Pong'
 
-    resp = cap_api.ping()
+#     resp = cap_api.ping()
 
-    assert resp == 'Pong'
+#     assert resp == 'Pong'
 
 
 @patch('requests.delete')
@@ -279,8 +279,7 @@ def test_update_method_when_success_returns_updated_data(mocked_cap_api,
 
     with patch('__builtin__.open', new_callable=mock_open,
                read_data=json_data):
-        mocked_cap_api._make_request.side_effect = [None,
-                                                    record_data]
+        mocked_cap_api._make_request.side_effect = [record_data]
 
         resp = mocked_cap_api.update(filename='file',
                                      pid='some_pid')
