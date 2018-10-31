@@ -1,60 +1,26 @@
-# -*- coding: utf-8 -*-
-#
-# This file is part of CERN Analysis Preservation Framework.
-# Copyright (C) 2017 CERN.
-#
-# CERN Analysis Preservation Framework is free software; you can redistribute
-# it and/or modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 2 of the
-# License, or (at your option) any later version.
-#
-# CERN Analysis Preservation Framework is distributed in the hope that it will
-# be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with CERN Analysis Preservation Framework; if not, write to the
-# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-# MA 02111-1307, USA.
-#
-# In applying this license, CERN does not
-# waive the privileges and immunities granted to it by virtue of its status
-# as an Intergovernmental Organization or submit itself to any jurisdiction.
-
-
 notifications:
   email: false
-
 sudo: true
-
 language: python
-
 cache:
-  - pip
-
+- pip
 python:
-  - '2.7'
-
+- '2.7'
 before_install:
-  - travis_retry pip install --upgrade pip setuptools py
-  - travis_retry pip install twine wheel coveralls
-
+- travis_retry pip install --upgrade pip setuptools py
+- travis_retry pip install twine wheel coveralls
 install:
-  - travis_retry pip install -e .[all]
-
+- travis_retry pip install -e .[all]
 script:
-  - "./run-tests.sh"
-
+- "./run-tests.sh"
 after_success:
-  - coveralls
-
+- coveralls
 deploy:
   provider: pypi
   user: anthropoid
   password:
-    secure: iBv1YPVyGhY50Pfhct4GnHPI7StRlWFh+EFahb17JYsx6zw8U3CQ0r3r8mv3SQcs08lFG6cFHSh24xsoNm4RI+e508k4TpDOo/rsdY19hwsdPVhMMzPIkuOq0+IxeuM2ZAFqXU+Dnhe4BExp2dVAjOHlMB04c4zpIFBqSwFnaPtTX8gnYGK8L0V5vHuGn7HMp91aG4JOauDlRlW9JHbwhgEU/eoNu+5fyM68b2ciaMI1h+jSFcSRyzXVKJj9/grulkyNmgSpSU+PGZno0mwdgwXS3YuK+Z/kixQu5hxZpIQSvIK/u697lTH0xtuNuXkCfgaWnSJ/Xg3xw1P6G8pWOHruqrlXO0IjMEn3RH0EcfcJNLeTp8OeHPwl5VTNtmdcN9F93T0EzwB9BKlBR8DOSESDAIFD5U1/CeUeMgy/7XxdokVUwGt5kh37eh84DI6oFL2NLEiTshNA2UAmN1n/xa8lKXfNBJKIxiol9DNjbyZ6wWIiBhHd8F9YNPihdZtRT4SEkJlp+7QGmSv/orfraCJSK8GUZTBEQgsdAY2mkSHkAtWuZCM8tLs2CrMHifSJTDoG+jVZIkvJJNyfvxIZeypiLLg0KPrcOFBDzwXIZjlvGomF2cutHR95PAdbwmjXsdnjzuyhqYq8D7OmYwKxv9KL+gcPNteie0CzvonQzds=
-  distributions: "sdist bdist_wheel"
+    secure: t7ub9BylTbHWQaudxO4mZdl4iU0SK1/e/FDZghU0H4ELyAoPYtQTHFPKWY6AyzcFMqzTnAxZVqhcnBa7cEvnLxB9srKbeRWYW1r1ChJf7KF3HOVjZydV9rPTBiHXfTHgJUvXRy0qP+cRh4mn1ATpmC4B78r2H4k2fnxUGHZMSpELU01T64n/3zm5Fpp+9R/pq6MtQwlOV852AXjN2v+Ub3ygEApba/c2bpPJTshZq3DH4KwBUtO93PUfrOZ2wFcRsKoDmVt3u/fWfBXZjMBjXVqebJsAv5Gk9qrN+zfhiIte5kyAn4tNNTdkPloG/quE6LhvnmgA/1oEo1Yf71ot12SFo558KB6W9Xo9jGieQRBQorcG+m69CjDIa1VSbAUirzacO5lCjyoVhom2Dos0cb7IpwzoE0DFN8eEizpy1fIIKVBqDj/kBhdxavLv9KsnEHCIXPpEcc4C8UjAvsXic3S3FCca3coj3orInhvIa5oxZi6bXSUdtqbIBspR8sWvxrNKBE80ntI/dIsZ2oHWbvKPDZodjYUiI/vMYo+IoVvzXZJ11CJt5PY83tjo3ra0CFDDGhbemsFOoL9rPpT5unHBJuR2+3txDGSRYy681MzRhZ/F1HqB3dg7SM/Y3BPNO+eyBG7cDEE3FxDIPcQJ1rtH/pHt4uwwlmtfp1VYUbM=
+  distributions: sdist bdist_wheel
   on:
     tags: true
     python: '2.7'
