@@ -46,18 +46,15 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 class CapAPI(object):
     """CAP API client code."""
 
-    def __init__(self, server_url, apipath, access_token):
+    def __init__(self, server_url, access_token):
         """Initialize CapAPI object."""
         self.server_url = server_url
-        self.apipath = apipath
         self.access_token = access_token
-        self.endpoint = '{server_url}/{apipath}/{url}'
+        self.endpoint = '{server_url}/{url}'
 
     def _construct_endpoint(self, url=None):
         """Construct api endpoint."""
-        return self.endpoint.format(server_url=self.server_url,
-                                    apipath=self.apipath,
-                                    url=url)
+        return self.endpoint.format(server_url=self.server_url, url=url)
 
     def _make_request(self,
                       url=None,
@@ -319,11 +316,11 @@ class CapAPI(object):
 
     def add_permissions(self, pid=None, email=None,
                         rights=None):
-        """Assigns access right to users in a deposit."""
+        """Assign access right to users in a deposit."""
         data = self._get_permissions_data(rights, email, operation='add')
         url = urljoin('deposits/', pid + '/actions/permissions')
         return self._make_request(url=url,
-                                  data=json.dumps(data),
+                                  data=json.dumps(data['permissions']),
                                   method='post',
                                   expected_status_code=201,
                                   headers={
@@ -333,11 +330,11 @@ class CapAPI(object):
 
     def remove_permissions(self, pid=None, email=None,
                            rights=None):
-        """Removes access right to users in a deposit."""
+        """Remove access right to users in a deposit."""
         data = self._get_permissions_data(rights, email, operation='remove')
         url = urljoin('deposits/', pid + '/actions/permissions')
         return self._make_request(url=url,
-                                  data=json.dumps(data),
+                                  data=json.dumps(data['permissions']),
                                   method='post',
                                   expected_status_code=201,
                                   headers={
@@ -354,9 +351,11 @@ class CapAPI(object):
         return deposit['links']['bucket'].split("/")[-1:][0]
 
     def list_files(self, pid):
+        """List the deposit files."""
         return self._make_request(url='deposits/{}/files'.format(pid))
 
     def download_file(self, pid, filename, output_filename=None):
+        """Download the deposit files."""
         bucket_id = self._get_bucket_id(pid)
         output = output_filename or filename
 
@@ -374,6 +373,7 @@ class CapAPI(object):
         return response
 
     def remove_file(self, pid, filename):
+        """Remove the specified deposit file."""
         bucket_id = self._get_bucket_id(pid)
 
         return self._make_request(
@@ -420,7 +420,7 @@ class CapAPI(object):
         )
 
     def upload_docker_img(self, pid=None, img_name=None, output_img_name=None):
-        """Uploads docker image."""
+        """Upload docker image."""
         if output_img_name is None:
             output_img_name = img_name
         from subprocess import check_call
@@ -430,6 +430,7 @@ class CapAPI(object):
         check_call(["rm", "{}.tar".format(output_img_name)])
 
     def publish(self, pid):
+        """Publish the draft."""
         return self._make_request(url='deposits/{}/actions/publish'.format(pid),  # noqa
                                   expected_status_code=202,
                                   method='post',
@@ -437,6 +438,7 @@ class CapAPI(object):
                                            'Accept': 'application/basic+json'})
 
     def clone(self, pid):
+        """Clone the deposit draft."""
         return self._make_request(url='deposits/{}/actions/clone'.format(pid),
                                   expected_status_code=201,
                                   method='post',

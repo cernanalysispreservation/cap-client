@@ -44,11 +44,10 @@ class Config(object):
     def __init__(self, access_token=None, verbose=False):
         """Initialize config variables."""
         self.server = os.environ.get(
-            'CAP_SERVER_URL', 'https://analysispreservation.cern.ch')
-        apipath = os.environ.get('CAP_SERVER_API_PATH', 'api')
+            'CAP_SERVER_URL', 'https://analysispreservation.cern.ch/api')
         access_token = access_token or os.environ.get('CAP_ACCESS_TOKEN', None)
 
-        self.cap_api = CapAPI(self.server, apipath, access_token)
+        self.cap_api = CapAPI(self.server, access_token)
         self.verbose = verbose
 
 

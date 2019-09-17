@@ -82,3 +82,6 @@ target/
 
 # Vagrant
 .vagrant
+
+# Intellij
+.idea/
