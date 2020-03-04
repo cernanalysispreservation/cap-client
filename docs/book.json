@@ -1,0 +1,29 @@
+{
+  "title": "CERN Analysis Preservation Client",
+  "description": "API for cap-client, the CLI tool of CERN Analysis Preservation",
+  "plugins": [
+    "insert-logo",
+    "back-to-top-button",
+    "copy-code-button",
+    "anchorjs",
+    "collapsible-menu",
+    "github"
+  ],
+  "pluginsConfig": {
+    "insert-logo": {
+      "url": "https://awesome-workshop.github.io/cap-cms/fig/banner.png",
+      "style": "width: 100%;"
+    },
+    "anchorjs": {
+      "placement": "left",
+      "visible": "always"
+    },
+    "sharing": {
+      "twitter": true,
+      "facebook": false
+    },
+    "github": {
+      "url": "https://github.com/cernanalysispreservation/cap-client"
+    }
+  }
+}
