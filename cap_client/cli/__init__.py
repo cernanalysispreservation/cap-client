@@ -36,6 +36,7 @@ from cap_client.cli.cli import (create, clone, publish, delete, get, me,
 from cap_client.cli.metadata_cli import metadata
 from cap_client.cli.files_cli import files
 from cap_client.cli.permissions_cli import permissions
+from cap_client.cli.repositories_cli import repositories
 
 
 class Config(object):
@@ -99,3 +100,4 @@ cli.add_command(types)
 cli.add_command(files)
 cli.add_command(metadata)
 cli.add_command(permissions)
+cli.add_command(repositories)

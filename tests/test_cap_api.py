@@ -22,12 +22,12 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-
 from __future__ import absolute_import, print_function
 
 import json
 import sys
 
+import responses
 from mock import mock_open, patch
 from pytest import raises
 from cap_client.errors import BadStatusCode, UnknownAnalysisType, \
@@ -57,7 +57,6 @@ def test_make_request_send_request_with_correct_params(mock_requests,
     named_args = mock_requests.call_args[1]
 
     assert named_args['verify'] is False
-    assert named_args['params']['access_token'] == 'random_access_token'
     assert named_args['headers']['Content-type'] == 'application/json'
     assert named_args['data'] == record_data
 
@@ -349,3 +348,51 @@ def test_set_field_when_appending_string_field_to_array(mocked_cap_api,
     assert sent_json['op'] == 'add'
     assert sent_json['path'] == '/field_name/nested/nested2/-'
     assert sent_json['value'] == 'field_val'
+
+
+@responses.activate
+def test_upload_repo_no_webhook(cap_api):
+    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload'
+    responses.add(responses.POST, upload_url,
+                  json={'webhooks': []},
+                  content_type='application/json',
+                  headers={'Accept': 'application/repositories+json'},
+                  status=201)
+
+    resp = cap_api.upload_repository('some-pid', 'endpoint')
+    assert resp == {'webhooks': []}
+
+
+@responses.activate
+def test_upload_repo_push_webhook(cap_api):
+    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload'
+    webhooks = [{
+        "branch": "master",
+        "event_type": "push",
+        "host": "github.com",
+        "name": "some_repo",
+        "owner": "SomeUser",
+        "snapshots": []
+    }]
+
+    responses.add(responses.POST, upload_url,
+                  json=webhooks,
+                  content_type='application/json',
+                  headers={'Accept': 'application/repositories+json'},
+                  status=201)
+
+    resp = cap_api.upload_repository('some-pid', 'endpoint')
+    assert resp == webhooks
+
+
+@responses.activate
+def test_upload_repo_400_from_server(cap_api):
+    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload'
+    responses.add(responses.POST, upload_url,
+                  content_type='application/json',
+                  headers={'Accept': 'application/repositories+json'},
+                  stream=True,
+                  status=400)
+
+    with raises(BadStatusCode):
+        cap_api.upload_repository('some-pid', 'endpoint')

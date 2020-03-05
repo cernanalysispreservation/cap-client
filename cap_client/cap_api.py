@@ -67,13 +67,14 @@ class CapAPI(object):
                       stream=False,
                       **kwargs):
 
-        endpoint = self._construct_endpoint(url=url)
+        headers.update(
+            {'Authorization': 'OAuth2 {}'.format(self.access_token)}
+        )
 
-        params = {'access_token': self.access_token}
+        endpoint = self._construct_endpoint(url=url)
         method_obj = getattr(requests, method)
         response = method_obj(url=endpoint,
                               verify=False,
-                              params=params,
                               headers=headers,
                               stream=stream,
                               **kwargs)
@@ -442,3 +443,22 @@ class CapAPI(object):
                                   method='post',
                                   headers={'Content-Type': 'application/json',
                                            'Accept': 'application/basic+json'})
+
+    ##############
+    # REPOS
+    ##############
+
+    def upload_repository(self, pid, url, event_type=None):
+        return self._make_request(url='deposits/{}/actions/upload'.format(pid),
+                                  expected_status_code=201,
+                                  method='post',
+                                  data=json.dumps({
+                                      'pid': pid,
+                                      'url': url,
+                                      'webhook': True if event_type else False,
+                                      'event_type': event_type
+                                  }),
+                                  headers={
+                                      'Content-Type': 'application/json',
+                                      'Accept': 'application/repositories+json'
+                                  })

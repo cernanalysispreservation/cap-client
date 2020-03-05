@@ -82,3 +82,6 @@ target/
 
 # Vagrant
 .vagrant
+
+# JetBrains
+.idea/

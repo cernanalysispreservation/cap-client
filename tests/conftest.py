@@ -28,7 +28,7 @@ from __future__ import absolute_import, print_function
 
 import pytest
 from click.testing import CliRunner
-from mock import DEFAULT, Mock, patch
+from mock import DEFAULT, patch
 
 from cap_client.cap_api import CapAPI
 from cap_client.cli import cli
