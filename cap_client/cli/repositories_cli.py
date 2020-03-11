@@ -78,3 +78,35 @@ def upload(ctx, pid, url, webhook):
     except Exception as e:
         logging.error('Unexpected error.')
         logging.debug(str(e))
+
+
+@repositories.command()
+@click.option(
+    '--pid',
+    '-p',
+    help='Get repositories analysis with given PID.',
+    default=None,
+    required=True
+)
+@click.option(
+    '--with-snapshots',
+    '-ws',
+    help='Include the snapshots of each repository.',
+    default=False,
+    is_flag=True)
+@click.pass_context
+def get(ctx, pid, with_snapshots):
+    """Get all the repositories for your analysis."""
+    try:
+        response = ctx.obj.cap_api.get_repositories(
+            pid=pid,
+            with_snapshots=with_snapshots
+        )
+        click.echo(json.dumps(response, indent=4))
+
+    except BadStatusCode as e:
+        logging.error(str(e))
+
+    except Exception as e:
+        logging.error('Unexpected error.')
+        logging.debug(str(e))

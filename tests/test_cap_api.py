@@ -396,3 +396,77 @@ def test_upload_repo_400_from_server(cap_api):
 
     with raises(BadStatusCode):
         cap_api.upload_repository('some-pid', 'endpoint')
+
+
+@responses.activate
+def test_get_repositories_from_server_without_snapshots(cap_api):
+    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_response = {
+        'webhooks': [{
+            "branch": "master",
+            "event_type": "release",
+            "host": "github.com",
+            "name": "test-repo",
+            "owner": "user",
+            "snapshots": []
+        }]
+    }
+
+    responses.add(responses.GET, upload_url,
+                  content_type='application/json',
+                  json=mock_response,
+                  headers={'Accept': 'application/repositories+json'},
+                  stream=True,
+                  status=200)
+
+    resp = cap_api.get_repositories('some-pid')
+
+    mock_response['webhooks'][0].pop('snapshots')
+    assert resp == mock_response
+
+@responses.activate
+def test_get_repositories_from_server_with_snapshots(cap_api):
+    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_response = {
+        'webhooks': [{
+            "branch": "master",
+            "event_type": "release",
+            "host": "github.com",
+            "name": "test-repo",
+            "owner": "user",
+            "snapshots": [{
+                "created": "2020-03-11T13:45:16.199496+00:00",
+                "payload": {
+                    "branch": None,
+                    "commit": None,
+                    "event_type": "release",
+                    "link": "https://github.com/Lilykos/test-repo/releases/tag/0.2",
+                    "author": {"id": 2445433, "name": "Lilykos"},
+                    "release": {"name": "test", "tag": "0.2"}
+                }
+            }]
+        }]
+    }
+
+    responses.add(responses.GET, upload_url,
+                  content_type='application/json',
+                  json=mock_response,
+                  headers={'Accept': 'application/repositories+json'},
+                  stream=True,
+                  status=200)
+
+    resp = cap_api.get_repositories('some-pid', True)
+    assert resp == mock_response
+
+
+@responses.activate
+def test_upload_repo_400_from_server(cap_api):
+    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    responses.add(responses.GET, upload_url,
+                  content_type='application/json',
+                  headers={'Accept': 'application/repositories+json'},
+                  stream=True,
+                  status=400)
+
+    with raises(BadStatusCode):
+        cap_api.get_repositories('some-pid')
