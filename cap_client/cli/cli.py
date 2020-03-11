@@ -75,13 +75,14 @@ def me(ctx):
 @click.option(
     '--all',
     is_flag=True,
+    default=False,
     help="Retrieve all shared analyses you can access."
 )
 @click.pass_context
 def get_shared(ctx, pid, all):
     """Retrieve one or all shared analyses from a user."""
     try:
-        response = ctx.obj.cap_api.get_shared(pid=pid)
+        response = ctx.obj.cap_api.get_shared(pid=pid, all=all)
         click.echo(json.dumps(response,
                               indent=4))
 
