@@ -445,7 +445,7 @@ class CapAPI(object):
                                            'Accept': 'application/basic+json'})
 
     ##############
-    # REPOS
+    # REPOSITORIES
     ##############
 
     def upload_repository(self, pid, url, event_type=None):
@@ -462,3 +462,18 @@ class CapAPI(object):
                                       'Content-Type': 'application/json',
                                       'Accept': 'application/repositories+json'
                                   })
+
+    def get_repositories(self, pid, with_snapshots=False):
+        response = self._make_request(url='deposits/{}'.format(pid),
+                                      expected_status_code=200,
+                                      method='get',
+                                      headers={
+                                          'Accept':
+                                              'application/repositories+json'
+                                      })
+
+        if not with_snapshots:
+            for hook in response['webhooks']:
+                hook.pop('snapshots')
+
+        return response
