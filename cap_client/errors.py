@@ -48,11 +48,10 @@ class BadStatusCode(Exception):
     def __str__(self):
         """Print BadStatusCode exception's details."""
         return "Something went wrong when trying to connect to {endpoint}\n" \
-               "Server replied with:\n" \
-               "{data}" .format(endpoint=self.endpoint,
-                                data=json.dumps({'status': self.status_code,
-                                                 'data': self.data
-                                                 }, indent=4))
+               "\tStatus Code: {status_code}\n" \
+               "\t{message}".format(endpoint=self.endpoint,
+                                    status_code=self.data['status'],
+                                    message=self.data['message'])
 
 
 class UnknownAnalysisType(Exception):
