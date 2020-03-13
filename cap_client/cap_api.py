@@ -352,7 +352,7 @@ class CapAPI(object):
         deposit = self._make_request(url='deposits/{}'.format(pid))
         return deposit['links']['bucket'].split("/")[-1:][0]
 
-    def list_files(self, pid):
+    def get_files(self, pid):
         return self._make_request(url='deposits/{}/files'.format(pid))
 
     def download_file(self, pid, filename, output_filename=None):

@@ -122,10 +122,10 @@ def download(ctx, pid, output_file, filename):
     required=True
 )
 @click.pass_context
-def list(ctx, pid):
+def get(ctx, pid):
     """List files associated with deposit with given pid."""
     try:
-        response = ctx.obj.cap_api.list_files(pid=pid)
+        response = ctx.obj.cap_api.get_files(pid=pid)
         click.echo(json.dumps(response,
                               indent=4))
 
