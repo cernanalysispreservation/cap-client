@@ -68,9 +68,11 @@ def upload(ctx, pid, url, webhook):
             url=url,
             event_type=webhook
         )
-        click.echo('Repository {} saved in analysis {}.'.format(url, pid))
-        click.echo(json.dumps(response,
-                              indent=4))
+
+        if webhook:
+            click.echo(json.dumps(response, indent=4))
+        else:
+            click.echo('Repository {} saved in analysis {}.'.format(url, pid))
 
     except BadStatusCode as e:
         logging.error(str(e))
