@@ -209,17 +209,6 @@ def test_get_available_types_returns_all_available_types(mock_requests,
     assert 'alice-analysis' in types
 
 
-@patch('requests.get')
-def test_get_permissions(mock_requests, cap_api,
-                         record_data):
-    mock_requests.return_value.status_code = 200
-    mock_requests.return_value.json.return_value = record_data
-
-    resp = cap_api.get_permissions('some_pid')
-
-    assert 'alice@inveniosoftware.org' in resp['metadata']['_access']['deposit-read']['user'][0]  # noqa
-
-
 def test_create_method_when_no_type_given_returns_list_of_options(mocked_cap_api):  # noqa
     with raises(UnknownAnalysisType):
         mocked_cap_api.create(ana_type=None)
@@ -470,3 +459,120 @@ def test_upload_repo_400_from_server(cap_api):
 
     with raises(BadStatusCode):
         cap_api.get_repositories('some-pid')
+
+
+@responses.activate
+def test_get_permissions(cap_api):
+    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_permissions = {
+        'permissions': {
+            'deposit-admin': {
+                'roles': [],
+                'users': ['cms@inveniosoftware.org']
+            },
+            'deposit-read': {
+                'roles': [],
+                'users': ['cms@inveniosoftware.org']},
+            'deposit-update': {
+                'roles': [],
+                'users': ['cms@inveniosoftware.org']
+            }
+        }
+    }
+
+    responses.add(responses.GET, upload_url,
+                  content_type='application/json',
+                  json=mock_permissions,
+                  headers={'Accept': 'application/permissions+json'},
+                  stream=True,
+                  status=200)
+
+    resp = cap_api.get_permissions('some-pid')
+    assert resp == mock_permissions
+
+
+@responses.activate
+def test_add_permissions(cap_api):
+    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions'
+    mock_permissions = {
+        'permissions': {
+            'deposit-admin': {
+                'roles': [],
+                'users': ['cms@inveniosoftware.org']
+            },
+            'deposit-read': {
+                'roles': [],
+                'users': ['cms@inveniosoftware.org',
+                          'cms2@inveniosoftware.org']},
+            'deposit-update': {
+                'roles': [],
+                'users': ['cms@inveniosoftware.org',
+                          'cms2@inveniosoftware.org']
+            }
+        }
+    }
+
+    responses.add(responses.POST, upload_url,
+                  content_type='application/json',
+                  json=mock_permissions,
+                  headers={'Content-type': 'application/json',
+                           'Accept': 'application/permissions+json'},
+                  stream=True,
+                  status=201)
+
+    resp = cap_api.add_permissions(pid='some-pid',
+                                   email='cms2@inveniosoftware.org',
+                                   rights=['read', 'update'])
+    assert resp == mock_permissions
+
+
+@responses.activate
+def test_remove_permissions(cap_api):
+    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions'
+    mock_permissions = {
+        'permissions': {
+            'deposit-admin': {
+                'roles': [],
+                'users': []
+            },
+            'deposit-read': {
+                'roles': [],
+                'users': ['cms@inveniosoftware.org']},
+            'deposit-update': {
+                'roles': [],
+                'users': ['cms@inveniosoftware.org']
+            }
+        }
+    }
+
+    responses.add(responses.POST, upload_url,
+                  content_type='application/json',
+                  json=mock_permissions,
+                  headers={'Content-type': 'application/json',
+                           'Accept': 'application/permissions+json'},
+                  stream=True,
+                  status=201)
+
+    resp = cap_api.remove_permissions(pid='some-pid',
+                                      email='cms@inveniosoftware.org',
+                                      rights=['read'])
+    assert resp == mock_permissions
+
+
+@responses.activate
+def test_add_permissions_no_access(cap_api):
+    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions'
+
+    responses.add(responses.POST, upload_url,
+                  content_type='application/json',
+                  headers={
+                      'Content-type': 'application/json',
+                      'Accept': 'application/permissions+json'
+                  },
+                  stream=True,
+                  status=403)
+
+    with raises(BadStatusCode):
+        resp = cap_api.add_permissions(pid='some-pid',
+                                       email='cms@inveniosoftware.org',
+                                       rights=['read'])
