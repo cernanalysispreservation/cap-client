@@ -76,19 +76,17 @@ class CapAPI(object):
                               stream=stream,
                               **kwargs)
 
-        try:
-            response_data = response if stream else response.json()
-        except ValueError:
-            response_data = None
-
         if response.status_code == expected_status_code:
-            return response_data
+            try:
+                resp_data = response if stream else response.json()
+            except ValueError:
+                resp_data = None
+            return resp_data
         else:
-            raise BadStatusCode(
-                endpoint=endpoint,
-                expected_status_code=expected_status_code,
-                status_code=response.status_code,
-                data=response_data)
+            raise BadStatusCode(endpoint=endpoint,
+                                expected_status_code=expected_status_code,
+                                status_code=response.status_code,
+                                data=response.json())
 
     def _get_available_types(self):
         """Get available analyses types from server."""
