@@ -99,19 +99,12 @@ class CapAPI(object):
 
     def _get_permissions_data(self, rights, email, operation=None):
         """Get data for setting/removing permissions."""
-        permissions = [{'action': 'deposit-{}'.format(r),
-                        'op': operation} for r in rights]
-        data = {
-            "permissions": [
-                {
-                    "type": "user",
-                    "identity": "{}".format(email),
-                    "permissions": permissions
-                }
-            ]
-        }
-
-        return data
+        return [{
+            "email": email,
+            "type": "user",
+            "op": operation,
+            "action": "deposit-{}".format(right)
+        } for right in rights]
 
     # def ping(self):
     #     """Health check CAP Server."""

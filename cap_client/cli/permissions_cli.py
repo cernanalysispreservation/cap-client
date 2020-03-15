@@ -29,6 +29,8 @@ import logging
 
 import click
 
+from cap_client.errors import BadStatusCode
+
 
 @click.group()
 def permissions():
@@ -68,6 +70,9 @@ def add(ctx, pid, user, rights):
                                                    )
         click.echo(json.dumps(response, indent=4))
 
+    except BadStatusCode as e:
+        logging.error(str(e))
+
     except Exception as e:
         logging.error('Unexpected error.')
         logging.debug(str(e))
@@ -106,6 +111,9 @@ def remove(ctx, pid, user, rights):
                                                       )
         click.echo(json.dumps(response, indent=4))
 
+    except BadStatusCode as e:
+        logging.error(str(e))
+
     except Exception as e:
         logging.error('Unexpected error.')
         logging.debug(str(e))
@@ -125,6 +133,10 @@ def get(ctx, pid):
     try:
         response = ctx.obj.cap_api.get_permissions(pid=pid)
         click.echo(json.dumps(response, indent=4))
+
+    except BadStatusCode as e:
+        logging.error(str(e))
+
     except Exception as e:
         logging.error('Unexpected error.')
         logging.debug(str(e))
