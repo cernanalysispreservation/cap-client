@@ -345,7 +345,6 @@ def test_upload_repo_no_webhook(cap_api):
     responses.add(responses.POST, upload_url,
                   json={'webhooks': []},
                   content_type='application/json',
-                  headers={'Accept': 'application/repositories+json'},
                   status=201)
 
     resp = cap_api.upload_repository('some-pid', 'endpoint')
@@ -367,7 +366,6 @@ def test_upload_repo_push_webhook(cap_api):
     responses.add(responses.POST, upload_url,
                   json=webhooks,
                   content_type='application/json',
-                  headers={'Accept': 'application/repositories+json'},
                   status=201)
 
     resp = cap_api.upload_repository('some-pid', 'endpoint')
@@ -379,7 +377,6 @@ def test_upload_repo_400_from_server(cap_api):
     upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload'
     responses.add(responses.POST, upload_url,
                   content_type='application/json',
-                  headers={'Accept': 'application/repositories+json'},
                   stream=True,
                   status=400)
 
@@ -404,7 +401,6 @@ def test_get_repositories_from_server_without_snapshots(cap_api):
     responses.add(responses.GET, upload_url,
                   content_type='application/json',
                   json=mock_response,
-                  headers={'Accept': 'application/repositories+json'},
                   stream=True,
                   status=200)
 
@@ -440,7 +436,6 @@ def test_get_repositories_from_server_with_snapshots(cap_api):
     responses.add(responses.GET, upload_url,
                   content_type='application/json',
                   json=mock_response,
-                  headers={'Accept': 'application/repositories+json'},
                   stream=True,
                   status=200)
 
@@ -453,7 +448,6 @@ def test_upload_repo_400_from_server(cap_api):
     upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
     responses.add(responses.GET, upload_url,
                   content_type='application/json',
-                  headers={'Accept': 'application/repositories+json'},
                   stream=True,
                   status=400)
 
@@ -483,7 +477,6 @@ def test_get_permissions(cap_api):
     responses.add(responses.GET, upload_url,
                   content_type='application/json',
                   json=mock_permissions,
-                  headers={'Accept': 'application/permissions+json'},
                   stream=True,
                   status=200)
 
@@ -515,8 +508,6 @@ def test_add_permissions(cap_api):
     responses.add(responses.POST, upload_url,
                   content_type='application/json',
                   json=mock_permissions,
-                  headers={'Content-type': 'application/json',
-                           'Accept': 'application/permissions+json'},
                   stream=True,
                   status=201)
 
@@ -524,6 +515,20 @@ def test_add_permissions(cap_api):
                                    email='cms2@inveniosoftware.org',
                                    rights=['read', 'update'])
     assert resp == mock_permissions
+
+
+@responses.activate
+def test_add_permissions_no_access(cap_api):
+    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions'
+
+    responses.add(responses.POST, upload_url,
+                  content_type='application/json',
+                  status=403)
+
+    with raises(BadStatusCode):
+        resp = cap_api.add_permissions(pid='some-pid',
+                                       email='cms@inveniosoftware.org',
+                                       rights=['read'])
 
 
 @responses.activate
@@ -548,9 +553,6 @@ def test_remove_permissions(cap_api):
     responses.add(responses.POST, upload_url,
                   content_type='application/json',
                   json=mock_permissions,
-                  headers={'Content-type': 'application/json',
-                           'Accept': 'application/permissions+json'},
-                  stream=True,
                   status=201)
 
     resp = cap_api.remove_permissions(pid='some-pid',
@@ -560,19 +562,100 @@ def test_remove_permissions(cap_api):
 
 
 @responses.activate
-def test_add_permissions_no_access(cap_api):
-    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions'
+def test_get_schema_deposit(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/jsonschemas/some-type?resolve=True'
+    mock_schema = {
+        'record_schema': {},
+        'deposit_schema': {
+            'title': 'Test',
+            'properties': {
+                '_deposit': {},
+                '_files': {},
+                'basic_info': {
+                    'id': 'basic_info',
+                    'title': 'Basic Information'
+                },
+            }
+        }
+    }
+    mock_response = {
+        'title': 'Test',
+        'properties': {
+            'basic_info': {
+                'id': 'basic_info',
+                'title': 'Basic Information'
+            },
+        }
+    }
 
-    responses.add(responses.POST, upload_url,
+    responses.add(responses.GET, url,
                   content_type='application/json',
-                  headers={
-                      'Content-type': 'application/json',
-                      'Accept': 'application/permissions+json'
-                  },
-                  stream=True,
-                  status=403)
+                  json=mock_schema,
+                  status=200)
+
+    resp = cap_api.get_schema(ana_type='some-type')
+    assert resp == mock_response
+
+
+@responses.activate
+def test_get_schema_record(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/jsonschemas/some-type/0.0.1?resolve=True'
+    mock_schema = {
+        'deposit_schema': {},
+        'record_schema': {
+            'title': 'Record Test',
+            'properties': {
+                '_deposit': {},
+                '_files': {},
+                'basic_info': {
+                    'id': 'basic_info',
+                    'title': 'Basic Information'
+                },
+            }
+        }
+    }
+    mock_response = {
+        'title': 'Record Test',
+        'properties': {
+            'basic_info': {
+                'id': 'basic_info',
+                'title': 'Basic Information'
+            },
+        }
+    }
+
+    responses.add(responses.GET, url,
+                  content_type='application/json',
+                  json=mock_schema,
+                  status=200)
+
+    resp = cap_api.get_schema(ana_type='some-type',
+                              version='0.0.1',
+                              record=True)
+    assert resp == mock_response
+
+
+@responses.activate
+def test_get_schema_not_found(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/jsonschemas/some-type?resolve=True'
+    responses.add(responses.GET, url,
+                  content_type='application/json',
+                  json={'status': 404, 'message': 'Error'},
+                  status=404)
 
     with raises(BadStatusCode):
-        resp = cap_api.add_permissions(pid='some-pid',
-                                       email='cms@inveniosoftware.org',
-                                       rights=['read'])
+        cap_api.get_schema(ana_type='some-type', record=True)
+
+
+@responses.activate
+def test_get_schema_version_not_found(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/jsonschemas/some-type/0.0.5?resolve=True'
+    responses.add(responses.GET, url,
+                  content_type='application/json',
+                  json={'status': 404, 'message': 'Error'},
+                  status=404)
+
+    with raises(BadStatusCode):
+        cap_api.get_schema(ana_type='some-type',
+                           version='0.0.5',
+                           record=True)
