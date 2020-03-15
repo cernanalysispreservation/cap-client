@@ -147,21 +147,24 @@ class CapAPI(object):
 
         return response if pid else response['hits']['hits']
 
-    def get_schema(self, ana_type=None, version='0.0.1'):
+    def get_schema(self, ana_type=None, version=None, record=False):
         """Retrieve schema according to type of analysis."""
-        types = self._get_available_types()
+        url = 'jsonschemas/{}/{}?resolve=True'.format(ana_type, version) \
+            if version \
+            else 'jsonschemas/{}?resolve=True'.format(ana_type)
 
-        if ana_type not in types:
-            raise UnknownAnalysisType(types)
+        resp = self._make_request(url=url)
 
-        response = self._make_request(
-            url='schemas/deposits/records/{}-v{}.json'.format(
-                ana_type, version
-            ))
+        schema = resp['record_schema'] if record \
+            else resp['deposit_schema']
 
-        schema = {k: v for k, v in response.get('properties', {}).items()
-                  if not k.startswith('_')}
+        properties = {
+            k: v
+            for k, v in schema.get('properties', {}).items()
+            if not k.startswith('_')
+        }
 
+        schema['properties'] = properties
         return schema
 
     def create(self, json_='', ana_type=None, version='0.0.1'):

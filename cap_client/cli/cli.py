@@ -31,6 +31,7 @@ import click
 
 from cap_client.errors import BadStatusCode, UnknownAnalysisType, \
     MissingJsonFile
+from cap_client.utils import validate_version
 
 
 # @click.command()
@@ -259,13 +260,30 @@ def types(ctx):
     default=None,
     required=True
 )
+@click.option(
+    '--version',
+    '-v',
+    help='Version of the schema',
+    default=None,
+    required=False,
+    callback=validate_version
+)
+@click.option(
+    '--record',
+    is_flag=True,
+    default=False,
+    help="Retrieve the record schema, instead of the deposit"
+)
 @click.pass_context
-def get_schema(ctx, type):
+def get_schema(ctx, type, version, record):
     """Retrieve analysis schema."""
     try:
-        response = ctx.obj.cap_api.get_schema(ana_type=type)
+        response = ctx.obj.cap_api.get_schema(ana_type=type,
+                                              version=version,
+                                              record=record)
         click.echo(json.dumps(response,
                               indent=4))
+
     except UnknownAnalysisType as e:
         logging.error(str(e))
 

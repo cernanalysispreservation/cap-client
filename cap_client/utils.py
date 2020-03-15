@@ -25,9 +25,24 @@
 """CAP Client Utils."""
 import tarfile
 import os
+import re
+
+from click import BadParameter
 
 
 def make_tarfile(output_filename, source_dir):
     """Make a tarball out of {source_dir} into {output_filename}."""
     with tarfile.open(output_filename, "w:gz") as tar:
         tar.add(source_dir, arcname=os.path.basename(source_dir))
+
+
+def validate_version(ctx, param, version_value):
+    """Validate the schema version requested."""
+    if version_value:
+        matched = re.match(r"(\d+).(\d+).(\d+)", version_value)
+        if not matched:
+            raise BadParameter(
+                'Version has to be passed as string <major>.<minor>.<patch>')
+        return version_value
+
+    return None
