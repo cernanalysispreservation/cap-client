@@ -32,10 +32,8 @@ import requests
 import urllib3
 from future.moves.urllib.parse import urljoin
 
-from cap_client.errors import (BadStatusCode, MissingJsonFile,
-                               UnknownAnalysisType)
-
-from .utils import make_tarfile
+from .errors import BadStatusCode, DepositCreationError
+from .utils import make_tarfile, get_json
 
 # @TOFIX
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -162,43 +160,38 @@ class CapAPI(object):
         schema['properties'] = properties
         return schema
 
-    def create(self, json_='', ana_type=None, version='0.0.1'):
+    def create(self, json_='', ana_type=None):
         """Create an analysis."""
-        types = self._get_available_types()
+        data = get_json(json_)
+        schema_type = data.get('$schema', None)
 
-        if ana_type not in types:
-            raise UnknownAnalysisType(types)
+        if ana_type and schema_type:
+            raise DepositCreationError(
+                'You cannot have both $ana-type (--type/-t parameter) and '
+                '$schema in your deposit creation.\n'
+                'Please remove the $schema field from your json or '
+                'don\'t provide the --type parameter.')
+        elif not ana_type and not schema_type:
+            raise DepositCreationError(
+                'You need to provide the --type/-t parameter '
+                '($ana-type) or provide the $schema field in your json.')
+        elif ana_type and not schema_type:
+            data['$ana_type'] = ana_type
 
-        if not json_:
-            raise MissingJsonFile()
+        response = self._make_request(url='deposits/',
+                                      method='post',
+                                      data=json.dumps(data),
+                                      expected_status_code=201)
 
-        try:
-            data = json.loads(json_)
-        except ValueError:
-            with open(json_) as fp:
-                data = json.load(fp)
-
-        data['$ana_type'] = ana_type
-        json_data = json.dumps(data)
-
-        response = self._make_request(
-            url='deposits/',
-            method='post',
-            data=json_data,
-            expected_status_code=201,
-            headers={'Content-Type': 'application/json'})
-
-        res = self._make_request(url='deposits/{}'.format(
-            response.get('metadata', {}).get('_deposit', {}).get('id', '')),
-                                 method='put',
-                                 data=json.dumps(response.get('metadata', {})),
-                                 expected_status_code=200,
-                                 headers={
-                                     'Content-Type': 'application/json',
-                                     'Accept': 'application/basic+json'
-                                 })
-
-        return res
+        return self._make_request(url='deposits/{}'.format(response['id']),
+                                  data=json.dumps(response.get('metadata',
+                                                               {})),
+                                  expected_status_code=200,
+                                  method='put',
+                                  headers={
+                                      'Content-Type': 'application/json',
+                                      'Accept': 'application/basic+json'
+                                  })
 
     def delete(self, pid=None):
         """Delete an analysis by given pid."""
@@ -208,15 +201,7 @@ class CapAPI(object):
 
     def update(self, pid=None, json_=''):
         """Update an analysis by given pid and JSON data from file."""
-        try:
-            data = json.loads(json_)
-        except ValueError:
-            try:
-                with open(json_) as fp:
-                    data = json.load(fp)
-            except (IOError, ValueError):
-                raise MissingJsonFile()
-
+        data = get_json(json_)
         json_data = json.dumps(data)
 
         res = self._make_request(url=urljoin('deposits/', pid),
