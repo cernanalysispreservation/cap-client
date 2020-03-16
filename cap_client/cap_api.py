@@ -45,13 +45,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class CapAPI(object):
     """CAP API client code."""
-
     def __init__(self, server_url, apipath, access_token):
         """Initialize CapAPI object."""
         self.server_url = server_url
-        self.apipath = apipath
+        self.api = urljoin(server_url, apipath)
         self.access_token = access_token
-        self.endpoint = '{server_url}/{apipath}/{url}'
 
     def _construct_endpoint(self, url=None):
         """Construct api endpoint."""
@@ -67,12 +65,11 @@ class CapAPI(object):
                       stream=False,
                       **kwargs):
 
-        headers.update(
-            {'Authorization': 'OAuth2 {}'.format(self.access_token)}
-        )
-
-        endpoint = self._construct_endpoint(url=url)
+        endpoint = urljoin(self.api, url)
         method_obj = getattr(requests, method)
+        headers.update(
+            {'Authorization': 'OAuth2 {}'.format(self.access_token)})
+
         response = method_obj(url=endpoint,
                               verify=False,
                               headers=headers,
