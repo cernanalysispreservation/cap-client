@@ -87,26 +87,24 @@ def get(ctx, pid, all):
 
 @click.command()
 @click.option(
-    '--json-file',
+    '--json',
+    '-j',
+    'json_',
     required=True,
     help='JSON data from file or command line',
 )
 @click.option(
     '--type',
     '-t',
+    'type_',
+    default=None,
     help='Type of analysis',
-)
-@click.option(
-    '--version',
-    help='JSON schema version to api ',
 )
 @click.pass_context
 @logger
-def create(ctx, json_file, type, version):
+def create(ctx, json_, type_):
     """Create an analysis."""
-    res = ctx.obj.cap_api.create(json_=json_file,
-                                 ana_type=type,
-                                 version=version)
+    res = ctx.obj.cap_api.create(json_=json_, ana_type=type_)
 
     click.echo(json_dumps(res))
 

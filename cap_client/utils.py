@@ -34,13 +34,25 @@ from sys import exit
 import click
 from click import BadParameter
 
-from .errors import BadStatusCode, CLIError
+from .errors import BadStatusCode, CLIError, MissingJsonError
 
 
 def make_tarfile(output_filename, source_dir):
     """Make a tarball out of {source_dir} into {output_filename}."""
     with tarfile.open(output_filename, "w:gz") as tar:
         tar.add(source_dir, arcname=os.path.basename(source_dir))
+
+
+def get_json(json_):
+    """Checks if the arg is a json file/data and tries to retrieve it."""
+    try:
+        return json.loads(json_)
+    except ValueError:
+        try:
+            with open(json_) as fp:
+                return json.load(fp)
+        except (IOError, ValueError):
+            raise MissingJsonError()
 
 
 def validate_version(ctx, param, version_value):
