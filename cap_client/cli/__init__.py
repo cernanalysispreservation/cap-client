@@ -21,32 +21,30 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
-
 """CAP Client CLI init."""
 
-import click
 import logging
 import os
 import sys
 
+import click
+
 from cap_client.cap_api import CapAPI
-from cap_client.cli.cli import (create, clone, publish, delete, get, me,
-                                types, get_shared, get_schema)
-from cap_client.cli.metadata_cli import metadata
+from cap_client.cli.cli import (clone, create, delete, get, get_schema,
+                                get_shared, me, publish, types)
 from cap_client.cli.files_cli import files
+from cap_client.cli.metadata_cli import metadata
 from cap_client.cli.permissions_cli import permissions
 from cap_client.cli.repositories_cli import repositories
 
 
 class Config(object):
     """Configuration object to share across commands."""
-
     def __init__(self, access_token=None, verbose=False):
         """Initialize config variables."""
-        self.server = os.environ.get(
-            'CAP_SERVER_URL', 'https://analysispreservation.cern.ch')
-        apipath = os.environ.get('CAP_SERVER_API_PATH', 'api')
+        self.server = os.environ.get('CAP_SERVER_URL',
+                                     'https://analysispreservation.cern.ch')
+        apipath = os.environ.get('CAP_SERVER_API_PATH', 'api/')
         access_token = access_token or os.environ.get('CAP_ACCESS_TOKEN', None)
 
         self.cap_api = CapAPI(self.server, apipath, access_token)

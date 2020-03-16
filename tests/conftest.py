@@ -53,8 +53,8 @@ def cli_run():
 
 @pytest.yield_fixture
 def cap_api():
-    yield CapAPI('https://analysispreservation-dev.cern.ch',
-                 'api', 'accesstoken')
+    yield CapAPI('https://analysispreservation-dev.cern.ch', 'api/',
+                 'accesstoken')
 
 
 @pytest.yield_fixture
