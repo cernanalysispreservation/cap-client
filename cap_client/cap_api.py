@@ -21,22 +21,20 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
 """CAP API Class."""
-
-from future.moves.urllib.parse import urljoin
 
 import datetime
 import json
 import os
 
-
 import click
 import requests
 import urllib3
+from future.moves.urllib.parse import urljoin
 
-from cap_client.errors import BadStatusCode, UnknownAnalysisType, \
-    MissingJsonFile
+from cap_client.errors import (BadStatusCode, MissingJsonFile,
+                               UnknownAnalysisType)
+
 from .utils import make_tarfile
 
 # @TOFIX
@@ -50,12 +48,6 @@ class CapAPI(object):
         self.server_url = server_url
         self.api = urljoin(server_url, apipath)
         self.access_token = access_token
-
-    def _construct_endpoint(self, url=None):
-        """Construct api endpoint."""
-        return self.endpoint.format(server_url=self.server_url,
-                                    apipath=self.apipath,
-                                    url=url)
 
     def _make_request(self,
                       url=None,
@@ -92,8 +84,7 @@ class CapAPI(object):
         """Get available analyses types from server."""
         ana_types = self._make_request(url='me')
 
-        return [exp['deposit_group'] for exp in
-                ana_types['deposit_groups']]
+        return [exp['deposit_group'] for exp in ana_types['deposit_groups']]
 
     def _get_permissions_data(self, rights, email, operation=None):
         """Get data for setting/removing permissions."""
@@ -103,10 +94,6 @@ class CapAPI(object):
             "op": operation,
             "action": "deposit-{}".format(right)
         } for right in rights]
-
-    # def ping(self):
-    #     """Health check CAP Server."""
-    #     return self._make_request(url='ping')
 
     def me(self):
         """Retrieve user info."""
@@ -120,30 +107,40 @@ class CapAPI(object):
     ##############
     # CRUD
     ##############
+    def get_drafts(self, all=False):
+        """Retrieve user drafts."""
+        url = 'deposits/' if all else 'deposits/?q=&by_me=True'
 
-    def get(self, pid=None, all=False):
-        """Retrieve one or all analyses from a user."""
-        url = urljoin('deposits/', pid) if pid or all \
-            else 'deposits/?q=&by_me=True'
+        response = self._make_request(
+            url=url, headers={'Accept': 'application/basic+json'})
 
-        response = self._make_request(url=url,
-                                      headers={
-                                          'Accept': 'application/basic+json'
-                                      })
+        return response['hits']['hits']
 
-        return response if pid else response['hits']['hits']
+    def get_draft_by_pid(self, pid):
+        """Retrieve draft by pid."""
+        url = urljoin('deposits/', pid)
 
-    def get_shared(self, pid=None, all=False):
+        response = self._make_request(
+            url=url, headers={'Accept': 'application/basic+json'})
+
+        return response
+
+    def get_shared(self, all=False):
+        """Retrieve user published analysis."""
+        url = 'records/' if all else 'records/?q=&by_me=True'
+
+        response = self._make_request(
+            url=url, headers={'Accept': 'application/basic+json'})
+
+        return response['hits']['hits']
+
+    def get_shared_by_pid(self, pid):
         """Retrieve one or all shared analyses from a user."""
-        url = urljoin('records/', pid) if pid or all \
-            else 'records/?q=&by_me=True'
+        response = self._make_request(
+            url=urljoin('records/', pid),
+            headers={'Accept': 'application/basic+json'})
 
-        response = self._make_request(url=url,
-                                      headers={
-                                          'Accept': 'application/basic+json'
-                                      })
-
-        return response if pid else response['hits']['hits']
+        return response
 
     def get_schema(self, ana_type=None, version=None, record=False):
         """Retrieve schema according to type of analysis."""
@@ -184,33 +181,30 @@ class CapAPI(object):
         data['$ana_type'] = ana_type
         json_data = json.dumps(data)
 
-        response = self._make_request(url='deposits/',
-                                      method='post',
-                                      data=json_data,
-                                      expected_status_code=201,
-                                      headers={
-                                          'Content-Type': 'application/json'
-                                      })
+        response = self._make_request(
+            url='deposits/',
+            method='post',
+            data=json_data,
+            expected_status_code=201,
+            headers={'Content-Type': 'application/json'})
 
-        return self._make_request(
-            url='deposits/{}'.format(
-                response.get(
-                    'metadata', {}).get(
-                    '_deposit', {}).get(
-                    'id', '')),
-            method='put',
-            data=json.dumps(response.get('metadata', {})),
-            expected_status_code=200,
-            headers={
-                'Content-Type': 'application/json',
-                'Accept': 'application/basic+json'
-            })
+        res = self._make_request(url='deposits/{}'.format(
+            response.get('metadata', {}).get('_deposit', {}).get('id', '')),
+                                 method='put',
+                                 data=json.dumps(response.get('metadata', {})),
+                                 expected_status_code=200,
+                                 headers={
+                                     'Content-Type': 'application/json',
+                                     'Accept': 'application/basic+json'
+                                 })
+
+        return res
 
     def delete(self, pid=None):
         """Delete an analysis by given pid."""
-        return self._make_request(url=urljoin('deposits/', pid),
-                                  method='delete',
-                                  expected_status_code=204)
+        self._make_request(url=urljoin('deposits/', pid),
+                           method='delete',
+                           expected_status_code=204)
 
     def update(self, pid=None, filename=''):
         """Update an analysis by given pid and JSON data from file."""
@@ -222,9 +216,11 @@ class CapAPI(object):
 
         json_data = json.dumps(data)
 
-        return self._make_request(url=urljoin('deposits/', pid),
-                                  data=json_data,
-                                  method='put')
+        res = self._make_request(url=urljoin('deposits/', pid),
+                                 data=json_data,
+                                 method='put')
+
+        return res
 
     def patch(self, pid=None, filename=''):
         """Patch an analysis by given pid and JSON-patch data from file."""
@@ -234,14 +230,15 @@ class CapAPI(object):
             with open(filename) as fp:
                 data = json.load(fp)
 
-        json_data = json.dumps(data)
+        res = self._make_request(
+            url=urljoin('deposits/', pid),
+            data=json.dumps(data),
+            method='patch',
+            headers={
+                'Content-Type': 'application/json-patch+json'  # noqa
+            })
 
-        return self._make_request(url=urljoin('deposits/', pid),
-                                  data=json_data,
-                                  method='patch',
-                                  headers={
-                                      'Content-Type': 'application/json-patch+json'  # noqa
-                                  })
+        return res
 
     ##############
     # METADATA
@@ -249,15 +246,18 @@ class CapAPI(object):
     def get_field(self, pid, field=None):
         """Return metadata on analysis."""
         dct = self._make_request(url=urljoin('deposits/', pid),
-                                 headers={
-                                     'Accept': 'application/basic+json'
-        })['metadata']
+                                 headers={'Accept': 'application/basic+json'
+                                          })['metadata']
         fields = field.split('.') if field else []
         for x in fields:
             dct = dct[x or int(x)]
         return dct
 
-    def set_field(self, field_name, field_val, pid, filepath=None,
+    def set_field(self,
+                  field_name,
+                  field_val,
+                  pid,
+                  filepath=None,
                   append=False):
         """Edit analysis field value."""
         try:
@@ -275,13 +275,14 @@ class CapAPI(object):
         if filepath:
             self.upload_file(pid, filepath, field_val)
 
-        response = self._make_request(url=urljoin('deposits/', pid),
-                                      data=json.dumps(json_data),
-                                      method='patch',
-                                      headers={
-                                          'Content-Type': 'application/json-patch+json',  # noqa
-                                          'Accept': 'application/basic+json'
-                                      })
+        response = self._make_request(
+            url=urljoin('deposits/', pid),
+            data=json.dumps(json_data),
+            method='patch',
+            headers={
+                'Content-Type': 'application/json-patch+json',  # noqa
+                'Accept': 'application/basic+json'
+            })
         return response['metadata']
 
     def remove_field(self, field_name, pid):
@@ -291,13 +292,14 @@ class CapAPI(object):
             "path": '/{}'.format(field_name.replace('.', '/'))
         }]
 
-        response = self._make_request(url=urljoin('deposits/', pid),
-                                      data=json.dumps(json_data),
-                                      method='patch',
-                                      headers={
-                                          'Content-Type': 'application/json-patch+json',  # noqa
-                                          'Accept': 'application/basic+json'
-                                      })
+        response = self._make_request(
+            url=urljoin('deposits/', pid),
+            data=json.dumps(json_data),
+            method='patch',
+            headers={
+                'Content-Type': 'application/json-patch+json',  # noqa
+                'Accept': 'application/basic+json'
+            })
         return response['metadata']
 
     ##############
@@ -305,13 +307,11 @@ class CapAPI(object):
     ##############
     def get_permissions(self, pid):
         """Return deposit user permissions."""
-        return self._make_request(url=urljoin('deposits/', pid),
-                                  headers={
-                                      'Accept': 'application/permissions+json'
-        })
+        return self._make_request(
+            url=urljoin('deposits/', pid),
+            headers={'Accept': 'application/permissions+json'})
 
-    def add_permissions(self, pid=None, email=None,
-                        rights=None):
+    def add_permissions(self, pid=None, email=None, rights=None):
         """Assigns access right to users in a deposit."""
         data = self._get_permissions_data(rights, email, operation='add')
         url = urljoin('deposits/', pid + '/actions/permissions')
@@ -324,8 +324,7 @@ class CapAPI(object):
                                       'Accept': 'application/permissions+json'
                                   })
 
-    def remove_permissions(self, pid=None, email=None,
-                           rights=None):
+    def remove_permissions(self, pid=None, email=None, rights=None):
         """Removes access right to users in a deposit."""
         data = self._get_permissions_data(rights, email, operation='remove')
         url = urljoin('deposits/', pid + '/actions/permissions')
@@ -354,12 +353,10 @@ class CapAPI(object):
         output = output_filename or filename
 
         response = self._make_request(
-            url="files/{bucket_id}/{filename}".format(
-                bucket_id=bucket_id,
-                filename=filename),
+            url="files/{bucket_id}/{filename}".format(bucket_id=bucket_id,
+                                                      filename=filename),
             method='get',
-            stream=True
-        )
+            stream=True)
 
         with open(output, 'wb') as f:
             f.write(response.content)
@@ -369,15 +366,15 @@ class CapAPI(object):
     def remove_file(self, pid, filename):
         bucket_id = self._get_bucket_id(pid)
 
-        return self._make_request(
-            url="files/{bucket_id}/{filename}".format(
-                bucket_id=bucket_id,
-                filename=filename),
-            expected_status_code=204,
-            method='delete'
-        )
+        return self._make_request(url="files/{bucket_id}/{filename}".format(
+            bucket_id=bucket_id, filename=filename),
+                                  expected_status_code=204,
+                                  method='delete')
 
-    def upload_file(self, pid=None, filepath=None, yes=False,
+    def upload_file(self,
+                    pid=None,
+                    filepath=None,
+                    yes=False,
                     output_filename=None):
         """Upload file or directory to deposit by given pid."""
         bucket_id = self._get_bucket_id(pid)
@@ -395,8 +392,7 @@ class CapAPI(object):
                         pid=pid,
                         bucket_id=bucket_id,
                         time=datetime.datetime.now().strftime(
-                            '%b-%d-%I%M%p-%G')
-                    )
+                            '%b-%d-%I%M%p-%G'))
                 make_tarfile(output_filename, filepath)
                 filepath = output_filename
         else:
@@ -406,8 +402,7 @@ class CapAPI(object):
         # data = {'filename': output_filename}
         return self._make_request(
             url="files/{bucket_id}/{filename}".format(
-                bucket_id=bucket_id,
-                filename=output_filename),
+                bucket_id=bucket_id, filename=output_filename),
             data=open(filepath, 'rb'),
             method='put',
         )
@@ -417,24 +412,30 @@ class CapAPI(object):
         if output_img_name is None:
             output_img_name = img_name
         from subprocess import check_call
-        check_call(["docker", "save", "-o", "{}.tar".format(output_img_name),
-                    img_name])
+        check_call([
+            "docker", "save", "-o", "{}.tar".format(output_img_name), img_name
+        ])
         self.upload_file(pid=pid, filepath="{}.tar".format(output_img_name))
         check_call(["rm", "{}.tar".format(output_img_name)])
 
     def publish(self, pid):
-        return self._make_request(url='deposits/{}/actions/publish'.format(pid),  # noqa
-                                  expected_status_code=202,
-                                  method='post',
-                                  headers={'Content-Type': 'application/json',
-                                           'Accept': 'application/basic+json'})
+        return self._make_request(
+            url='deposits/{}/actions/publish'.format(pid),  # noqa
+            expected_status_code=202,
+            method='post',
+            headers={
+                'Content-Type': 'application/json',
+                'Accept': 'application/basic+json'
+            })
 
     def clone(self, pid):
         return self._make_request(url='deposits/{}/actions/clone'.format(pid),
                                   expected_status_code=201,
                                   method='post',
-                                  headers={'Content-Type': 'application/json',
-                                           'Accept': 'application/basic+json'})
+                                  headers={
+                                      'Content-Type': 'application/json',
+                                      'Accept': 'application/basic+json'
+                                  })
 
     ##############
     # REPOSITORIES
@@ -456,13 +457,11 @@ class CapAPI(object):
                                   })
 
     def get_repositories(self, pid, with_snapshots=False):
-        response = self._make_request(url='deposits/{}'.format(pid),
-                                      expected_status_code=200,
-                                      method='get',
-                                      headers={
-                                          'Accept':
-                                              'application/repositories+json'
-                                      })
+        response = self._make_request(
+            url='deposits/{}'.format(pid),
+            expected_status_code=200,
+            method='get',
+            headers={'Accept': 'application/repositories+json'})
 
         if not with_snapshots:
             for hook in response['webhooks']:

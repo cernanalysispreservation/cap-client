@@ -21,15 +21,11 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
 """Files CAP Client CLI."""
-
-import json
-import logging
 
 import click
 
-from cap_client.errors import BadStatusCode
+from ..utils import json_dumps, logger
 
 
 @click.group()
@@ -38,13 +34,11 @@ def files():
 
 
 @files.command()
-@click.option(
-    '--pid',
-    '-p',
-    help='Upload file to deposit with given pid',
-    default=None,
-    required=True
-)
+@click.option('--pid',
+              '-p',
+              help='Upload file to deposit with given pid',
+              default=None,
+              required=True)
 @click.argument('file', type=click.Path(exists=False))
 @click.option(
     '--output-file',
@@ -52,45 +46,27 @@ def files():
     help='Filename to be given to uploaded file',
     default=None,
 )
-@click.option(
-    '--yes',
-    is_flag=True,
-    help="Bypasses prompts..Say YES to everything"
-)
-@click.option(
-    '--docker',
-    is_flag=True,
-    help="Uploads docker image."
-)
+@click.option('--yes',
+              is_flag=True,
+              help="Bypasses prompts..Say YES to everything")
 @click.pass_context
-def upload(ctx, pid, file, yes, output_file=None, docker=False):
+@logger
+def upload(ctx, pid, file, yes, output_file=None):
     """Upload file to deposit with given pid."""
-    try:
-        if docker:
-            ctx.obj.cap_api.upload_docker_img(pid=pid, img_name=file,
-                                              output_img_name=output_file)
-        else:
-            ctx.obj.cap_api.upload_file(
-                pid=pid, filepath=file,
-                output_filename=output_file, yes=yes)
-        click.echo("File uploaded successfully.")
+    ctx.obj.cap_api.upload_file(pid=pid,
+                                filepath=file,
+                                output_filename=output_file,
+                                yes=yes)
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo("File uploaded successfully.")
 
 
 @files.command()
-@click.option(
-    '--pid',
-    '-p',
-    help='Get file uploaded with deposit with given pid',
-    default=None,
-    required=True
-)
+@click.option('--pid',
+              '-p',
+              help='Get file uploaded with deposit with given pid',
+              default=None,
+              required=True)
 @click.option(
     '--output-file',
     '-o',
@@ -99,63 +75,37 @@ def upload(ctx, pid, file, yes, output_file=None, docker=False):
 )
 @click.argument('filename')
 @click.pass_context
+@logger
 def download(ctx, pid, output_file, filename):
     """Download file uploaded with given deposit."""
-    try:
-        ctx.obj.cap_api.download_file(pid, filename, output_file)
-        click.echo("File saved as {}".format(output_file or filename))
-
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    ctx.obj.cap_api.download_file(pid, filename, output_file)
+    click.echo("File saved as {}".format(output_file or filename))
 
 
 @files.command()
-@click.option(
-    '--pid',
-    '-p',
-    help='List files of deposit with given pid',
-    default=None,
-    required=True
-)
+@click.option('--pid',
+              '-p',
+              help='List files of deposit with given pid',
+              default=None,
+              required=True)
 @click.pass_context
+@logger
 def get(ctx, pid):
     """List files associated with deposit with given pid."""
-    try:
-        response = ctx.obj.cap_api.get_files(pid=pid)
-        click.echo(json.dumps(response,
-                              indent=4))
-
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    res = ctx.obj.cap_api.get_files(pid=pid)
+    click.echo(json_dumps(res))
 
 
 @files.command()
-@click.option(
-    '--pid',
-    '-p',
-    help='Remove file from deposit with given pid',
-    default=None,
-    required=True
-)
+@click.option('--pid',
+              '-p',
+              help='Remove file from deposit with given pid',
+              default=None,
+              required=True)
 @click.argument('filename')
 @click.pass_context
+@logger
 def remove(ctx, pid, filename):
     """Removefile from deposit with given pid."""
-    try:
-        ctx.obj.cap_api.remove_file(pid=pid, filename=filename)
-        click.echo("File {} removed.".format(filename))
-
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    ctx.obj.cap_api.remove_file(pid=pid, filename=filename)
+    click.echo("File {} removed.".format(filename))

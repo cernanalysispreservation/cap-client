@@ -21,15 +21,11 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
 """Permissions CAP Client CLI."""
-
-import json
-import logging
 
 import click
 
-from cap_client.errors import BadStatusCode
+from ..utils import json_dumps, logger
 
 
 @click.group()
@@ -43,39 +39,33 @@ def permissions():
     '-p',
     help='PID of draft to update.',
     default=None,
-    required=True
+    required=True,
 )
 @click.option(
     '--user',
     '-u',
     help='User mail to assign permissions.',
     default=None,
-    required=True
+    required=True,
 )
-@click.option('--rights',
-              '-r',
-              required=True,
-              type=click.Choice(
-                  ['read',
-                   'update',
-                   'admin']),
-              multiple=True)
+@click.option(
+    '--rights',
+    '-r',
+    required=True,
+    type=click.Choice(['read', 'update', 'admin']),
+    multiple=True,
+)
 @click.pass_context
+@logger
 def add(ctx, pid, user, rights):
     """Set analysis user permissions."""
-    try:
-        response = ctx.obj.cap_api.add_permissions(pid=pid,
-                                                   email=user,
-                                                   rights=rights,
-                                                   )
-        click.echo(json.dumps(response, indent=4))
+    res = ctx.obj.cap_api.add_permissions(
+        pid=pid,
+        email=user,
+        rights=rights,
+    )
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))
 
 
 @permissions.command()
@@ -84,39 +74,33 @@ def add(ctx, pid, user, rights):
     '-p',
     help='PID of draft to update.',
     default=None,
-    required=True
+    required=True,
 )
 @click.option(
     '--user',
     '-u',
     help='User email to assign permissions.',
     default=None,
-    required=True
+    required=True,
 )
-@click.option('--rights',
-              '-r',
-              required=True,
-              type=click.Choice(
-                  ['read',
-                   'update',
-                   'admin']),
-              multiple=True)
+@click.option(
+    '--rights',
+    '-r',
+    required=True,
+    type=click.Choice(['read', 'update', 'admin']),
+    multiple=True,
+)
 @click.pass_context
+@logger
 def remove(ctx, pid, user, rights):
     """Set analysis user permissions."""
-    try:
-        response = ctx.obj.cap_api.remove_permissions(pid=pid,
-                                                      email=user,
-                                                      rights=rights,
-                                                      )
-        click.echo(json.dumps(response, indent=4))
+    res = ctx.obj.cap_api.remove_permissions(
+        pid=pid,
+        email=user,
+        rights=rights,
+    )
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))
 
 
 @permissions.command()
@@ -128,15 +112,9 @@ def remove(ctx, pid, user, rights):
     required=True,
 )
 @click.pass_context
+@logger
 def get(ctx, pid):
     """Retrieve analysis user permissions."""
-    try:
-        response = ctx.obj.cap_api.get_permissions(pid=pid)
-        click.echo(json.dumps(response, indent=4))
+    res = ctx.obj.cap_api.get_permissions(pid=pid)
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))

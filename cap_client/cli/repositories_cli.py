@@ -21,15 +21,11 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
 """Repositories CAP Client CLI."""
-
-import json
-import logging
 
 import click
 
-from cap_client.errors import BadStatusCode, UnknownAnalysisType
+from ..utils import json_dumps, logger
 
 
 @click.group()
@@ -43,43 +39,34 @@ def repositories():
     '-p',
     help='Upload repository to analysis with given PID.',
     default=None,
-    required=True
+    required=True,
 )
 @click.option(
     '--url',
     '-u',
     help='The repo url.',
     default=None,
-    required=True
+    required=True,
 )
 @click.option(
     '--webhook',
     '-w',
     type=click.Choice(['push', 'release']),
     help='Webhook type (push|release)',
-    default=None
+    default=None,
 )
 @click.pass_context
+@logger
 def upload(ctx, pid, url, webhook):
     """Upload repository and/or create webhook for your analysis."""
-    try:
-        response = ctx.obj.cap_api.upload_repository(
-            pid=pid,
-            url=url,
-            event_type=webhook
-        )
+    res = ctx.obj.cap_api.upload_repository(pid=pid,
+                                            url=url,
+                                            event_type=webhook)
 
-        if webhook:
-            click.echo(json.dumps(response, indent=4))
-        else:
-            click.echo('Repository {} saved in analysis {}.'.format(url, pid))
-
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    if webhook:
+        click.echo(json_dumps(res))
+    else:
+        click.echo('Repository {} saved in analysis {}.'.format(url, pid))
 
 
 @repositories.command()
@@ -88,27 +75,19 @@ def upload(ctx, pid, url, webhook):
     '-p',
     help='Get repositories analysis with given PID.',
     default=None,
-    required=True
+    required=True,
 )
 @click.option(
     '--with-snapshots',
     '-ws',
     help='Include the snapshots of each repository.',
     default=False,
-    is_flag=True)
+    is_flag=True,
+)
 @click.pass_context
+@logger
 def get(ctx, pid, with_snapshots):
     """Get all the repositories for your analysis."""
-    try:
-        response = ctx.obj.cap_api.get_repositories(
-            pid=pid,
-            with_snapshots=with_snapshots
-        )
-        click.echo(json.dumps(response, indent=4))
-
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    res = ctx.obj.cap_api.get_repositories(pid=pid,
+                                           with_snapshots=with_snapshots)
+    click.echo(json_dumps(res))

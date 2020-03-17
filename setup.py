@@ -21,8 +21,6 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
-
 """CAP client"""
 
 from __future__ import absolute_import, print_function
@@ -69,7 +67,8 @@ setup_requires = [
 install_requires = [
     'click>=6.7',
     'requests>=2.18.4',
-    'future>=0.16.0'
+    'colorama>=0.4.3',
+    'future>=0.16.0',
 ]
 
 packages = find_packages()

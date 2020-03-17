@@ -21,105 +21,74 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
 """General CAP Client CLI."""
-
-import json
-import logging
 
 import click
 
-from cap_client.errors import BadStatusCode, UnknownAnalysisType, \
-    MissingJsonFile
+from cap_client.errors import (BadStatusCode, MissingJsonFile,
+                               UnknownAnalysisType)
 from cap_client.utils import validate_version
 
-
-# @click.command()
-# @click.pass_context
-# def ping(ctx):
-#     """Health check CAP Server."""
-#     try:
-#         response = ctx.obj.cap_api.ping()
-#         click.echo(response)
-
-#     except BadStatusCode as e:
-#         logging.error(str(e))
-
-#     except Exception as e:
-#         logging.error('Unexpected error.')
-#         logging.debug(str(e))
+from ..utils import json_dumps, logger
 
 
 @click.command()
 @click.pass_context
+@logger
 def me(ctx):
     """Retrieve user info."""
-    try:
-        response = ctx.obj.cap_api.me()
-        click.echo(json.dumps(response,
-                              indent=4))
+    res = ctx.obj.cap_api.me()
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))
 
 
 @click.command('get-shared')
 @click.option(
     '--pid',
     '-p',
-    help='Get record with given pid',
-    default=None)
+    help='Get analysis with given pid',
+    default=None,
+)
 @click.option(
     '--all',
     is_flag=True,
     default=False,
-    help="Retrieve all shared analyses you can access."
+    help="Retrieve all shared (published) analyses you can access.",
 )
 @click.pass_context
+@logger
 def get_shared(ctx, pid, all):
-    """Retrieve one or all shared analyses from a user."""
-    try:
-        response = ctx.obj.cap_api.get_shared(pid=pid, all=all)
-        click.echo(json.dumps(response,
-                              indent=4))
+    """Retrieve user's published analysis."""
+    if pid:
+        res = ctx.obj.cap_api.get_shared_by_pid(pid)
+    else:
+        res = ctx.obj.cap_api.get_shared(all=all)
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))
 
 
 @click.command()
 @click.option(
     '--pid',
     '-p',
-    help='Get deposit with given pid',
-    default=None)
+    help='Get analysis with given pid',
+    default=None,
+)
 @click.option(
     '--all',
     is_flag=True,
-    help="Retrieve all analyses you can access."
+    help="Retrieve all draft analyses you can access.",
 )
 @click.pass_context
+@logger
 def get(ctx, pid, all):
-    """Retrieve one or all analyses from a user."""
-    try:
-        response = ctx.obj.cap_api.get(pid=pid, all=all)
-        click.echo(json.dumps(response,
-                              indent=4))
+    """Retrieve user's drafts."""
+    if pid:
+        res = ctx.obj.cap_api.get_draft_by_pid(pid)
+    else:
+        res = ctx.obj.cap_api.get_drafts(all=all)
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))
 
 
 @click.command()
@@ -139,30 +108,14 @@ def get(ctx, pid, all):
     help='JSON schema version to api ',
 )
 @click.pass_context
+@logger
 def create(ctx, json_file, type, version):
     """Create an analysis."""
-    try:
-        response = ctx.obj.cap_api.create(
-            json_=json_file,
-            ana_type=type,
-            version=version
-        )
+    res = ctx.obj.cap_api.create(json_=json_file,
+                                 ana_type=type,
+                                 version=version)
 
-        click.echo(json.dumps(response,
-                              indent=4))
-
-    except UnknownAnalysisType as e:
-        logging.error(str(e))
-
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except MissingJsonFile as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))
 
 
 @click.command()
@@ -171,21 +124,15 @@ def create(ctx, json_file, type, version):
     '-p',
     help='Delete deposit with given pid',
     default=None,
-    required=True
+    required=True,
 )
 @click.pass_context
+@logger
 def delete(ctx, pid):
     """Delete analysis with given pid."""
-    try:
-        ctx.obj.cap_api.delete(pid=pid)
-        click.echo('Analysis {} deleted.'.format(pid))
+    ctx.obj.cap_api.delete(pid=pid)
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo('Analysis {} deleted.'.format(pid))
 
 
 @click.command()
@@ -194,22 +141,15 @@ def delete(ctx, pid):
     '-p',
     help='Publish deposit with given pid',
     default=None,
-    required=True
+    required=True,
 )
 @click.pass_context
+@logger
 def publish(ctx, pid):
     """Publish analysis with given pid."""
-    try:
-        response = ctx.obj.cap_api.publish(pid=pid)
-        click.echo(json.dumps(response,
-                              indent=4))
+    ctx.obj.cap_api.publish(pid=pid)
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo('Your analysis has been published')
 
 
 @click.command()
@@ -218,38 +158,25 @@ def publish(ctx, pid):
     '-p',
     help='Clone deposit with given pid',
     default=None,
-    required=True
+    required=True,
 )
 @click.pass_context
+@logger
 def clone(ctx, pid):
     """Clone analysis with given pid."""
-    try:
-        response = ctx.obj.cap_api.clone(pid=pid)
-        click.echo(json.dumps(response,
-                              indent=4))
+    res = ctx.obj.cap_api.clone(pid=pid)
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))
 
 
 @click.command()
 @click.pass_context
+@logger
 def types(ctx):
     """Retrieve all types of analyses."""
-    try:
-        response = ctx.obj.cap_api.types()
-        click.echo('Available types:\n{}'.format('\n'.join(response)))
+    res = ctx.obj.cap_api.types()
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo('Available types:\n{}'.format('\n'.join(res)))
 
 
 @click.command('get-schema')
@@ -258,38 +185,24 @@ def types(ctx):
     '-t',
     help='Type of analysis',
     default=None,
-    required=True
+    required=True,
 )
-@click.option(
-    '--version',
-    '-v',
-    help='Version of the schema',
-    default=None,
-    required=False,
-    callback=validate_version
-)
-@click.option(
-    '--record',
-    is_flag=True,
-    default=False,
-    help="Retrieve the record schema, instead of the deposit"
-)
+@click.option('--version',
+              '-v',
+              help='Version of the schema',
+              default=None,
+              required=False,
+              callback=validate_version)
+@click.option('--record',
+              is_flag=True,
+              default=False,
+              help="Retrieve the record schema, instead of the deposit")
 @click.pass_context
+@logger
 def get_schema(ctx, type, version, record):
     """Retrieve analysis schema."""
-    try:
-        response = ctx.obj.cap_api.get_schema(ana_type=type,
-                                              version=version,
-                                              record=record)
-        click.echo(json.dumps(response,
-                              indent=4))
+    res = ctx.obj.cap_api.get_schema(ana_type=type,
+                                     version=version,
+                                     record=record)
 
-    except UnknownAnalysisType as e:
-        logging.error(str(e))
-
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))
