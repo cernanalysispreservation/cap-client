@@ -30,12 +30,13 @@ import os
 import click
 import requests
 import urllib3
+from click import BadParameter
 from future.moves.urllib.parse import urljoin
 
 from cap_client.errors import (BadStatusCode, MissingJsonFile,
                                UnknownAnalysisType)
 
-from .utils import make_tarfile
+from .utils import make_tarfile, is_int
 
 # @TOFIX
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -241,9 +242,7 @@ class CapAPI(object):
             url=urljoin('deposits/', pid),
             data=json.dumps(data),
             method='patch',
-            headers={
-                'Content-Type': 'application/json-patch+json'  # noqa
-            })
+            headers={'Content-Type': 'application/json-patch+json'})
 
         return res
 
@@ -272,12 +271,23 @@ class CapAPI(object):
         except ValueError:
             val = field_val
 
-        json_data = [{
-            "op": "add",
-            "path": '/{}{}'.format(field_name.replace('.', '/'),
-                                   '/-' if append else ''),
-            "value": val,
-        }]
+        path = '/{}'.format(field_name.replace('.', '/'))
+        if append:
+            # we need to differentiate between appending / adding a field
+            # the command `cap-client append -p PID basic_info.abstract VALUE
+            # could mean either add this field to basic_info, or append to the
+            # already existing abstract list
+            json_data = [{
+                "op": "add",
+                "path": '{}/-'.format(path),  # or just path, to add a field
+                "value": val,
+            }]
+        else:
+            json_data = [{
+                "op": "replace",
+                "path": path,
+                "value": val,
+            }]
 
         if filepath:
             self.upload_file(pid, filepath, field_val)
@@ -287,7 +297,7 @@ class CapAPI(object):
             data=json.dumps(json_data),
             method='patch',
             headers={
-                'Content-Type': 'application/json-patch+json',  # noqa
+                'Content-Type': 'application/json-patch+json',
                 'Accept': 'application/basic+json'
             })
         return response['metadata']
@@ -304,7 +314,7 @@ class CapAPI(object):
             data=json.dumps(json_data),
             method='patch',
             headers={
-                'Content-Type': 'application/json-patch+json',  # noqa
+                'Content-Type': 'application/json-patch+json',
                 'Accept': 'application/basic+json'
             })
         return response['metadata']
@@ -427,7 +437,7 @@ class CapAPI(object):
 
     def publish(self, pid):
         return self._make_request(
-            url='deposits/{}/actions/publish'.format(pid),  # noqa
+            url='deposits/{}/actions/publish'.format(pid),
             expected_status_code=202,
             method='post',
             headers={

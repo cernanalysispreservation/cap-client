@@ -28,6 +28,7 @@ import json
 import sys
 
 import responses
+from click import BadParameter
 from mock import mock_open, patch
 from pytest import raises
 
@@ -362,35 +363,137 @@ def test_patch_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
         mocked_cap_api.patch(filename='file')
 
 
-def test_set_field_when_setting_string_field(mocked_cap_api, record_data):
-    mocked_cap_api._make_request.return_value = record_data
+@responses.activate
+def test_set_field(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_response = {
+        "metadata": {
+            "basic_info": {
+                "abstract": "test_value_abstract"
+            },
+            "general_title": "test"
+        }
+    }
 
-    mocked_cap_api.set_field('field_name.nested.nested2', 'field_val',
-                             'some_pid')
+    responses.add(responses.PATCH, url, json=mock_response, status=200)
 
-    named_args = mocked_cap_api._make_request.call_args[1]
-    sent_json = json.loads(named_args['data'])[0]
+    resp = cap_api.set_field('test_field', 'test_value', 'some-pid')
 
-    assert sent_json['op'] == 'add'
-    assert sent_json['path'] == '/field_name/nested/nested2'
-    assert sent_json['value'] == 'field_val'
+    assert responses.calls[0].request.headers[
+        'Content-Type'] == 'application/json-patch+json'
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert resp == mock_response['metadata']
 
 
-def test_set_field_when_appending_string_field_to_array(
-        mocked_cap_api, record_data):
-    mocked_cap_api._make_request.return_value = record_data
+@responses.activate
+def test_set_field_as_array(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_response = {
+        "metadata": {
+            "basic_info": {
+                "abstract": "test_value_abstract",
+                "test_array": ["a", "b"]
+            },
+            "general_title": "test"
+        }
+    }
 
-    mocked_cap_api.set_field('field_name.nested.nested2',
-                             'field_val',
-                             'some_pid',
+    responses.add(responses.PATCH, url, json=mock_response, status=200)
+
+    resp = cap_api.set_field('basic_info.test_array', '["a", "b"]', 'some-pid')
+
+    assert responses.calls[0].request.headers[
+        'Content-Type'] == 'application/json-patch+json'
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert resp == mock_response['metadata']
+
+
+@responses.activate
+def test_set_field_append_to_array(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_response = {
+        "metadata": {
+            "basic_info": {
+                "abstract": "test_value_abstract",
+                "test_array": ["a", "b", "abc"]
+            },
+            "general_title": "test"
+        }
+    }
+
+    responses.add(responses.PATCH, url, json=mock_response, status=200)
+
+    resp = cap_api.set_field('basic_info.test_array',
+                             'abc',
+                             'some-pid',
                              append=True)
 
-    named_args = mocked_cap_api._make_request.call_args[1]
-    sent_json = json.loads(named_args['data'])[0]
+    assert responses.calls[0].request.headers[
+        'Content-Type'] == 'application/json-patch+json'
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert resp == mock_response['metadata']
 
-    assert sent_json['op'] == 'add'
-    assert sent_json['path'] == '/field_name/nested/nested2/-'
-    assert sent_json['value'] == 'field_val'
+
+@responses.activate
+def test_set_field_in_nested_dict(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_response = {
+        "metadata": {
+            "basic_info": {
+                "abstract": "test_value_abstract",
+                "test_array": [{
+                    "test": "test-one"
+                }]
+            },
+            "general_title": "test"
+        }
+    }
+
+    responses.add(responses.PATCH, url, json=mock_response, status=200)
+
+    resp = cap_api.set_field('basic_info.test_array.0.test',
+                             'test-one',
+                             'some-pid',
+                             append=True)
+
+    assert responses.calls[0].request.headers[
+        'Content-Type'] == 'application/json-patch+json'
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert resp == mock_response['metadata']
+
+
+@responses.activate
+def test_set_field_when_pid_is_wrong(cap_api):
+    responses.add(
+        responses.PATCH,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
+        json={
+            'status_code': 404,
+            'message': 'PID does not exist.'
+        },
+        status=404)
+
+    with raises(BadStatusCode):
+        cap_api.set_field('basic_info.test', 'test', 'some-pid')
+
+
+@responses.activate
+def test_set_field_when_no_permission(cap_api):
+    responses.add(
+        responses.PATCH,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
+        json={
+            'status_code': 403,
+            'message': 'Forbidden'
+        },
+        status=403)
+
+    with raises(BadStatusCode):
+        cap_api.set_field('basic_info.test', 'test', 'some-pid')
 
 
 @responses.activate

@@ -55,6 +55,15 @@ def validate_version(ctx, param, version_value):
     return None
 
 
+def is_int(val):
+    """Check if a string can be cast to int."""
+    try:
+        int(val)
+    except ValueError:
+        return False
+    return True
+
+
 def logger(fun):
     @wraps(fun)
     def wrapper(*args, **kwargs):
