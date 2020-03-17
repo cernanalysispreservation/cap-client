@@ -252,13 +252,28 @@ class CapAPI(object):
     ##############
     def get_field(self, pid, field=None):
         """Return metadata on analysis."""
-        dct = self._make_request(url=urljoin('deposits/', pid),
-                                 headers={'Accept': 'application/basic+json'
-                                          })['metadata']
+        resp_meta = self._make_request(
+            url=urljoin('deposits/', pid),
+            headers={'Accept': 'application/basic+json'})['metadata']
+
         fields = field.split('.') if field else []
         for x in fields:
-            dct = dct[x or int(x)]
-        return dct
+            try:
+                idx = int(x)
+            except ValueError:
+                idx = x
+
+            try:
+                resp_meta = resp_meta[idx]
+            except IndexError:
+                raise IndexError(
+                    'The index you are trying to access does not exist.')
+            except KeyError:
+                raise KeyError(
+                    'The field {} does not exist. Try a different field.'.
+                    format(x))
+
+        return resp_meta
 
     def set_field(self,
                   field_name,

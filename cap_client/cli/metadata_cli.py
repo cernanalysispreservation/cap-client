@@ -107,8 +107,8 @@ def append(ctx, pid, field_name, field_value, file):
 @click.option(
     '--pid',
     '-p',
-    help='Get metadata of the deposit with given pid',
     required=True,
+    help='Get metadata of the deposit with given pid',
 )
 @click.pass_context
 @logger
