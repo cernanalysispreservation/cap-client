@@ -30,7 +30,7 @@ import sys
 import click
 
 from cap_client.cap_api import CapAPI
-from cap_client.cli.cli import (clone, create, delete, get, get_schema,
+from cap_client.cli.cli import (clone, create, update, delete, get, get_schema,
                                 get_shared, me, publish, types)
 from cap_client.cli.files_cli import files
 from cap_client.cli.metadata_cli import metadata
@@ -89,6 +89,7 @@ cli.add_command(get_shared)
 cli.add_command(get_schema)
 cli.add_command(me)
 cli.add_command(create)
+cli.add_command(update)
 cli.add_command(delete)
 cli.add_command(publish)
 cli.add_command(clone)

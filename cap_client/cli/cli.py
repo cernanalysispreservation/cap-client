@@ -25,11 +25,7 @@
 
 import click
 
-from cap_client.errors import (BadStatusCode, MissingJsonFile,
-                               UnknownAnalysisType)
-from cap_client.utils import validate_version
-
-from ..utils import json_dumps, logger
+from ..utils import json_dumps, logger, validate_version
 
 
 @click.command()
@@ -111,6 +107,29 @@ def create(ctx, json_file, type, version):
     res = ctx.obj.cap_api.create(json_=json_file,
                                  ana_type=type,
                                  version=version)
+
+    click.echo(json_dumps(res))
+
+
+@click.command()
+@click.option(
+    '--pid',
+    '-p',
+    required=True,
+    help='Delete deposit with given pid',
+)
+@click.option(
+    '--json',
+    '-j',
+    'json_',
+    required=True,
+    help='JSON data from file or command line',
+)
+@click.pass_context
+@logger
+def update(ctx, pid, json_):
+    """Update an analysis."""
+    res = ctx.obj.cap_api.update(pid=pid, json_=json_)
 
     click.echo(json_dumps(res))
 

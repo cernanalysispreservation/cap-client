@@ -206,19 +206,26 @@ class CapAPI(object):
                            method='delete',
                            expected_status_code=204)
 
-    def update(self, pid=None, filename=''):
+    def update(self, pid=None, json_=''):
         """Update an analysis by given pid and JSON data from file."""
         try:
-            data = json.loads(filename)
+            data = json.loads(json_)
         except ValueError:
-            with open(filename) as fp:
-                data = json.load(fp)
+            try:
+                with open(json_) as fp:
+                    data = json.load(fp)
+            except (IOError, ValueError):
+                raise MissingJsonFile()
 
         json_data = json.dumps(data)
 
         res = self._make_request(url=urljoin('deposits/', pid),
+                                 method='put',
                                  data=json_data,
-                                 method='put')
+                                 headers={
+                                     'Content-Type': 'application/json',
+                                     'Accept': 'application/basic+json'
+                                 })
 
         return res
 
