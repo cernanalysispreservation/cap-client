@@ -125,34 +125,52 @@ def test_get_drafts_method_with_given_pid(cap_api, record_data):
     assert resp == record_data
 
 
-@patch('requests.get')
-def test_get_field_when_field_unspecified(mock_requests, cap_api, record_data):
-    mock_requests.return_value.status_code = 200
-    mock_requests.return_value.json.return_value = record_data
+@responses.activate
+def test_get_field_when_field_unspecified(cap_api, record_data):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    responses.add(responses.GET, url, json=record_data, status=200)
 
-    resp = cap_api.get_field('some_pid')
+    resp = cap_api.get_field('some-pid')
 
     assert resp == record_data['metadata']
 
 
-@patch('requests.get')
-def test_get_field_when_field_specified(mock_requests, cap_api, record_data):
-    mock_requests.return_value.status_code = 200
-    mock_requests.return_value.json.return_value = record_data
+@responses.activate
+def test_get_field_when_field_specified(cap_api, record_data):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    responses.add(responses.GET, url, json=record_data, status=200)
 
-    resp = cap_api.get_field('some_pid', 'general_title')
+    resp = cap_api.get_field('some-pid', 'general_title')
 
     assert resp == record_data['metadata']['general_title']
 
 
-@patch('requests.get')
-def test_get_field_when_field_is_incorrect(mock_requests, cap_api,
-                                           record_data):
-    mock_requests.return_value.status_code = 200
-    mock_requests.return_value.json.return_value = record_data
+@responses.activate
+def test_get_field_array_item(cap_api, record_data):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    responses.add(responses.GET, url, json=record_data, status=200)
+
+    resp = cap_api.get_field('some-pid', 'basic_info.people_info.0.name')
+    assert resp == record_data['metadata']['basic_info']['people_info'][0][
+        'name']
+
+
+@responses.activate
+def test_get_field_array_item(cap_api, record_data):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    responses.add(responses.GET, url, json=record_data, status=200)
+
+    with raises(IndexError):
+        cap_api.get_field('some-pid', 'basic_info.people_info.3.name')
+
+
+@responses.activate
+def test_get_field_when_field_is_incorrect(cap_api, record_data):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    responses.add(responses.GET, url, json=record_data, status=200)
 
     with raises(KeyError):
-        cap_api.get_field('some_pid', 'title')
+        cap_api.get_field('some-pid', 'title')
 
 
 # @patch('requests.get')
