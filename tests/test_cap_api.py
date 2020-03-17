@@ -43,11 +43,7 @@ else:
 @responses.activate
 def test_make_request_when_request_successful(cap_api, record_data):
     url = 'https://analysispreservation-dev.cern.ch/api/endpoint'
-    responses.add(responses.GET,
-                  url,
-                  content_type='application/json',
-                  json=record_data,
-                  status=200)
+    responses.add(responses.GET, url, json=record_data, status=200)
 
     resp = cap_api._make_request(url='endpoint')
     assert resp == record_data
@@ -126,6 +122,8 @@ def test_get_drafts_method_with_given_pid(cap_api, record_data):
 
     resp = cap_api.get_draft_by_pid('some_pid')
 
+    assert resp == record_data
+
 
 @patch('requests.get')
 def test_get_field_when_field_unspecified(mock_requests, cap_api, record_data):
@@ -192,7 +190,7 @@ def test_types(mock_requests, cap_api, mocked_cap_api):
 # Public methods
 @patch('requests.get')
 def test_get_available_types_returns_all_available_types(
-    mock_requests, cap_api, user_data):
+        mock_requests, cap_api, user_data):
     mock_requests.return_value.status_code = 200
     mock_requests.return_value.json.return_value = user_data
 
@@ -203,13 +201,13 @@ def test_get_available_types_returns_all_available_types(
 
 
 def test_create_method_when_no_type_given_returns_list_of_options(
-    mocked_cap_api):  # noqa
+        mocked_cap_api):  # noqa
     with raises(UnknownAnalysisType):
         mocked_cap_api.create(ana_type=None)
 
 
 def test_create_method_when_type_given_not_in_available_options(
-    mocked_cap_api):  # noqa
+        mocked_cap_api):  # noqa
     with raises(UnknownAnalysisType):
         mocked_cap_api.create(ana_type='non-atlas-workflows')
 
@@ -228,7 +226,7 @@ def test_create_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
 
 
 def test_create_method_when_validate_failed_raises_exception(
-    mocked_cap_api, record_data):
+        mocked_cap_api, record_data):
     json_data = json.dumps(record_data)
     with patch('{}.open'.format(builtin_module_name),
                new_callable=mock_open,
@@ -238,42 +236,98 @@ def test_create_method_when_validate_failed_raises_exception(
             mocked_cap_api.create(json_='file', ana_type='atlas-workflows')
 
 
-def test_update_method_when_no_file_with_data_given(mocked_cap_api):
-    with raises(IOError):
-        mocked_cap_api.update(pid='some_pid')
+@patch('{}.open'.format(builtin_module_name), new_callable=mock_open)
+def test_update_method_when_json_file_not_found(mock_open, cap_api):
+    mock_open.side_effect = IOError
+
+    with raises(MissingJsonFile):
+        cap_api.update(pid='some_pid', json_='file')
 
 
 @patch('{}.open'.format(builtin_module_name),
        new_callable=mock_open,
        read_data='{,}]')
-def test_update_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
-    with raises(ValueError):
-        mocked_cap_api.update(filename='file')
+def test_update_method_when_no_json_in_given_file(mock_open, cap_api):
+    with raises(MissingJsonFile):
+        cap_api.update(pid='some-pid', json_='file')
 
 
-def test_update_method_when_validate_failed_raises_exception(
-    mocked_cap_api, record_data):
-    json_data = json.dumps(record_data)
-    with patch('{}.open'.format(builtin_module_name),
-               new_callable=mock_open,
-               read_data=json_data):
-        mocked_cap_api._make_request.side_effect = [BadStatusCode(), None]
-        with raises(BadStatusCode):
-            mocked_cap_api.update(filename='file', pid='some_pid')
+@responses.activate
+def test_update_method_when_validate_failed_raises_exception(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_json_data = {
+        "title": "Bad Title",
+        "basic_info": {
+            "abstract": "Example Abstract"
+        }
+    }
+    mock_response = {
+        "status": 400,
+        "message": "Validation error. Try again with valid data",
+        "errors": [{
+            "field": [],
+            "message": "Additional properties are not allowed ('title' was unexpected)"
+        }]
+    }
+    responses.add(responses.PUT, url, json=mock_response, status=400)
+    with raises(BadStatusCode):
+        cap_api.update(pid='some-pid', json_=json.dumps(mock_json_data))
 
 
-def test_update_method_when_success_returns_updated_data(
-    mocked_cap_api, record_data):
-    json_data = json.dumps(record_data)
+@responses.activate
+def test_update_method_when_no_permission(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_json_data = {"basic_info": {"abstract": "Example abstract"}}
 
-    with patch('{}.open'.format(builtin_module_name),
-               new_callable=mock_open,
-               read_data=json_data):
-        mocked_cap_api._make_request.side_effect = [record_data]
+    responses.add(responses.PUT,
+                  url,
+                  json={
+                      'status': 403,
+                      'message': 'Forbidden'
+                  },
+                  status=403)
 
-        resp = mocked_cap_api.update(filename='file', pid='some_pid')
+    with raises(BadStatusCode):
+        cap_api.update(pid='some-pid', json_=json.dumps(mock_json_data))
 
-        assert resp == record_data
+
+@responses.activate
+def test_update_method_when_wrong_pid(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_json_data = {"basic_info": {"abstract": "Example abstract"}}
+
+    responses.add(responses.PUT,
+                  url,
+                  json={
+                      'status': 404,
+                      'message': 'PID does not exist'
+                  },
+                  status=404)
+
+    with raises(BadStatusCode):
+        cap_api.update(pid='some-pid', json_=json.dumps(mock_json_data))
+
+
+@responses.activate
+def test_update_method_when_success_returns_updated_data(cap_api, record_data):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_json_data = {
+        "metadata": {
+            "general_title": "General relativity",
+            "basic_info": {
+                "analysis_number": "HIN-16-007",
+                "people_info": [{
+                    "name": "John Doe"
+                }, {
+                    "name": "Albert Einstein"
+                }],
+            }
+        }
+    }
+    responses.add(responses.PUT, url, json=record_data, status=200)
+
+    resp = cap_api.update(pid='some-pid', json_=json.dumps(mock_json_data))
+    assert resp == record_data
 
 
 def test_patch_method(mocked_cap_api, record_data):
@@ -323,7 +377,7 @@ def test_set_field_when_setting_string_field(mocked_cap_api, record_data):
 
 
 def test_set_field_when_appending_string_field_to_array(
-    mocked_cap_api, record_data):
+        mocked_cap_api, record_data):
     mocked_cap_api._make_request.return_value = record_data
 
     mocked_cap_api.set_field('field_name.nested.nested2',
@@ -341,11 +395,8 @@ def test_set_field_when_appending_string_field_to_array(
 
 @responses.activate
 def test_upload_repo_no_webhook(cap_api):
-    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload'
-    responses.add(responses.POST,
-                  upload_url,
-                  json={'webhooks': []},
-                  status=201)
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload'
+    responses.add(responses.POST, url, json={'webhooks': []}, status=201)
 
     resp = cap_api.upload_repository('some-pid', 'endpoint')
 
@@ -356,7 +407,7 @@ def test_upload_repo_no_webhook(cap_api):
 
 @responses.activate
 def test_upload_repo_push_webhook(cap_api):
-    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload'
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload'
     webhooks = [{
         "branch": "master",
         "event_type": "push",
@@ -366,11 +417,7 @@ def test_upload_repo_push_webhook(cap_api):
         "snapshots": []
     }]
 
-    responses.add(responses.POST,
-                  upload_url,
-                  json=webhooks,
-                  content_type='application/json',
-                  status=201)
+    responses.add(responses.POST, url, json=webhooks, status=201)
 
     resp = cap_api.upload_repository('some-pid', 'endpoint')
 
@@ -381,9 +428,9 @@ def test_upload_repo_push_webhook(cap_api):
 
 @responses.activate
 def test_upload_repo_400_from_server(cap_api):
-    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload'
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload'
     responses.add(responses.POST,
-                  upload_url,
+                  url,
                   json={
                       'status': 400,
                       'message': 'Error'
@@ -397,7 +444,7 @@ def test_upload_repo_400_from_server(cap_api):
 
 @responses.activate
 def test_get_repositories_from_server_without_snapshots(cap_api):
-    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
     mock_response = {
         'webhooks': [{
             "branch": "master",
@@ -410,7 +457,7 @@ def test_get_repositories_from_server_without_snapshots(cap_api):
     }
 
     responses.add(responses.GET,
-                  upload_url,
+                  url,
                   json=mock_response,
                   stream=True,
                   status=200)
@@ -426,7 +473,7 @@ def test_get_repositories_from_server_without_snapshots(cap_api):
 
 @responses.activate
 def test_get_repositories_from_server_with_snapshots(cap_api):
-    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
     mock_response = {
         'webhooks': [{
             "branch": "master",
@@ -455,7 +502,7 @@ def test_get_repositories_from_server_with_snapshots(cap_api):
     }
 
     responses.add(responses.GET,
-                  upload_url,
+                  url,
                   json=mock_response,
                   stream=True,
                   status=200)
@@ -469,9 +516,9 @@ def test_get_repositories_from_server_with_snapshots(cap_api):
 
 @responses.activate
 def test_get_repo_400_from_server(cap_api):
-    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
     responses.add(responses.GET,
-                  upload_url,
+                  url,
                   json={
                       'status': 400,
                       'message': 'Error'
@@ -485,7 +532,7 @@ def test_get_repo_400_from_server(cap_api):
 
 @responses.activate
 def test_get_permissions(cap_api):
-    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
     mock_permissions = {
         'permissions': {
             'deposit-admin': {
@@ -504,7 +551,7 @@ def test_get_permissions(cap_api):
     }
 
     responses.add(responses.GET,
-                  upload_url,
+                  url,
                   json=mock_permissions,
                   stream=True,
                   status=200)
@@ -518,7 +565,7 @@ def test_get_permissions(cap_api):
 
 @responses.activate
 def test_add_permissions(cap_api):
-    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions'
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions'
     mock_permissions = {
         'permissions': {
             'deposit-admin': {
@@ -541,7 +588,7 @@ def test_add_permissions(cap_api):
     }
 
     responses.add(responses.POST,
-                  upload_url,
+                  url,
                   json=mock_permissions,
                   stream=True,
                   status=201)
@@ -557,10 +604,10 @@ def test_add_permissions(cap_api):
 
 @responses.activate
 def test_add_permissions_no_access(cap_api):
-    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions'
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions'
 
     responses.add(responses.POST,
-                  upload_url,
+                  url,
                   json={
                       'status': 403,
                       'message': 'Error'
@@ -575,7 +622,7 @@ def test_add_permissions_no_access(cap_api):
 
 @responses.activate
 def test_remove_permissions(cap_api):
-    upload_url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions'
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions'
     mock_permissions = {
         'permissions': {
             'deposit-admin': {
@@ -593,10 +640,7 @@ def test_remove_permissions(cap_api):
         }
     }
 
-    responses.add(responses.POST,
-                  upload_url,
-                  json=mock_permissions,
-                  status=201)
+    responses.add(responses.POST, url, json=mock_permissions, status=201)
 
     resp = cap_api.remove_permissions(pid='some-pid',
                                       email='cms@inveniosoftware.org',
@@ -710,7 +754,6 @@ def test_get_schema_version_not_found(cap_api):
     url = 'https://analysispreservation-dev.cern.ch/api/jsonschemas/some-type/0.0.5?resolve=True'
     responses.add(responses.GET,
                   url,
-                  content_type='application/json',
                   json={
                       'status': 404,
                       'message': 'Error'
