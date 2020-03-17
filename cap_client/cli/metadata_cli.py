@@ -21,15 +21,11 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
 """Metadata CAP Client CLI."""
-
-import json
-import logging
 
 import click
 
-from cap_client.errors import BadStatusCode
+from ..utils import json_dumps, logger
 
 
 @click.group()
@@ -43,7 +39,7 @@ def metadata():
     '-p',
     help='PID of draft to update.',
     default=None,
-    required=True
+    required=True,
 )
 @click.option(
     '--file',
@@ -51,24 +47,17 @@ def metadata():
     type=click.Path(),
     help='Path to file to upload.',
     default=None,
-    required=False
+    required=False,
 )
 @click.argument('field_name')
 @click.argument('field_value')
 @click.pass_context
+@logger
 def set(ctx, field_name, field_value, pid, file):
     """Edit analysis field value."""
-    try:
-        response = ctx.obj.cap_api.set_field(field_name, field_value, pid,
-                                             file)
-        click.echo(json.dumps(response, indent=4))
+    res = ctx.obj.cap_api.set_field(field_name, field_value, pid, file)
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))
 
 
 @metadata.command()
@@ -77,22 +66,16 @@ def set(ctx, field_name, field_value, pid, file):
     '-p',
     help='PID of draft to update.',
     default=None,
-    required=True
+    required=True,
 )
 @click.argument('field_name')
 @click.pass_context
+@logger
 def remove(ctx, field_name, pid):
     """Remove analysis field."""
-    try:
-        response = ctx.obj.cap_api.remove_field(field_name, pid)
-        click.echo(json.dumps(response, indent=4))
+    res = ctx.obj.cap_api.remove_field(field_name, pid)
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))
 
 
 @metadata.command()
@@ -101,7 +84,7 @@ def remove(ctx, field_name, pid):
     '-p',
     help='Append value to metadata array field',
     default=None,
-    required=True
+    required=True,
 )
 @click.option(
     '--file',
@@ -109,24 +92,21 @@ def remove(ctx, field_name, pid):
     type=click.Path(),
     help='Path to file to upload.',
     default=None,
-    required=False
+    required=False,
 )
 @click.argument('field_name')
 @click.argument('field_value')
 @click.pass_context
+@logger
 def append(ctx, field_name, field_value, pid, file):
     """Edit analysis field adding a new value to an array."""
-    try:
-        response = ctx.obj.cap_api.set_field(field_name, field_value, pid,
-                                             file, append=True)
-        click.echo(json.dumps(response, indent=4))
+    res = ctx.obj.cap_api.set_field(field_name,
+                                    field_value,
+                                    pid,
+                                    file,
+                                    append=True)
 
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))
 
 
 @metadata.command()
@@ -143,20 +123,9 @@ def append(ctx, field_name, field_value, pid, file):
     required=True,
 )
 @click.pass_context
+@logger
 def get(ctx, field, pid):
     """Retrieve one or more fields in analysis metadata."""
-    try:
-        response = ctx.obj.cap_api.get_field(pid=pid, field=field)
-        click.echo(json.dumps(response,
-                              indent=4))
+    res = ctx.obj.cap_api.get_field(pid=pid, field=field)
 
-    except KeyError:
-        logging.error('Field {} doesn\'t exist'
-                      .format(field))
-
-    except BadStatusCode as e:
-        logging.error(str(e))
-
-    except Exception as e:
-        logging.error('Unexpected error.')
-        logging.debug(str(e))
+    click.echo(json_dumps(res))

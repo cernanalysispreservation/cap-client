@@ -64,7 +64,7 @@ class Config(object):
     '-l',
     help='Sets log level',
     type=click.Choice(['error', 'debug', 'info']),
-    default='info'
+    default='info',
 )
 @click.option(
     '--access_token',
@@ -78,14 +78,12 @@ def cli(ctx, loglevel, verbose, access_token):
         lvl = verbose
     else:
         lvl = getattr(logging, loglevel.upper())
-    logging.basicConfig(
-        format='[%(levelname)s] %(message)s',
-        stream=sys.stderr,
-        level=lvl)
+    logging.basicConfig(format='[%(levelname)s] %(message)s',
+                        stream=sys.stderr,
+                        level=lvl)
     ctx.obj = Config(access_token=access_token)
 
 
-# cli.add_command(ping)
 cli.add_command(get)
 cli.add_command(get_shared)
 cli.add_command(get_schema)

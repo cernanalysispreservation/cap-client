@@ -21,13 +21,20 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
 """CAP Client Utils."""
-import tarfile
+import functools
+import json
+import logging
 import os
 import re
+import tarfile
+from functools import wraps
+from sys import exit
 
+import click
 from click import BadParameter
+
+from .errors import BadStatusCode, CLIError
 
 
 def make_tarfile(output_filename, source_dir):
@@ -46,3 +53,27 @@ def validate_version(ctx, param, version_value):
         return version_value
 
     return None
+
+
+def logger(fun):
+    @wraps(fun)
+    def wrapper(*args, **kwargs):
+        try:
+            fun(*args, **kwargs)
+        except BadStatusCode as e:
+            logging.debug(e.data)
+            click.secho(str(e), fg='red')
+            exit(1)
+        except CLIError as e:
+            click.secho(str(e), fg='red')
+            exit(1)
+        except Exception as e:
+            logging.debug(str(e))
+            click.echo('Client has encountered an unexpected error.\n'
+                       'Try again or use --verbose flag to get more details.')
+            exit(1)
+
+    return wrapper
+
+
+json_dumps = functools.partial(json.dumps, indent=4)

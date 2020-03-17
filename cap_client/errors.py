@@ -21,15 +21,16 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
 """CAP client exceptions."""
 
-import json
+
+class CLIError(Exception):
+    """Base CAP cli exception class."""
+    pass
 
 
-class BadStatusCode(Exception):
-    """Exception for status code different than expected."""
-
+class BadStatusCode(CLIError):
+    """Response status code not as expected."""
     def __init__(self,
                  message=None,
                  expected_status_code=None,
@@ -38,43 +39,33 @@ class BadStatusCode(Exception):
                  data=None,
                  **kwargs):
         """Initialize BadStatusCode."""
-        super(Exception, self)
-        self.message = message
         self.expected_status_code = expected_status_code
+        self.data = data if data else {}
         self.status_code = status_code
         self.endpoint = endpoint
-        self.data = data
+        self.message = message or self.data.get('message')
 
     def __str__(self):
-        """Print BadStatusCode exception's details."""
-        return "Something went wrong when trying to connect to {endpoint}\n" \
-               "\tStatus Code: {status_code}\n" \
-               "\t{message}".format(endpoint=self.endpoint,
-                                    status_code=self.data['status'],
-                                    message=self.data['message'])
+        """Print error details."""
+        return self.message
 
 
-class UnknownAnalysisType(Exception):
+class UnknownAnalysisType(CLIError):
     """Analysis type not supported."""
-
-    def __init__(self,
-                 types=None,
-                 **kwargs):
+    def __init__(self, types=None, **kwargs):
         """Initialize UnknownAnalysisType."""
-        super(Exception, self)
-        self.types = types
+        self.message = "Choose one of the available analyses types\n{}".format(
+            '\n'.join(types))
 
     def __str__(self):
-        """Print UnknownAnalysisType exception's details."""
-        return "Choose one of the available analyses types:\n{}".format(
-                '\n'.join(self.types))
+        """Print error details."""
+        return self.message
 
 
-class MissingJsonFile(Exception):
+class MissingJsonFile(CLIError):
     """Json file not provided."""
-
     def __str__(self):
-        """Print MissingJsonFile exception's details."""
+        """Print error details."""
         return "Please provide a JSON file for the analysis. " \
                "If you don't know the analysis fields, first call " \
                "cap-client get-schema --type <analysis-type> ."
