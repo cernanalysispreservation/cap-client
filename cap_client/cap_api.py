@@ -68,17 +68,21 @@ class CapAPI(object):
                               stream=stream,
                               **kwargs)
 
-        if response.status_code == expected_status_code:
-            try:
-                resp_data = response if stream else response.json()
-            except ValueError:
-                resp_data = None
-            return resp_data
+        if stream:
+            resp_data = response
         else:
+            try:
+                resp_data = response.json()
+            except ValueError:
+                resp_data = response.text if response.text else None
+
+        if response.status_code != expected_status_code:
             raise BadStatusCode(endpoint=endpoint,
                                 expected_status_code=expected_status_code,
                                 status_code=response.status_code,
-                                data=response.json())
+                                data=resp_data)
+
+        return resp_data
 
     def _get_available_types(self):
         """Get available analyses types from server."""
@@ -266,10 +270,13 @@ class CapAPI(object):
             val = field_val
 
         json_data = [{
-            "op": "add",
-            "path": '/{}{}'.format(field_name.replace('.', '/'),
-                                   '/-' if append else ''),
-            "value": val,
+            "op":
+            "add",
+            "path":
+            '/{}{}'.format(field_name.replace('.', '/'),
+                           '/-' if append else ''),
+            "value":
+            val,
         }]
 
         if filepath:
@@ -446,10 +453,14 @@ class CapAPI(object):
                                   expected_status_code=201,
                                   method='post',
                                   data=json.dumps({
-                                      'pid': pid,
-                                      'url': url,
-                                      'webhook': True if event_type else False,
-                                      'event_type': event_type
+                                      'pid':
+                                      pid,
+                                      'url':
+                                      url,
+                                      'webhook':
+                                      True if event_type else False,
+                                      'event_type':
+                                      event_type
                                   }),
                                   headers={
                                       'Content-Type': 'application/json',
