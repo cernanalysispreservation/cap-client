@@ -37,23 +37,20 @@ def metadata():
 @click.option(
     '--pid',
     '-p',
-    help='PID of draft to update.',
-    default=None,
     required=True,
+    help='PID of draft to update.',
 )
 @click.option(
     '--file',
     '-f',
     type=click.Path(),
     help='Path to file to upload.',
-    default=None,
-    required=False,
 )
 @click.argument('field_name')
 @click.argument('field_value')
 @click.pass_context
 @logger
-def set(ctx, field_name, field_value, pid, file):
+def set(ctx, pid, field_name, field_value, file):
     """Edit analysis field value."""
     res = ctx.obj.cap_api.set_field(field_name, field_value, pid, file)
 
@@ -64,14 +61,13 @@ def set(ctx, field_name, field_value, pid, file):
 @click.option(
     '--pid',
     '-p',
-    help='PID of draft to update.',
-    default=None,
     required=True,
+    help='PID of draft to update.',
 )
 @click.argument('field_name')
 @click.pass_context
 @logger
-def remove(ctx, field_name, pid):
+def remove(ctx, pid, field_name):
     """Remove analysis field."""
     res = ctx.obj.cap_api.remove_field(field_name, pid)
 
@@ -82,23 +78,20 @@ def remove(ctx, field_name, pid):
 @click.option(
     '--pid',
     '-p',
-    help='Append value to metadata array field',
-    default=None,
     required=True,
+    help='Append value to metadata array field',
 )
 @click.option(
     '--file',
     '-f',
     type=click.Path(),
     help='Path to file to upload.',
-    default=None,
-    required=False,
 )
 @click.argument('field_name')
 @click.argument('field_value')
 @click.pass_context
 @logger
-def append(ctx, field_name, field_value, pid, file):
+def append(ctx, pid, field_name, field_value, file):
     """Edit analysis field adding a new value to an array."""
     res = ctx.obj.cap_api.set_field(field_name,
                                     field_value,
@@ -110,22 +103,17 @@ def append(ctx, field_name, field_value, pid, file):
 
 
 @metadata.command()
-@click.argument(
-    'field',
-    default=None,
-    required=False,
-)
+@click.argument('field_name')
 @click.option(
     '--pid',
     '-p',
     help='Get metadata of the deposit with given pid',
-    default=None,
     required=True,
 )
 @click.pass_context
 @logger
-def get(ctx, field, pid):
+def get(ctx, pid, field_name):
     """Retrieve one or more fields in analysis metadata."""
-    res = ctx.obj.cap_api.get_field(pid=pid, field=field)
+    res = ctx.obj.cap_api.get_field(pid, field_name)
 
     click.echo(json_dumps(res))

@@ -37,22 +37,20 @@ def permissions():
 @click.option(
     '--pid',
     '-p',
-    help='PID of draft to update.',
-    default=None,
     required=True,
+    help='PID of draft to update.',
 )
 @click.option(
     '--user',
     '-u',
-    help='User mail to assign permissions.',
-    default=None,
     required=True,
+    help='User mail to assign permissions.',
 )
 @click.option(
     '--rights',
     '-r',
-    required=True,
     type=click.Choice(['read', 'update', 'admin']),
+    required=True,
     multiple=True,
 )
 @click.pass_context
@@ -72,22 +70,20 @@ def add(ctx, pid, user, rights):
 @click.option(
     '--pid',
     '-p',
-    help='PID of draft to update.',
-    default=None,
     required=True,
+    help='PID of draft to update.',
 )
 @click.option(
     '--user',
     '-u',
-    help='User email to assign permissions.',
-    default=None,
     required=True,
+    help='User email to assign permissions.',
 )
 @click.option(
     '--rights',
     '-r',
-    required=True,
     type=click.Choice(['read', 'update', 'admin']),
+    required=True,
     multiple=True,
 )
 @click.pass_context
@@ -107,9 +103,8 @@ def remove(ctx, pid, user, rights):
 @click.option(
     '--pid',
     '-p',
-    help='Get permissions of the deposit with given pid',
-    default=None,
     required=True,
+    help='Get permissions of the deposit with given pid',
 )
 @click.pass_context
 @logger
