@@ -34,24 +34,30 @@ def files():
 
 
 @files.command()
-@click.option('--pid',
-              '-p',
-              help='Upload file to deposit with given pid',
-              default=None,
-              required=True)
-@click.argument('file', type=click.Path(exists=False))
+@click.option(
+    '--pid',
+    '-p',
+    required=True,
+    help='Upload file to deposit with given pid',
+)
 @click.option(
     '--output-file',
     '-o',
     help='Filename to be given to uploaded file',
-    default=None,
 )
-@click.option('--yes',
-              is_flag=True,
-              help="Bypasses prompts..Say YES to everything")
+@click.option(
+    '--yes',
+    is_flag=True,
+    default=False,
+    help="Bypasses prompts..Say YES to everything",
+)
+@click.argument(
+    'file',
+    type=click.Path(exists=False),
+)
 @click.pass_context
 @logger
-def upload(ctx, pid, file, yes, output_file=None):
+def upload(ctx, pid, file, output_file, yes):
     """Upload file to deposit with given pid."""
     ctx.obj.cap_api.upload_file(pid=pid,
                                 filepath=file,
@@ -62,50 +68,55 @@ def upload(ctx, pid, file, yes, output_file=None):
 
 
 @files.command()
-@click.option('--pid',
-              '-p',
-              help='Get file uploaded with deposit with given pid',
-              default=None,
-              required=True)
+@click.option(
+    '--pid',
+    '-p',
+    required=True,
+    help='Get file uploaded with deposit with given pid',
+)
 @click.option(
     '--output-file',
     '-o',
     help='Filename to be given to uploaded file',
-    default=None,
 )
 @click.argument('filename')
 @click.pass_context
 @logger
-def download(ctx, pid, output_file, filename):
+def download(ctx, pid, filename, output_file):
     """Download file uploaded with given deposit."""
     ctx.obj.cap_api.download_file(pid, filename, output_file)
+
     click.echo("File saved as {}".format(output_file or filename))
 
 
 @files.command()
-@click.option('--pid',
-              '-p',
-              help='List files of deposit with given pid',
-              default=None,
-              required=True)
+@click.option(
+    '--pid',
+    '-p',
+    help='List files of deposit with given pid',
+    required=True,
+)
 @click.pass_context
 @logger
 def get(ctx, pid):
     """List files associated with deposit with given pid."""
     res = ctx.obj.cap_api.get_files(pid=pid)
+
     click.echo(json_dumps(res))
 
 
 @files.command()
-@click.option('--pid',
-              '-p',
-              help='Remove file from deposit with given pid',
-              default=None,
-              required=True)
+@click.option(
+    '--pid',
+    '-p',
+    help='Remove file from deposit with given pid',
+    required=True,
+)
 @click.argument('filename')
 @click.pass_context
 @logger
 def remove(ctx, pid, filename):
     """Removefile from deposit with given pid."""
     ctx.obj.cap_api.remove_file(pid=pid, filename=filename)
+
     click.echo("File {} removed.".format(filename))

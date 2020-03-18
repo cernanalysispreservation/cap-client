@@ -47,7 +47,6 @@ def me(ctx):
     '--pid',
     '-p',
     help='Get analysis with given pid',
-    default=None,
 )
 @click.option(
     '--all',
@@ -72,7 +71,6 @@ def get_shared(ctx, pid, all):
     '--pid',
     '-p',
     help='Get analysis with given pid',
-    default=None,
 )
 @click.option(
     '--all',
@@ -94,14 +92,13 @@ def get(ctx, pid, all):
 @click.command()
 @click.option(
     '--json-file',
+    required=True,
     help='JSON data from file or command line',
-    default=None,
 )
 @click.option(
     '--type',
     '-t',
     help='Type of analysis',
-    default=None,
 )
 @click.option(
     '--version',
@@ -122,9 +119,8 @@ def create(ctx, json_file, type, version):
 @click.option(
     '--pid',
     '-p',
-    help='Delete deposit with given pid',
-    default=None,
     required=True,
+    help='Delete deposit with given pid',
 )
 @click.pass_context
 @logger
@@ -139,9 +135,8 @@ def delete(ctx, pid):
 @click.option(
     '--pid',
     '-p',
-    help='Publish deposit with given pid',
-    default=None,
     required=True,
+    help='Publish deposit with given pid',
 )
 @click.pass_context
 @logger
@@ -156,9 +151,8 @@ def publish(ctx, pid):
 @click.option(
     '--pid',
     '-p',
-    help='Clone deposit with given pid',
-    default=None,
     required=True,
+    help='Clone deposit with given pid',
 )
 @click.pass_context
 @logger
@@ -183,20 +177,21 @@ def types(ctx):
 @click.option(
     '--type',
     '-t',
-    help='Type of analysis',
-    default=None,
     required=True,
+    help='Type of analysis',
 )
-@click.option('--version',
-              '-v',
-              help='Version of the schema',
-              default=None,
-              required=False,
-              callback=validate_version)
-@click.option('--record',
-              is_flag=True,
-              default=False,
-              help="Retrieve the record schema, instead of the deposit")
+@click.option(
+    '--version',
+    '-v',
+    callback=validate_version,
+    help='Version of the schema',
+)
+@click.option(
+    '--record',
+    is_flag=True,
+    default=False,
+    help="Retrieve the record schema, instead of the deposit",
+)
 @click.pass_context
 @logger
 def get_schema(ctx, type, version, record):

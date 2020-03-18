@@ -37,23 +37,20 @@ def repositories():
 @click.option(
     '--pid',
     '-p',
-    help='Upload repository to analysis with given PID.',
-    default=None,
     required=True,
+    help='Upload repository to analysis with given PID.',
 )
 @click.option(
     '--url',
     '-u',
-    help='The repo url.',
-    default=None,
     required=True,
+    help='The repo url.',
 )
 @click.option(
     '--webhook',
     '-w',
     type=click.Choice(['push', 'release']),
     help='Webhook type (push|release)',
-    default=None,
 )
 @click.pass_context
 @logger
@@ -73,16 +70,15 @@ def upload(ctx, pid, url, webhook):
 @click.option(
     '--pid',
     '-p',
-    help='Get repositories analysis with given PID.',
-    default=None,
     required=True,
+    help='Get repositories analysis with given PID.',
 )
 @click.option(
     '--with-snapshots',
     '-ws',
-    help='Include the snapshots of each repository.',
     default=False,
     is_flag=True,
+    help='Include the snapshots of each repository.',
 )
 @click.pass_context
 @logger
