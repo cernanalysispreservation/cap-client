@@ -25,7 +25,7 @@
 
 import click
 
-from ..utils import json_dumps, logger
+from ..utils import json_dumps, logger, pid_option
 
 
 @click.group()
@@ -34,12 +34,7 @@ def files():
 
 
 @files.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='Upload file to deposit with given pid',
-)
+@pid_option(required=True)
 @click.option(
     '--output-file',
     '-o',
@@ -68,12 +63,7 @@ def upload(ctx, pid, file, output_file, yes):
 
 
 @files.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='Get file uploaded with deposit with given pid',
-)
+@pid_option(required=True)
 @click.option(
     '--output-file',
     '-o',
@@ -90,12 +80,7 @@ def download(ctx, pid, filename, output_file):
 
 
 @files.command()
-@click.option(
-    '--pid',
-    '-p',
-    help='List files of deposit with given pid',
-    required=True,
-)
+@pid_option(required=True)
 @click.pass_context
 @logger
 def get(ctx, pid):
@@ -106,12 +91,7 @@ def get(ctx, pid):
 
 
 @files.command()
-@click.option(
-    '--pid',
-    '-p',
-    help='Remove file from deposit with given pid',
-    required=True,
-)
+@pid_option(required=True)
 @click.argument('filename')
 @click.pass_context
 @logger
