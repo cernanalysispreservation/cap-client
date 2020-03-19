@@ -68,13 +68,3 @@ class MissingJsonError(CLIError):
         return "Please provide a JSON file for the analysis. " \
                "If you don't know the analysis fields, first call " \
                "cap-client get-schema --type <analysis-type> ."
-
-
-class DepositCreationError(CLIError):
-    """Missing fields."""
-    def __init__(self, message=None):
-        self.message = message
-
-    def __str__(self):
-        """Print DepositCreationError exception's details."""
-        return self.message

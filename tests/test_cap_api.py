@@ -24,17 +24,14 @@
 
 from __future__ import absolute_import, print_function
 
-import json
 import sys
-import tempfile
 
 import responses
-from click import BadParameter
+from click import UsageError
 from mock import mock_open, patch
 from pytest import raises
 
-from cap_client.errors import (BadStatusCode, DepositCreationError,
-                               MissingJsonError)
+from cap_client.errors import BadStatusCode
 
 if sys.version_info.major == 3:
     builtin_module_name = 'builtins'
@@ -164,7 +161,6 @@ def test_get_field_array_item(cap_api, record_data):
         cap_api.get_field('some-pid', 'basic_info.people_info.3.name')
 
 
-from click import UsageError
 @responses.activate
 def test_get_field_when_field_is_incorrect(cap_api, record_data):
     url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
@@ -209,7 +205,7 @@ def test_types(mock_requests, cap_api, mocked_cap_api):
 # Public methods
 @patch('requests.get')
 def test_get_available_types_returns_all_available_types(
-    mock_requests, cap_api, user_data):
+        mock_requests, cap_api, user_data):
     mock_requests.return_value.status_code = 200
     mock_requests.return_value.json.return_value = user_data
 
@@ -219,36 +215,88 @@ def test_get_available_types_returns_all_available_types(
     assert 'alice-analysis' in types
 
 
-def test_patch_method(mocked_cap_api, record_data):
-    json_data = json.dumps(record_data)
-
-    with patch('{}.open'.format(builtin_module_name),
-               new_callable=mock_open,
-               read_data=json_data):
-        mocked_cap_api._make_request.return_value = record_data
-
-        resp = mocked_cap_api.patch(filename='file', pid='some_pid')
-
-        named_args = mocked_cap_api._make_request.call_args[1]
-
-        assert resp == record_data
-        assert named_args['method'] == 'patch'
-        assert named_args['headers'] == {
-            'Content-Type': 'application/json-patch+json'
-        }
-
-
-def test_patch_method_when_no_file_with_data_given(mocked_cap_api):
-    with raises(IOError):
-        mocked_cap_api.patch(pid='some_pid')
-
-
 @patch('{}.open'.format(builtin_module_name),
        new_callable=mock_open,
        read_data='{,}]')
-def test_patch_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
-    with raises(ValueError):
-        mocked_cap_api.patch(filename='file')
+def test_patch_method_when_no_json_file(mock_open, cap_api):
+    with raises(UsageError):
+        cap_api.patch(pid='some-pid', data='file')
+
+
+def test_patch_method_when_no_json(cap_api):
+    with raises(UsageError):
+        cap_api.patch(pid='some-pid', data='file')
+
+
+@responses.activate
+def test_patch_method_when_no_permission(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_json_data = [{"op": "add", "path": "/test", "value": "test"}]
+
+    responses.add(responses.PATCH,
+                  url,
+                  json={
+                      'status': 403,
+                      'message': 'Forbidden'
+                  },
+                  status=403)
+
+    with raises(BadStatusCode):
+        cap_api.patch(pid='some-pid', data=mock_json_data)
+
+
+@responses.activate
+def test_patch_method_when_wrong_pid(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_json_data = [{"op": "add", "path": "/test", "value": "test"}]
+
+    responses.add(responses.PATCH,
+                  url,
+                  json={
+                      'status': 404,
+                      'message': 'PID does not exist'
+                  },
+                  status=404)
+
+    with raises(BadStatusCode):
+        cap_api.patch(pid='some-pid', data=mock_json_data)
+
+
+@responses.activate
+def test_patch_method_when_success_returns_updated_data(cap_api, record_data):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_json_data = [{
+        "op": "add",
+        "path": "/basic_info/analysis_number",
+        "value": "HIN-16-007"
+    }]
+
+    responses.add(responses.PATCH, url, json=record_data, status=200)
+
+    resp = cap_api.patch(pid='some-pid', data=mock_json_data)
+
+    assert responses.calls[0].request.headers[
+        'Content-Type'] == 'application/json-patch+json'
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert resp == record_data
+
+
+@responses.activate
+def test_patch_method_when_failed_raises_exception(cap_api):
+    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
+    mock_json_data = [{"op": "add", "path": "/test", "value": "test"}]
+
+    responses.add(responses.PATCH,
+                  url,
+                  json={
+                      'status': 400,
+                      'message': 'Could not patch JSON.'
+                  },
+                  status=400)
+
+    with raises(BadStatusCode):
+        cap_api.patch(pid='some-pid', data=mock_json_data)
 
 
 @responses.activate
