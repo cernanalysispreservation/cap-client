@@ -31,7 +31,7 @@ import click
 
 from cap_client.cap_api import CapAPI
 from cap_client.cli.cli import (clone, create, update, delete, get, get_schema,
-                                get_shared, me, publish, types)
+                                get_shared, me, patch, publish, types)
 from cap_client.cli.files_cli import files
 from cap_client.cli.metadata_cli import metadata
 from cap_client.cli.permissions_cli import permissions
@@ -90,6 +90,7 @@ cli.add_command(get_schema)
 cli.add_command(me)
 cli.add_command(create)
 cli.add_command(update)
+cli.add_command(patch)
 cli.add_command(delete)
 cli.add_command(publish)
 cli.add_command(clone)

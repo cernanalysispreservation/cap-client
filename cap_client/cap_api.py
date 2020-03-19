@@ -29,10 +29,10 @@ import os
 
 import requests
 import urllib3
-from click import BadParameter, UsageError, confirm
+from click import UsageError, confirm
 from future.moves.urllib.parse import urljoin
 
-from .errors import BadStatusCode, DepositCreationError
+from .errors import BadStatusCode
 from .utils import make_tarfile
 
 # @TOFIX
@@ -222,20 +222,18 @@ class CapAPI(object):
                                       'Content-Type': 'application/json'
                                   })
 
-    def patch(self, pid=None, filename=''):
-        """Patch an analysis by given pid and JSON-patch data from file."""
-        try:
-            data = json.loads(filename)
-        except ValueError:
-            with open(filename) as fp:
-                data = json.load(fp)
+    def patch(self, pid, data):
+        """Patch an analysis by given pid and JSON-patch data."""
+        if not (isinstance(data, dict) or isinstance(data, list)):
+            raise UsageError('Not a JSON object.')
 
         res = self._make_request(
             url=urljoin('deposits/', pid),
             data=json.dumps(data),
             method='patch',
             headers={
-                'Content-Type': 'application/json-patch+json'  # noqa
+                'Content-Type': 'application/json-patch+json',
+                'Accept': 'application/basic+json'
             })
 
         return res

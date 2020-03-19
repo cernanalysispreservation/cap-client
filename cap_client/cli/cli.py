@@ -144,6 +144,35 @@ def update(ctx, pid, jsonfile, json):
 
 @click.command()
 @pid_option(required=True)
+@click.option(
+    '--json',
+    cls=MutuallyExclusiveOption,
+    not_required_if="jsonfile",
+    callback=load_json,
+    help='\nJSON data from command line.',
+)
+@click.option(
+    '--jsonfile',
+    type=click.File('r'),
+    cls=MutuallyExclusiveOption,
+    not_required_if="json",
+    callback=load_json_from_file,
+    help='\nJSON file.',
+)
+@click.pass_context
+@logger
+def patch(ctx, pid, jsonfile, json):
+    """Update an analysis using the JSON patch method."""
+    res = ctx.obj.cap_api.patch(
+        pid=pid,
+        data=jsonfile if json is None else json,
+    )
+
+    click.echo(json_dumps(res))
+
+
+@click.command()
+@pid_option(required=True)
 @click.pass_context
 @logger
 def delete(ctx, pid):
