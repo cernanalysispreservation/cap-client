@@ -25,7 +25,7 @@
 
 import click
 
-from ..utils import json_dumps, logger, validate_version
+from ..utils import json_dumps, logger, pid_option, validate_version
 
 
 @click.command()
@@ -39,11 +39,7 @@ def me(ctx):
 
 
 @click.command('get-shared')
-@click.option(
-    '--pid',
-    '-p',
-    help='Get analysis with given pid',
-)
+@pid_option(required=False)
 @click.option(
     '--all',
     is_flag=True,
@@ -63,11 +59,7 @@ def get_shared(ctx, pid, all):
 
 
 @click.command()
-@click.option(
-    '--pid',
-    '-p',
-    help='Get analysis with given pid',
-)
+@pid_option(required=False)
 @click.option(
     '--all',
     is_flag=True,
@@ -110,12 +102,7 @@ def create(ctx, json_, type_):
 
 
 @click.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='Delete deposit with given pid',
-)
+@pid_option(required=True)
 @click.option(
     '--json',
     '-j',
@@ -133,12 +120,7 @@ def update(ctx, pid, json_):
 
 
 @click.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='Delete deposit with given pid',
-)
+@pid_option(required=True)
 @click.pass_context
 @logger
 def delete(ctx, pid):
@@ -149,12 +131,7 @@ def delete(ctx, pid):
 
 
 @click.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='Publish deposit with given pid',
-)
+@pid_option(required=True)
 @click.pass_context
 @logger
 def publish(ctx, pid):
@@ -165,12 +142,7 @@ def publish(ctx, pid):
 
 
 @click.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='Clone deposit with given pid',
-)
+@pid_option(required=True)
 @click.pass_context
 @logger
 def clone(ctx, pid):

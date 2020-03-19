@@ -25,7 +25,7 @@
 
 import click
 
-from ..utils import json_dumps, logger
+from ..utils import json_dumps, logger, pid_option
 
 
 @click.group()
@@ -34,12 +34,7 @@ def metadata():
 
 
 @metadata.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='PID of draft to update.',
-)
+@pid_option(required=True)
 @click.option(
     '--file',
     '-f',
@@ -58,12 +53,7 @@ def set(ctx, pid, field_name, field_value, file):
 
 
 @metadata.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='PID of draft to update.',
-)
+@pid_option(required=True)
 @click.argument('field_name')
 @click.pass_context
 @logger
@@ -76,12 +66,7 @@ def remove(ctx, pid, field_name):
 
 @metadata.command()
 @click.argument('field_name')
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='Get metadata of the deposit with given pid',
-)
+@pid_option(required=True)
 @click.pass_context
 @logger
 def get(ctx, pid, field_name):

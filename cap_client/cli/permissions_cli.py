@@ -25,7 +25,7 @@
 
 import click
 
-from ..utils import json_dumps, logger
+from ..utils import json_dumps, logger, pid_option
 
 
 @click.group()
@@ -34,12 +34,7 @@ def permissions():
 
 
 @permissions.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='PID of draft to update.',
-)
+@pid_option(required=True)
 @click.option(
     '--user',
     '-u',
@@ -67,12 +62,7 @@ def add(ctx, pid, user, rights):
 
 
 @permissions.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='PID of draft to update.',
-)
+@pid_option(required=True)
 @click.option(
     '--user',
     '-u',
@@ -100,12 +90,7 @@ def remove(ctx, pid, user, rights):
 
 
 @permissions.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='Get permissions of the deposit with given pid',
-)
+@pid_option(required=True)
 @click.pass_context
 @logger
 def get(ctx, pid):

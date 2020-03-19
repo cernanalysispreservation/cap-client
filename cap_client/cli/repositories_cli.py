@@ -25,7 +25,7 @@
 
 import click
 
-from ..utils import json_dumps, logger
+from ..utils import json_dumps, logger, pid_option
 
 
 @click.group()
@@ -34,12 +34,7 @@ def repositories():
 
 
 @repositories.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='Upload repository to analysis with given PID.',
-)
+@pid_option(required=True)
 @click.option(
     '--url',
     '-u',
@@ -67,12 +62,7 @@ def upload(ctx, pid, url, webhook):
 
 
 @repositories.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='Get repositories analysis with given PID.',
-)
+@pid_option(required=True)
 @click.option(
     '--with-snapshots',
     '-ws',

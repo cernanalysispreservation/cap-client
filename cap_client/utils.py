@@ -92,3 +92,21 @@ def logger(fun):
 
 
 json_dumps = functools.partial(json.dumps, indent=4)
+
+
+def pid_option(required):
+    def inner_pid_option(fun):
+        """Add pid option to your command."""
+        @click.option(
+            '--pid',
+            '-p',
+            required=required,
+            help='Your analysis PID (Persistent Identifier)',
+        )
+        @wraps(fun)
+        def wrapper(*args, **kwargs):
+            return fun(*args, **kwargs)
+
+        return wrapper
+
+    return inner_pid_option
