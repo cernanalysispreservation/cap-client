@@ -66,17 +66,26 @@ class CapAPI(object):
                               stream=stream,
                               **kwargs)
 
-        if response.status_code == expected_status_code:
+        if response.status_code != expected_status_code:
             try:
-                resp_data = response if stream else response.json()
+                data = response.json()
+                msg = data.get('message')
             except ValueError:
-                resp_data = None
-            return resp_data
+                data = msg = response.text
+
+                if response.status_code == 500:
+                    msg = 'The server encountered an unexpected error. Try again soon.\nIn case the error persists, please contact the server administrators.'  # noqa
+
+            raise BadStatusCode(msg, endpoint, expected_status_code,
+                                response.status_code, data)
+
+        if stream:
+            return response
         else:
-            raise BadStatusCode(endpoint=endpoint,
-                                expected_status_code=expected_status_code,
-                                status_code=response.status_code,
-                                data=response.json())
+            try:
+                return response.json()
+            except ValueError:
+                return response.text
 
     def _get_available_types(self):
         """Get available analyses types from server."""

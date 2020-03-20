@@ -36,14 +36,13 @@ class BadStatusCode(CLIError):
                  expected_status_code=None,
                  status_code=None,
                  endpoint=None,
-                 data=None,
-                 **kwargs):
+                 data=None):
         """Initialize BadStatusCode."""
+        self.message = message
         self.expected_status_code = expected_status_code
-        self.data = data if data else {}
         self.status_code = status_code
         self.endpoint = endpoint
-        self.message = message or self.data.get('message')
+        self.data = data
 
     def __str__(self):
         """Print error details."""
@@ -52,7 +51,7 @@ class BadStatusCode(CLIError):
 
 class UnknownAnalysisType(CLIError):
     """Analysis type not supported."""
-    def __init__(self, types=None, **kwargs):
+    def __init__(self, types=None):
         """Initialize UnknownAnalysisType."""
         self.message = "Choose one of the available analyses types\n{}".format(
             '\n'.join(types))

@@ -75,12 +75,10 @@ def test_make_request_when_no_json_in_resp(cap_api):
     url = 'https://analysispreservation-dev.cern.ch/api/endpoint'
     responses.add(responses.DELETE, url, json=None, status=204)
 
-    resp = cap_api._make_request(url='endpoint',
-                                 expected_status_code=204,
-                                 method='delete')
-
     # when no json in resp no error raised, just no data returned
-    assert resp is None
+    cap_api._make_request(url='endpoint',
+                          expected_status_code=204,
+                          method='delete')
 
 
 @responses.activate
