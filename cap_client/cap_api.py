@@ -30,6 +30,7 @@ import os
 import click
 import requests
 import urllib3
+from click import BadParameter
 from future.moves.urllib.parse import urljoin
 
 from .errors import BadStatusCode, DepositCreationError
@@ -253,39 +254,29 @@ class CapAPI(object):
         fields = field.split('.') if field else []
         for x in fields:
             try:
-                idx = int(x)
-            except ValueError:
-                idx = x
-
-            try:
-                resp_meta = resp_meta[idx]
+                resp_meta = resp_meta[int(x) if x.isdigit() else x]
             except IndexError:
                 raise IndexError(
                     'The index you are trying to access does not exist.')
-            except KeyError:
+            except (TypeError, KeyError):
                 raise KeyError(
                     'The field {} does not exist. Try a different field.'.
                     format(x))
 
         return resp_meta
 
-    def set_field(self,
-                  field_name,
-                  field_val,
-                  pid,
-                  filepath=None,
-                  append=False):
+    def set_field(self, pid, field_name, field_val, filepath=None):
         """Edit analysis field value."""
+
         try:
-            val = json.loads(field_val)
+            field_val = json.loads(field_val)
         except ValueError:
-            val = field_val
+            pass
 
         json_data = [{
-            "op": "add",
-            "path": '/{}{}'.format(field_name.replace('.', '/'),
-                                   '/-' if append else ''),
-            "value": val,
+            "op": "replace",
+            "path": '/' + field_name.replace('.', '/'),
+            "value": field_val,
         }]
 
         if filepath:
@@ -296,12 +287,13 @@ class CapAPI(object):
             data=json.dumps(json_data),
             method='patch',
             headers={
-                'Content-Type': 'application/json-patch+json',  # noqa
+                'Content-Type': 'application/json-patch+json',
                 'Accept': 'application/basic+json'
             })
+
         return response['metadata']
 
-    def remove_field(self, field_name, pid):
+    def remove_field(self, pid, field_name):
         """Remove analysis field."""
         json_data = [{
             "op": "remove",

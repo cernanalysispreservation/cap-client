@@ -52,7 +52,7 @@ def metadata():
 @logger
 def set(ctx, pid, field_name, field_value, file):
     """Edit analysis field value."""
-    res = ctx.obj.cap_api.set_field(field_name, field_value, pid, file)
+    res = ctx.obj.cap_api.set_field(pid, field_name, field_value, file)
 
     click.echo(json_dumps(res))
 
@@ -70,34 +70,6 @@ def set(ctx, pid, field_name, field_value, file):
 def remove(ctx, pid, field_name):
     """Remove analysis field."""
     res = ctx.obj.cap_api.remove_field(field_name, pid)
-
-    click.echo(json_dumps(res))
-
-
-@metadata.command()
-@click.option(
-    '--pid',
-    '-p',
-    required=True,
-    help='Append value to metadata array field',
-)
-@click.option(
-    '--file',
-    '-f',
-    type=click.Path(),
-    help='Path to file to upload.',
-)
-@click.argument('field_name')
-@click.argument('field_value')
-@click.pass_context
-@logger
-def append(ctx, pid, field_name, field_value, file):
-    """Edit analysis field adding a new value to an array."""
-    res = ctx.obj.cap_api.set_field(field_name,
-                                    field_value,
-                                    pid,
-                                    file,
-                                    append=True)
 
     click.echo(json_dumps(res))
 

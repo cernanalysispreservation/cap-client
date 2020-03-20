@@ -508,37 +508,6 @@ def test_patch_method_when_no_json_in_given_file(mock_open, mocked_cap_api):
         mocked_cap_api.patch(filename='file')
 
 
-def test_set_field_when_setting_string_field(mocked_cap_api, record_data):
-    mocked_cap_api._make_request.return_value = record_data
-
-    mocked_cap_api.set_field('field_name.nested.nested2', 'field_val',
-                             'some_pid')
-
-    named_args = mocked_cap_api._make_request.call_args[1]
-    sent_json = json.loads(named_args['data'])[0]
-
-    assert sent_json['op'] == 'add'
-    assert sent_json['path'] == '/field_name/nested/nested2'
-    assert sent_json['value'] == 'field_val'
-
-
-def test_set_field_when_appending_string_field_to_array(
-        mocked_cap_api, record_data):
-    mocked_cap_api._make_request.return_value = record_data
-
-    mocked_cap_api.set_field('field_name.nested.nested2',
-                             'field_val',
-                             'some_pid',
-                             append=True)
-
-    named_args = mocked_cap_api._make_request.call_args[1]
-    sent_json = json.loads(named_args['data'])[0]
-
-    assert sent_json['op'] == 'add'
-    assert sent_json['path'] == '/field_name/nested/nested2/-'
-    assert sent_json['value'] == 'field_val'
-
-
 @responses.activate
 def test_upload_repo_no_webhook(cap_api):
     url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload'

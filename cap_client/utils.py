@@ -32,7 +32,7 @@ from functools import wraps
 from sys import exit
 
 import click
-from click import BadParameter
+from click import BadParameter, ClickException
 
 from .errors import BadStatusCode, CLIError, MissingJsonError
 
@@ -72,6 +72,9 @@ def logger(fun):
     def wrapper(*args, **kwargs):
         try:
             fun(*args, **kwargs)
+        except ClickException as e:
+            e.show()
+            exit(1)
         except BadStatusCode as e:
             logging.debug(e.data)
             click.secho(str(e), fg='red')
