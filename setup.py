@@ -43,7 +43,7 @@ tests_require = [
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
-    'responses>=0.10.6'
+    'responses>=0.10.6',
 ]
 
 extras_require = {
@@ -66,6 +66,7 @@ setup_requires = [
 
 install_requires = [
     'click>=6.7',
+    'click-help-colors>=0.8',
     'requests>=2.18.4',
     'colorama>=0.4.3',
     'future>=0.16.0',
@@ -73,13 +74,10 @@ install_requires = [
 
 packages = find_packages()
 
-
 # Get the version string. Cannot be done with import!
 with open(os.path.join('cap_client', 'version.py'), 'rt') as f:
-    version = re.search(
-        '__version__\s*=\s*"(?P<version>.*)"\n',
-        f.read()
-    ).group('version')
+    version = re.search('__version__\s*=\s*"(?P<version>.*)"\n',
+                        f.read()).group('version')
 
 setup(
     name='cap-client',
@@ -92,9 +90,9 @@ setup(
     packages=packages,
     zip_safe=False,
     entry_points={
-         'console_scripts': [
-             'cap-client = cap_client.cli:cli',
-         ],
+        'console_scripts': [
+            'cap-client = cap_client.cli:cli',
+        ],
     },
     install_requires=install_requires,
     extras_require=extras_require,

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of CERN Analysis Preservation Framework.
-# Copyright (C) 2016, 2017 CERN.
+# Copyright (C) 2020 CERN.
 #
 # CERN Analysis Preservation Framework is free software; you can redistribute
 # it and/or modify it under the terms of the GNU General Public License as
@@ -23,16 +23,26 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 """CAP client exceptions."""
 
+import logging
 
-class CLIError(Exception):
+from click import ClickException, secho
+
+
+class CLIError(ClickException):
     """Base CAP cli exception class."""
-    pass
+    def __str__(self):
+        """Error details."""
+        return self.message
+
+    def show(self):
+        """Show exception details to the user."""
+        secho(str(self), fg='red')
 
 
 class BadStatusCode(CLIError):
     """Response status code not as expected."""
     def __init__(self,
-                 message=None,
+                 message='',
                  expected_status_code=None,
                  status_code=None,
                  endpoint=None,
@@ -45,26 +55,20 @@ class BadStatusCode(CLIError):
         self.data = data
 
     def __str__(self):
-        """Print error details."""
+        """Error details."""
+        if not self.message and isinstance(self.data, dict):
+            msg = [self.data.get('message', '')]
+            # validation errors
+            for err in self.data.get('errors', []):
+                if 'field' in err and 'message' in err:
+                    field = '.'.join(err['field'])
+                    msg.append((field + ' ' if field else '') + err['message'])
+
+            return '\n'.join(msg)
+
         return self.message
 
-
-class UnknownAnalysisType(CLIError):
-    """Analysis type not supported."""
-    def __init__(self, types=None):
-        """Initialize UnknownAnalysisType."""
-        self.message = "Choose one of the available analyses types\n{}".format(
-            '\n'.join(types))
-
-    def __str__(self):
-        """Print error details."""
-        return self.message
-
-
-class MissingJsonError(CLIError):
-    """Json file not provided."""
-    def __str__(self):
-        """Print error details."""
-        return "Please provide a JSON file for the analysis. " \
-               "If you don't know the analysis fields, first call " \
-               "cap-client get-schema --type <analysis-type> ."
+    def show(self):
+        """Show exception details to the user."""
+        logging.debug(self.data)
+        super(BadStatusCode, self).show()

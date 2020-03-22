@@ -21,17 +21,25 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
 """Pytest configuration."""
 
 from __future__ import absolute_import, print_function
 
+import os
+from time import sleep
+
 import pytest
 from click.testing import CliRunner
-from mock import DEFAULT, patch
 
-from cap_client.cap_api import CapAPI
 from cap_client.cli import cli
+
+
+@pytest.fixture(autouse=True)
+def env():
+    """Set environment."""
+    os.environ['CAP_SERVER_URL'] = 'https://analysispreservation-dev.cern.ch'
+    os.environ['CAP_SERVER_API_PATH'] = 'api/'
+    os.environ['CAP_ACCESS_TOKEN'] = 'token'
 
 
 @pytest.yield_fixture
@@ -52,30 +60,11 @@ def cli_run():
 
 
 @pytest.yield_fixture
-def cap_api():
-    yield CapAPI('https://analysispreservation-dev.cern.ch', 'api/',
-                 'accesstoken')
-
-
-@pytest.yield_fixture
-def mocked_cap_api(cap_api):
-    """ Mock all private methods in CapAPI class."""
-    with patch.multiple(cap_api,
-                        _get_available_types=DEFAULT,
-                        _make_request=DEFAULT) as mocks:
-        mocks['_get_available_types'].return_value = ['atlas-workflows',
-                                                      'alice-analysis']
-        mocks['_make_request'].return_value = {}
-
-        yield cap_api
-
-
-@pytest.yield_fixture
 def record_data():
     data = {
         "metadata": {
-            "$schema": "https://localhost:5000/schemas/"
-                       "deposits/records/cms-analysis-v0.0.1.json",
+            "$schema": "https://analysispreservation-dev.cern.ch/schemas/"
+            "deposits/records/cms-analysis-v0.0.1.json",
             "_access": {
                 "deposit-admin": {
                     "roles": [],
@@ -83,56 +72,23 @@ def record_data():
                 },
                 "deposit-read": {
                     "roles": [],
-                    "user": [
-                        "alice@inveniosoftware.org"
-                    ]
+                    "user": ["alice@inveniosoftware.org"]
                 },
                 "deposit-update": {
                     "roles": [],
-                    "user": [
-                        "alice@inveniosoftware.org"
-                    ]
+                    "user": ["alice@inveniosoftware.org"]
                 }
             },
             "basic_info": {
-                "analysis_number": "HIN-16-007",
-                "people_info": [
-                    {
-                        "name": "John Doe"
-                    },
-                    {
-                        "name": "Albert Einstein"
-                    }
-                ],
+                "analysis_number": "hin-16-007",
+                "people_info": [{
+                    "name": "john doe"
+                }, {
+                    "name": "albert einstein"
+                }],
             },
-            "general_title": "General relativity",
+            "general_title": "general relativity",
         }
     }
 
     yield data
-
-
-@pytest.yield_fixture
-def user_data():
-    user_data = {
-        "collaborations": [
-            "ATLAS",
-            "ALICE"
-        ],
-        "current_experiment": "ATLAS",
-        "deposit_groups": [
-            {
-                "deposit_group": "atlas-workflows",
-                "description": "Create an ATLAS Workflow",
-                "name": "ATLAS Workflow"
-            },
-            {
-                "deposit_group": "alice-analysis",
-                "description": "Create an ALICE Analysis",
-                "name": "ALICE Analysis"
-            }
-        ],
-        "email": "my_mail@cern.ch",
-        "id": 1
-    }
-    yield user_data

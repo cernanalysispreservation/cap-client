@@ -1,4 +1,3 @@
-#!/bin/sh
 # -*- coding: utf-8 -*-
 #
 # This file is part of CERN Analysis Preservation Framework.
@@ -22,9 +21,20 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
+"""Cap cli API module."""
 
-#isort -rc -c -df **/*.py && \
-#check-manifest --ignore ".travis-*" && \
-#sphinx-build -qnNW docs docs/_build/html && \
-python setup.py test
-#sphinx-build -qnNW -b doctest docs docs/_build/doctest
+from __future__ import absolute_import, print_function
+
+from .analysis_api import AnalysisAPI
+from .files_api import FilesAPI
+from .metadata_api import MetadataAPI
+from .permissions_api import PermissionsAPI
+from .repositories_api import RepositoriesAPI
+
+__all__ = [
+    'AnalysisAPI',
+    'FilesAPI',
+    'MetadataAPI',
+    'PermissionsAPI',
+    'RepositoriesAPI',
+]
