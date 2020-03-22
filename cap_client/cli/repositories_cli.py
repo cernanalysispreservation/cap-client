@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of CERN Analysis Preservation Framework.
-# Copyright (C) 2016, 2017 CERN.
+# Copyright (C) 2020 CERN.
 #
 # CERN Analysis Preservation Framework is free software; you can redistribute
 # it and/or modify it under the terms of the GNU General Public License as
@@ -25,40 +25,15 @@
 
 import click
 
-from ..utils import json_dumps, logger, pid_option
+from cap_client.api import RepositoriesAPI
+from cap_client.utils import ColoredGroup, json_dumps, logger, pid_option
+
+pass_api = click.make_pass_decorator(RepositoriesAPI, ensure=True)
 
 
-@click.group()
+@click.group(cls=ColoredGroup)
 def repositories():
-    """Repositories managing commands."""
-
-
-@repositories.command()
-@pid_option(required=True)
-@click.option(
-    '--url',
-    '-u',
-    required=True,
-    help='The repo url.',
-)
-@click.option(
-    '--webhook',
-    '-w',
-    type=click.Choice(['push', 'release']),
-    help='Webhook type (push|release)',
-)
-@click.pass_context
-@logger
-def upload(ctx, pid, url, webhook):
-    """Upload repository and/or create webhook for your analysis."""
-    res = ctx.obj.cap_api.upload_repository(pid=pid,
-                                            url=url,
-                                            event_type=webhook)
-
-    if webhook:
-        click.echo(json_dumps(res))
-    else:
-        click.echo('Repository {} saved in analysis {}.'.format(url, pid))
+    """Manage analysis repositories and webhooks."""
 
 
 @repositories.command()
@@ -68,12 +43,68 @@ def upload(ctx, pid, url, webhook):
     '-ws',
     default=False,
     is_flag=True,
-    help='Include the snapshots of each repository.',
+    help='Show snapshots.',
 )
-@click.pass_context
+@pass_api
 @logger
-def get(ctx, pid, with_snapshots):
-    """Get all the repositories for your analysis."""
-    res = ctx.obj.cap_api.get_repositories(pid=pid,
-                                           with_snapshots=with_snapshots)
+def get(api, pid, with_snapshots):
+    """Get all repositories connected with your analysis."""
+    res = api.get(
+        pid=pid,
+        with_snapshots=with_snapshots,
+    )
+
     click.echo(json_dumps(res))
+
+
+@repositories.command()
+@pid_option(required=True)
+@click.option(
+    '--url',
+    '-u',
+    required=True,
+    help='URL of repository.',
+)
+@pass_api
+@logger
+def upload(api, pid, url):
+    """Upload repository tarball to your analysis."""
+    api.upload(
+        pid=pid,
+        url=url,
+    )
+
+    click.echo('Repository tarball was saved with your analysis files. '
+               '(access using `cap-client files` methods)')
+
+
+@repositories.command()
+@pid_option(required=True)
+@click.option(
+    '--url',
+    '-u',
+    required=True,
+    help='URL of repository.',
+)
+@click.option(
+    '--event',
+    '-e',
+    required=True,
+    default='release',
+    type=click.Choice(['push', 'release']),
+    help='Download repository tarball on every (push|release)',
+)
+@pass_api
+@logger
+def connect(api, pid, url, event):
+    """Connect repository with your analysis."""
+    api.upload(
+        pid=pid,
+        url=url,
+        event_type=event,
+    )
+
+    click.echo(
+        'Repository was connected with analysis.\n'
+        'Now on every {}, we will attach the latest version to your analysis.'.
+        format(event))

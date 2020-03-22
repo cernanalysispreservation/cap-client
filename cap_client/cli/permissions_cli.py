@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of CERN Analysis Preservation Framework.
-# Copyright (C) 2016, 2017 CERN.
+# Copyright (C) 2020 CERN.
 #
 # CERN Analysis Preservation Framework is free software; you can redistribute
 # it and/or modify it under the terms of the GNU General Public License as
@@ -25,12 +25,27 @@
 
 import click
 
-from ..utils import json_dumps, logger, pid_option
+from cap_client.api import PermissionsAPI
+from cap_client.utils import (ColoredGroup, MutuallyExclusiveOption,
+                              json_dumps, logger, pid_option)
+
+pass_api = click.make_pass_decorator(PermissionsAPI, ensure=True)
 
 
-@click.group()
+@click.group(cls=ColoredGroup)
 def permissions():
-    """Permissions managing commands."""
+    """Manage analysis permissions."""
+
+
+@permissions.command()
+@pid_option(required=True)
+@logger
+@pass_api
+def get(api, pid):
+    """List analysis permissions."""
+    res = api.get(pid=pid)
+
+    click.echo(json_dumps(res))
 
 
 @permissions.command()
@@ -38,8 +53,16 @@ def permissions():
 @click.option(
     '--user',
     '-u',
-    required=True,
-    help='User mail to assign permissions.',
+    cls=MutuallyExclusiveOption,
+    not_required_if="egroup",
+    help='User mail.',
+)
+@click.option(
+    '--egroup',
+    '-e',
+    cls=MutuallyExclusiveOption,
+    not_required_if="user",
+    help='Egroup mail.',
 )
 @click.option(
     '--rights',
@@ -48,14 +71,15 @@ def permissions():
     required=True,
     multiple=True,
 )
-@click.pass_context
 @logger
-def add(ctx, pid, user, rights):
-    """Set analysis user permissions."""
-    res = ctx.obj.cap_api.add_permissions(
+@pass_api
+def add(api, pid, rights, user, egroup):
+    """Add user/egroup permissions for your analysis."""
+    res = api.add(
         pid=pid,
-        email=user,
+        email=user or egroup,
         rights=rights,
+        is_egroup=egroup and True,
     )
 
     click.echo(json_dumps(res))
@@ -66,8 +90,16 @@ def add(ctx, pid, user, rights):
 @click.option(
     '--user',
     '-u',
-    required=True,
-    help='User email to assign permissions.',
+    cls=MutuallyExclusiveOption,
+    not_required_if="egroup",
+    help='User mail.',
+)
+@click.option(
+    '--egroup',
+    '-e',
+    cls=MutuallyExclusiveOption,
+    not_required_if="user",
+    help='Egroup mail.',
 )
 @click.option(
     '--rights',
@@ -76,25 +108,15 @@ def add(ctx, pid, user, rights):
     required=True,
     multiple=True,
 )
-@click.pass_context
 @logger
-def remove(ctx, pid, user, rights):
-    """Set analysis user permissions."""
-    res = ctx.obj.cap_api.remove_permissions(
+@pass_api
+def remove(api, pid, rights, user, egroup):
+    """Remove user/egroup permissions for your analysis."""
+    res = api.remove(
         pid=pid,
-        email=user,
+        email=user or egroup,
         rights=rights,
+        is_egroup=egroup and True,
     )
-
-    click.echo(json_dumps(res))
-
-
-@permissions.command()
-@pid_option(required=True)
-@click.pass_context
-@logger
-def get(ctx, pid):
-    """Retrieve analysis user permissions."""
-    res = ctx.obj.cap_api.get_permissions(pid=pid)
 
     click.echo(json_dumps(res))

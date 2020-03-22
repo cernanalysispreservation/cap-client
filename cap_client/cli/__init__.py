@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of CERN Analysis Preservation Framework.
-# Copyright (C) 2016, 2017 CERN.
+# Copyright (C) 2020 CERN.
 #
 # CERN Analysis Preservation Framework is free software; you can redistribute
 # it and/or modify it under the terms of the GNU General Public License as
@@ -21,37 +21,22 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-"""CAP Client CLI init."""
+"""CAP cli module."""
 
 import logging
-import os
 import sys
 
 import click
 
-from cap_client.cap_api import CapAPI
-from cap_client.cli.cli import (clone, create, update, delete, get, get_schema,
-                                get_shared, me, patch, publish, types)
+from cap_client.cli.analysis_cli import analysis
 from cap_client.cli.files_cli import files
 from cap_client.cli.metadata_cli import metadata
 from cap_client.cli.permissions_cli import permissions
 from cap_client.cli.repositories_cli import repositories
+from cap_client.utils import ColoredGroup
 
 
-class Config(object):
-    """Configuration object to share across commands."""
-    def __init__(self, access_token=None, verbose=False):
-        """Initialize config variables."""
-        self.server = os.environ.get('CAP_SERVER_URL',
-                                     'https://analysispreservation.cern.ch')
-        apipath = os.environ.get('CAP_SERVER_API_PATH', 'api/')
-        access_token = access_token or os.environ.get('CAP_ACCESS_TOKEN', None)
-
-        self.cap_api = CapAPI(self.server, apipath, access_token)
-        self.verbose = verbose
-
-
-@click.group()
+@click.group(cls=ColoredGroup)
 @click.option(
     '--verbose',
     '-v',
@@ -66,35 +51,20 @@ class Config(object):
     type=click.Choice(['error', 'debug', 'info']),
     default='info',
 )
-@click.option(
-    '--access_token',
-    '-t',
-    help='Sets users access token',
-)
 @click.pass_context
-def cli(ctx, loglevel, verbose, access_token):
-    """CAP Client for interacting with CAP Server."""
+def cli(ctx, loglevel, verbose):
+    """CAP command line interface."""
     if verbose:
         lvl = verbose
     else:
         lvl = getattr(logging, loglevel.upper())
+
     logging.basicConfig(format='[%(levelname)s] %(message)s',
                         stream=sys.stderr,
                         level=lvl)
-    ctx.obj = Config(access_token=access_token)
 
 
-cli.add_command(get)
-cli.add_command(get_shared)
-cli.add_command(get_schema)
-cli.add_command(me)
-cli.add_command(create)
-cli.add_command(update)
-cli.add_command(patch)
-cli.add_command(delete)
-cli.add_command(publish)
-cli.add_command(clone)
-cli.add_command(types)
+cli.add_command(analysis)
 cli.add_command(files)
 cli.add_command(metadata)
 cli.add_command(permissions)

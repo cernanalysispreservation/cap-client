@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of CERN Analysis Preservation Framework.
-# Copyright (C) 2016, 2017 CERN.
+# Copyright (C) 2020 CERN.
 #
 # CERN Analysis Preservation Framework is free software; you can redistribute
 # it and/or modify it under the terms of the GNU General Public License as
@@ -25,52 +25,86 @@
 
 import click
 
-from ..utils import json_dumps, load_json, logger, pid_option
+from cap_client.api.metadata_api import MetadataAPI
+from cap_client.utils import (ColoredGroup, MutuallyExclusiveOption,
+                              json_dumps, load_json, load_json_from_file,
+                              logger, pid_option)
+
+pass_api = click.make_pass_decorator(MetadataAPI, ensure=True)
 
 
-@click.group()
+@click.group(cls=ColoredGroup)
 def metadata():
-    """Metadata managing commands."""
+    """Manage analysis metadata."""
+
+
+@metadata.command()
+@pid_option(required=True)
+@click.option('--field',
+              help="Specify an EXISTING field\n eg. object.nested_array.0")
+@click.option(
+    '--json',
+    '-j',
+    cls=MutuallyExclusiveOption,
+    not_required_if="jsonfile",
+    callback=load_json,
+    help='\nJSON data or text.',
+)
+@click.option(
+    '--jsonfile',
+    '-f',
+    type=click.File('r'),
+    cls=MutuallyExclusiveOption,
+    not_required_if="json",
+    callback=load_json_from_file,
+    help='\nJSON file.',
+)
+@pass_api
+@logger
+def update(api, pid, json, jsonfile, field):
+    """Update analysis metadata."""
+    res = api.set(
+        pid=pid,
+        value=jsonfile if json is None else json,
+        field=field,
+    )
+
+    click.echo(json_dumps(res))
 
 
 @metadata.command()
 @pid_option(required=True)
 @click.option(
-    '--file',
+    '--field',
     '-f',
-    type=click.Path(),
-    help='Path to file to upload.',
+    help="Specify field, eg. object.nested_array.0",
 )
-@click.argument('field_name')
-@click.argument('field_value', callback=load_json)
-@click.pass_context
+@pass_api
 @logger
-def set(ctx, pid, field_name, field_value, file):
-    """Edit analysis field value."""
-    res = ctx.obj.cap_api.set_field(pid, field_name, field_value, file)
+def remove(api, pid, field):
+    """Remove from analysis metadata."""
+    res = api.remove(
+        pid=pid,
+        field=field,
+    )
 
     click.echo(json_dumps(res))
 
 
 @metadata.command()
 @pid_option(required=True)
-@click.argument('field_name')
-@click.pass_context
+@click.option(
+    '--field',
+    '-f',
+    help="Specify field, eg. object.nested_array.0",
+)
+@pass_api
 @logger
-def remove(ctx, pid, field_name):
-    """Remove analysis field."""
-    res = ctx.obj.cap_api.remove_field(field_name, pid)
-
-    click.echo(json_dumps(res))
-
-
-@metadata.command()
-@click.argument('field_name')
-@pid_option(required=True)
-@click.pass_context
-@logger
-def get(ctx, pid, field_name):
-    """Retrieve one or more fields in analysis metadata."""
-    res = ctx.obj.cap_api.get_field(pid, field_name)
+def get(api, pid, field):
+    """Get analysis metadata."""
+    res = api.get(
+        pid=pid,
+        field=field,
+    )
 
     click.echo(json_dumps(res))

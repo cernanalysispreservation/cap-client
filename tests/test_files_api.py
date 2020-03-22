@@ -1,8 +1,7 @@
-#!/bin/sh
 # -*- coding: utf-8 -*-
 #
 # This file is part of CERN Analysis Preservation Framework.
-# Copyright (C) 2017 CERN.
+# Copyright (C) 2020, 2020 CERN.
 #
 # CERN Analysis Preservation Framework is free software; you can redistribute
 # it and/or modify it under the terms of the GNU General Public License as
@@ -22,9 +21,4 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
-#isort -rc -c -df **/*.py && \
-#check-manifest --ignore ".travis-*" && \
-#sphinx-build -qnNW docs docs/_build/html && \
-python setup.py test
-#sphinx-build -qnNW -b doctest docs docs/_build/doctest
+"""Tests for Files API."""
