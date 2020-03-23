@@ -34,25 +34,13 @@ from sys import exit
 import click
 from click import BadParameter, ClickException
 
-from .errors import BadStatusCode, CLIError, MissingJsonError
+from .errors import BadStatusCode
 
 
 def make_tarfile(output_filename, source_dir):
     """Make a tarball out of {source_dir} into {output_filename}."""
     with tarfile.open(output_filename, "w:gz") as tar:
         tar.add(source_dir, arcname=os.path.basename(source_dir))
-
-
-def get_json(json_):
-    """Checks if the arg is a json file/data and tries to retrieve it."""
-    try:
-        return json.loads(json_)
-    except ValueError:
-        try:
-            with open(json_) as fp:
-                return json.load(fp)
-        except (IOError, ValueError):
-            raise MissingJsonError()
 
 
 def validate_version(ctx, param, version_value):
@@ -67,6 +55,45 @@ def validate_version(ctx, param, version_value):
     return None
 
 
+def load_json_from_file(ctx, param, value):
+    if value is not None:
+        try:
+            return json.load(value)
+        except (KeyError, ValueError):
+            raise BadParameter('Not a valid JSON.')
+
+
+def load_json(ctx, param, value):
+    if value is not None:
+        try:
+            return json.loads(value)
+        except (KeyError, ValueError):
+            raise BadParameter('Not a valid JSON.')
+
+
+class MutuallyExclusiveOption(click.Option):
+    def __init__(self, *args, **kwargs):
+        self.not_required_if = kwargs.pop("not_required_if")
+        kwargs["help"] = "{} (mutually exclusive with --{})".format(
+            kwargs.get("help", ""), self.not_required_if)
+        super(MutuallyExclusiveOption, self).__init__(*args, **kwargs)
+
+    def handle_parse_result(self, ctx, opts, args):
+        is_option_present = self.name in opts
+        is_another_option_present = self.not_required_if in opts
+        if is_another_option_present:
+            if is_option_present:
+                raise click.UsageError(
+                    "--{} is mutually exclusive with --{}".format(
+                        self.name, self.not_required_if))
+        elif not is_option_present:
+            raise click.UsageError("You need to specify --{} or --{}.".format(
+                self.name, self.not_required_if))
+
+        return super(MutuallyExclusiveOption,
+                     self).handle_parse_result(ctx, opts, args)
+
+
 def logger(fun):
     @wraps(fun)
     def wrapper(*args, **kwargs):
@@ -77,9 +104,6 @@ def logger(fun):
             exit(1)
         except BadStatusCode as e:
             logging.debug(e.data)
-            click.secho(str(e), fg='red')
-            exit(1)
-        except CLIError as e:
             click.secho(str(e), fg='red')
             exit(1)
         except Exception as e:
