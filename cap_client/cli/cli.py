@@ -25,7 +25,8 @@
 
 import click
 
-from ..utils import json_dumps, logger, pid_option, validate_version
+from ..utils import (MutuallyExclusiveOption, json_dumps, load_json,
+                     load_json_from_file, logger, pid_option, validate_version)
 
 
 @click.command()
@@ -80,23 +81,34 @@ def get(ctx, pid, all):
 @click.command()
 @click.option(
     '--json',
-    '-j',
-    'json_',
-    required=True,
-    help='JSON data from file or command line',
+    cls=MutuallyExclusiveOption,
+    not_required_if="jsonfile",
+    callback=load_json,
+    help='\nJSON data from command line.',
+)
+@click.option(
+    '--jsonfile',
+    '-f',
+    type=click.File('r'),
+    cls=MutuallyExclusiveOption,
+    not_required_if="json",
+    callback=load_json_from_file,
+    help='\nJSON file.',
 )
 @click.option(
     '--type',
     '-t',
-    'type_',
     default=None,
     help='Type of analysis',
 )
 @click.pass_context
 @logger
-def create(ctx, json_, type_):
+def create(ctx, jsonfile, json, type):
     """Create an analysis."""
-    res = ctx.obj.cap_api.create(json_=json_, ana_type=type_)
+    res = ctx.obj.cap_api.create(
+        data=jsonfile if json is None else json,
+        ana_type=type,
+    )
 
     click.echo(json_dumps(res))
 
@@ -105,16 +117,27 @@ def create(ctx, json_, type_):
 @pid_option(required=True)
 @click.option(
     '--json',
-    '-j',
-    'json_',
-    required=True,
-    help='JSON data from file or command line',
+    cls=MutuallyExclusiveOption,
+    not_required_if="jsonfile",
+    callback=load_json,
+    help='\nJSON data from command line.',
+)
+@click.option(
+    '--jsonfile',
+    type=click.File('r'),
+    cls=MutuallyExclusiveOption,
+    not_required_if="json",
+    callback=load_json_from_file,
+    help='\nJSON file.',
 )
 @click.pass_context
 @logger
-def update(ctx, pid, json_):
+def update(ctx, pid, jsonfile, json):
     """Update an analysis."""
-    res = ctx.obj.cap_api.update(pid=pid, json_=json_)
+    res = ctx.obj.cap_api.update(
+        pid=pid,
+        data=jsonfile if json is None else json,
+    )
 
     click.echo(json_dumps(res))
 

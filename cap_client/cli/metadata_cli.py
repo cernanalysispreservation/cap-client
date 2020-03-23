@@ -25,7 +25,7 @@
 
 import click
 
-from ..utils import json_dumps, logger, pid_option
+from ..utils import json_dumps, load_json, logger, pid_option
 
 
 @click.group()
@@ -42,7 +42,7 @@ def metadata():
     help='Path to file to upload.',
 )
 @click.argument('field_name')
-@click.argument('field_value')
+@click.argument('field_value', callback=load_json)
 @click.pass_context
 @logger
 def set(ctx, pid, field_name, field_value, file):

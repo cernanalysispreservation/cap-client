@@ -26,10 +26,13 @@ from __future__ import absolute_import, print_function
 
 import json
 import sys
+import tempfile
 
 import responses
+from click import BadParameter
 from mock import mock_open, patch
 from pytest import raises
+
 from cap_client.errors import (BadStatusCode, DepositCreationError,
                                MissingJsonError)
 
@@ -157,16 +160,17 @@ def test_get_field_array_item(cap_api, record_data):
     url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
     responses.add(responses.GET, url, json=record_data, status=200)
 
-    with raises(IndexError):
+    with raises(UsageError):
         cap_api.get_field('some-pid', 'basic_info.people_info.3.name')
 
 
+from click import UsageError
 @responses.activate
 def test_get_field_when_field_is_incorrect(cap_api, record_data):
     url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
     responses.add(responses.GET, url, json=record_data, status=200)
 
-    with raises(KeyError):
+    with raises(UsageError):
         cap_api.get_field('some-pid', 'title')
 
 
@@ -205,7 +209,7 @@ def test_types(mock_requests, cap_api, mocked_cap_api):
 # Public methods
 @patch('requests.get')
 def test_get_available_types_returns_all_available_types(
-        mock_requests, cap_api, user_data):
+    mock_requests, cap_api, user_data):
     mock_requests.return_value.status_code = 200
     mock_requests.return_value.json.return_value = user_data
 
@@ -213,267 +217,6 @@ def test_get_available_types_returns_all_available_types(
 
     assert 'atlas-workflows' in types
     assert 'alice-analysis' in types
-
-
-def test_create_method_when_no_json_argument(cap_api):
-    with raises(MissingJsonError):
-        cap_api.create(json_='')
-
-
-@patch('{}.open'.format(builtin_module_name), new_callable=mock_open)
-def test_create_method_when_no_json_file_found(mock_open, cap_api):
-    mock_open.side_effect = IOError
-    with raises(MissingJsonError):
-        cap_api.create(json_='no-file')
-
-
-@patch('{}.open'.format(builtin_module_name),
-       new_callable=mock_open,
-       read_data='{,}]')
-def test_create_method_when_no_json_in_given_file(mock_open, cap_api):
-    with raises(MissingJsonError):
-        cap_api.create(json_='file')
-
-
-def test_create_method_when_no_type_and_no_schema(cap_api):
-    mock_json_data = {"basic_info": {"abstract": "Example abstract"}}
-    with raises(DepositCreationError):
-        cap_api.create(json_=json.dumps(mock_json_data))
-
-
-def test_create_method_when_both_type_and_schema(cap_api):
-    mock_json_data = {
-        "$schema": "test-schema",
-        "basic_info": {
-            "abstract": "Example abstract"
-        }
-    }
-    with raises(DepositCreationError):
-        cap_api.create(json_=json.dumps(mock_json_data), ana_type='test-type')
-
-
-@responses.activate
-def test_create_method_when_type_not_valid(cap_api):
-    url = 'https://analysispreservation-dev.cern.ch/api/deposits/'
-    mock_json_data = {"basic_info": {"abstract": "Example abstract"}}
-
-    responses.add(responses.POST,
-                  url,
-                  json={
-                      'status': 400,
-                      'message': 'Schema doesnt exist.'
-                  },
-                  status=400)
-
-    with raises(BadStatusCode):
-        cap_api.create(json_=json.dumps(mock_json_data), ana_type='test-type')
-
-
-@responses.activate
-def test_create_method_when_no_permission(cap_api):
-    url = 'https://analysispreservation-dev.cern.ch/api/deposits/'
-    mock_json_data = {"basic_info": {"abstract": "Example abstract"}}
-
-    responses.add(responses.POST,
-                  url,
-                  json={
-                      'status': 401,
-                      'message': 'Permission Error'
-                  },
-                  status=401)
-
-    with raises(BadStatusCode):
-        cap_api.create(json_=json.dumps(mock_json_data), ana_type='test-type')
-
-
-@responses.activate
-def test_create_method_when_validate_failed_raises_exception(cap_api):
-    url = 'https://analysispreservation-dev.cern.ch/api/deposits/'
-    mock_json_data = {
-        "title": "Bad Title",
-        "basic_info": {
-            "abstract": "Example Abstract"
-        }
-    }
-    mock_response = {
-        "status": 400,
-        "message": "Validation error. Try again with valid data",
-        "errors": [{
-            "field": [],
-            "message": "Additional properties are not allowed ('title' was unexpected)"
-        }]
-    }
-    responses.add(responses.POST, url, json=mock_response, status=400)
-
-    with raises(BadStatusCode):
-        cap_api.create(json_=json.dumps(mock_json_data), ana_type='test-type')
-
-
-@responses.activate
-def test_create_method(cap_api):
-    mock_json_data = {
-        "basic_info": {
-            "people_info": [{
-                "name": "John Doe"
-            }],
-        },
-        "general_title": "Test Example"
-    }
-
-    mock_record = {
-        'access': {
-            'deposit-admin': {
-                'roles': [],
-                'users': ['info@inveniosoftware.org']
-            },
-            'deposit-read': {
-                'roles': [],
-                'users': ['info@inveniosoftware.org']
-            },
-            'deposit-update': {
-                'roles': [],
-                'users': ['info@inveniosoftware.org']
-            }
-        },
-        'experiment': 'CMS',
-        'schema': {
-            'name': 'cms-analysis',
-            'version': '0.0.1'
-        },
-        'id': 'some-pid',
-        'metadata': {
-            'basic_info': {
-                'analysis_number': 'HIN-16-007',
-                'people_info': [{
-                    'name': 'John Doe'
-                }]
-            },
-            'general_title': 'Test Example'
-        }
-    }
-
-    mock_response = {
-        "metadata": {
-            "basic_info": {
-                "people_info": [{
-                    "name": "John Doe"
-                }]
-            },
-            "general_title": "Test Example"
-        },
-        "pid": "some-pid"
-    }
-
-    responses.add(responses.POST,
-                  'https://analysispreservation-dev.cern.ch/api/deposits/',
-                  json=mock_record,
-                  status=201)
-
-    responses.add(
-        responses.PUT,
-        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
-        json=mock_response,
-        status=200)
-
-    resp = cap_api.create(json_=json.dumps(mock_json_data), ana_type='lhcb')
-
-    assert responses.calls[1].request.headers[
-        'Accept'] == 'application/basic+json'
-    assert resp == mock_response
-
-
-@patch('{}.open'.format(builtin_module_name), new_callable=mock_open)
-def test_update_method_when_json_file_not_found(mock_open, cap_api):
-    mock_open.side_effect = IOError
-
-    with raises(MissingJsonError):
-        cap_api.update(pid='some_pid', json_='file')
-
-
-@patch('{}.open'.format(builtin_module_name),
-       new_callable=mock_open,
-       read_data='{,}]')
-def test_update_method_when_no_json_in_given_file(mock_open, cap_api):
-    with raises(MissingJsonError):
-        cap_api.update(pid='some-pid', json_='file')
-
-
-@responses.activate
-def test_update_method_when_validate_failed_raises_exception(cap_api):
-    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
-    mock_json_data = {
-        "title": "Bad Title",
-        "basic_info": {
-            "abstract": "Example Abstract"
-        }
-    }
-    mock_response = {
-        "status": 400,
-        "message": "Validation error. Try again with valid data",
-        "errors": [{
-            "field": [],
-            "message": "Additional properties are not allowed ('title' was unexpected)"
-        }]
-    }
-    responses.add(responses.PUT, url, json=mock_response, status=400)
-    with raises(BadStatusCode):
-        cap_api.update(pid='some-pid', json_=json.dumps(mock_json_data))
-
-
-@responses.activate
-def test_update_method_when_no_permission(cap_api):
-    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
-    mock_json_data = {"basic_info": {"abstract": "Example abstract"}}
-
-    responses.add(responses.PUT,
-                  url,
-                  json={
-                      'status': 403,
-                      'message': 'Forbidden'
-                  },
-                  status=403)
-
-    with raises(BadStatusCode):
-        cap_api.update(pid='some-pid', json_=json.dumps(mock_json_data))
-
-
-@responses.activate
-def test_update_method_when_wrong_pid(cap_api):
-    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
-    mock_json_data = {"basic_info": {"abstract": "Example abstract"}}
-
-    responses.add(responses.PUT,
-                  url,
-                  json={
-                      'status': 404,
-                      'message': 'PID does not exist'
-                  },
-                  status=404)
-
-    with raises(BadStatusCode):
-        cap_api.update(pid='some-pid', json_=json.dumps(mock_json_data))
-
-
-@responses.activate
-def test_update_method_when_success_returns_updated_data(cap_api, record_data):
-    url = 'https://analysispreservation-dev.cern.ch/api/deposits/some-pid'
-    mock_json_data = {
-        "metadata": {
-            "general_title": "General relativity",
-            "basic_info": {
-                "analysis_number": "HIN-16-007",
-                "people_info": [{
-                    "name": "John Doe"
-                }, {
-                    "name": "Albert Einstein"
-                }],
-            }
-        }
-    }
-    responses.add(responses.PUT, url, json=record_data, status=200)
-
-    resp = cap_api.update(pid='some-pid', json_=json.dumps(mock_json_data))
-    assert resp == record_data
 
 
 def test_patch_method(mocked_cap_api, record_data):

@@ -27,14 +27,13 @@ import datetime
 import json
 import os
 
-import click
 import requests
 import urllib3
-from click import BadParameter
+from click import BadParameter, UsageError, confirm
 from future.moves.urllib.parse import urljoin
 
 from .errors import BadStatusCode, DepositCreationError
-from .utils import make_tarfile, get_json
+from .utils import make_tarfile
 
 # @TOFIX
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -170,38 +169,39 @@ class CapAPI(object):
         schema['properties'] = properties
         return schema
 
-    def create(self, json_='', ana_type=None):
-        """Create an analysis."""
-        data = get_json(json_)
-        schema_type = data.get('$schema', None)
+    def create(self, data, ana_type=None):
+        """Create analysis."""
+        if not isinstance(data, dict):
+            raise UsageError('Not a JSON object.')
 
-        if ana_type and schema_type:
-            raise DepositCreationError(
-                'You cannot have both $ana-type (--type/-t parameter) and '
-                '$schema in your deposit creation.\n'
-                'Please remove the $schema field from your json or '
-                'don\'t provide the --type parameter.')
-        elif not ana_type and not schema_type:
-            raise DepositCreationError(
-                'You need to provide the --type/-t parameter '
-                '($ana-type) or provide the $schema field in your json.')
-        elif ana_type and not schema_type:
+        if data.get('$schema'):
+            if ana_type:
+                raise UsageError(
+                    'Your JSON data already provides $schema - --type/-t parameter forbidden.'  # noqa
+                )
+        elif ana_type:
             data['$ana_type'] = ana_type
+        else:
+            raise UsageError('You need to provide the --type/-t parameter'
+                             ' OR add $schema field in your JSON data.')
 
-        response = self._make_request(url='deposits/',
-                                      method='post',
-                                      data=json.dumps(data),
-                                      expected_status_code=201)
+        response = self._make_request(
+            url='deposits/',
+            method='post',
+            data=json.dumps(data),
+            expected_status_code=201,
+        )
 
-        return self._make_request(url='deposits/{}'.format(response['id']),
-                                  data=json.dumps(response.get('metadata',
-                                                               {})),
-                                  expected_status_code=200,
-                                  method='put',
-                                  headers={
-                                      'Content-Type': 'application/json',
-                                      'Accept': 'application/basic+json'
-                                  })
+        return self._make_request(
+            url=urljoin('deposits/', response['id']),
+            data=json.dumps(response.get('metadata', {})),
+            expected_status_code=200,
+            method='put',
+            headers={
+                'Content-Type': 'application/json',
+                'Accept': 'application/basic+json'
+            },
+        )
 
     def delete(self, pid=None):
         """Delete an analysis by given pid."""
@@ -209,20 +209,18 @@ class CapAPI(object):
                            method='delete',
                            expected_status_code=204)
 
-    def update(self, pid=None, json_=''):
+    def update(self, pid, data):
         """Update an analysis by given pid and JSON data from file."""
-        data = get_json(json_)
-        json_data = json.dumps(data)
+        if not isinstance(data, dict):
+            raise UsageError('Not a JSON object.')
 
-        res = self._make_request(url=urljoin('deposits/', pid),
-                                 method='put',
-                                 data=json_data,
-                                 headers={
-                                     'Content-Type': 'application/json',
-                                     'Accept': 'application/basic+json'
-                                 })
-
-        return res
+        return self._make_request(url=urljoin('deposits/', pid),
+                                  data=json.dumps(data),
+                                  method='put',
+                                  headers={
+                                      'Accept': 'application/basic+json',
+                                      'Content-Type': 'application/json'
+                                  })
 
     def patch(self, pid=None, filename=''):
         """Patch an analysis by given pid and JSON-patch data from file."""
@@ -247,32 +245,26 @@ class CapAPI(object):
     ##############
     def get_field(self, pid, field=None):
         """Return metadata on analysis."""
-        resp_meta = self._make_request(
+        metadata = self._make_request(
             url=urljoin('deposits/', pid),
             headers={'Accept': 'application/basic+json'})['metadata']
 
         fields = field.split('.') if field else []
         for x in fields:
             try:
-                resp_meta = resp_meta[int(x) if x.isdigit() else x]
+                metadata = metadata[int(x) if x.isdigit() else x]
             except IndexError:
-                raise IndexError(
+                raise UsageError(
                     'The index you are trying to access does not exist.')
             except (TypeError, KeyError):
-                raise KeyError(
+                raise UsageError(
                     'The field {} does not exist. Try a different field.'.
                     format(x))
 
-        return resp_meta
+        return metadata
 
     def set_field(self, pid, field_name, field_val, filepath=None):
         """Edit analysis field value."""
-
-        try:
-            field_val = json.loads(field_val)
-        except ValueError:
-            pass
-
         json_data = [{
             "op": "replace",
             "path": '/' + field_name.replace('.', '/'),
@@ -387,14 +379,12 @@ class CapAPI(object):
         """Upload file or directory to deposit by given pid."""
         bucket_id = self._get_bucket_id(pid)
 
-        # Check if filepath is file or DIR
         if os.path.isdir(filepath):
             # If it's a DIR alert that it is going to be tarballed
             # and uploaded
             if yes or \
-                    click.confirm('You are trying to upload a directory.\n'
-                                  'Should we upload '
-                                  'a tarball of the directory?'):
+                    confirm('You are trying to upload a directory.\n'
+                            'Should we upload a tarball of the directory?'):
                 if output_filename is None:
                     output_filename = "{pid}_{bucket_id}_{time}.tar.gz".format(
                         pid=pid,
@@ -407,24 +397,12 @@ class CapAPI(object):
             if output_filename is None:
                 output_filename = os.path.basename(filepath)
 
-        # data = {'filename': output_filename}
         return self._make_request(
             url="files/{bucket_id}/{filename}".format(
                 bucket_id=bucket_id, filename=output_filename),
             data=open(filepath, 'rb'),
             method='put',
         )
-
-    def upload_docker_img(self, pid=None, img_name=None, output_img_name=None):
-        """Uploads docker image."""
-        if output_img_name is None:
-            output_img_name = img_name
-        from subprocess import check_call
-        check_call([
-            "docker", "save", "-o", "{}.tar".format(output_img_name), img_name
-        ])
-        self.upload_file(pid=pid, filepath="{}.tar".format(output_img_name))
-        check_call(["rm", "{}.tar".format(output_img_name)])
 
     def publish(self, pid):
         return self._make_request(
