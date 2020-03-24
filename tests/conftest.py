@@ -26,7 +26,6 @@
 from __future__ import absolute_import, print_function
 
 import os
-from time import sleep
 
 import pytest
 from click.testing import CliRunner
@@ -46,15 +45,29 @@ def env():
 def cli_run():
     """Fixture for CLI runner function.
 
-    Returns a function accepting a single parameter (CLI command as string).
+    Returns a function accepting a single parameter (cli command as string).
     """
     runner = CliRunner()
 
-    def run(*args, **kwargs):
-        """Run the command from the CLI."""
-        params = ['-l', 'info']
-        params.extend(args)
-        return runner.invoke(cli, params, **kwargs)
+    def run(cmd, **kwargs):
+        """Run the command from the CLI.
+        :param cmd: command with its arguments
+        :type cmd: str
+
+        :warn: when passing your command remember
+        to not have any whitespaces inside an argument values!
+
+        :return: runner result
+        :rtype: `click.testing.Result`
+        """
+        res = runner.invoke(cli, cmd.split(), **kwargs)
+
+        if res.output:
+            res.stripped_output = res.output.strip(
+            )  # helpful as click adds some \n
+            res.singlequotes_output = res.output.replace('"', '\'')
+
+        return res
 
     yield run
 
