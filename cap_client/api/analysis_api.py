@@ -202,8 +202,10 @@ class AnalysisAPI(CapAPI):
 
         :param pid: analysis PID
         :type pid: str
+        :return: PID of published analysis
+        :rtype: str
         """
-        self._make_request(
+        res = self._make_request(
             url='deposits/{}/actions/publish'.format(pid),
             method='post',
             expected_status_code=202,
@@ -212,6 +214,8 @@ class AnalysisAPI(CapAPI):
                 'Accept': 'application/basic+json'
             },
         )
+
+        return res.get('recid')
 
     def get_schema_types(self):
         """Get available analyses types."""

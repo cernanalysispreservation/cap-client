@@ -120,8 +120,10 @@ def logger(fun):
             raise e
         except Exception as e:
             logging.debug(str(e))
-            click.echo('The client encountered an unexpected error.\n'
-                       'Try again or use --verbose flag to see more details.')
+            click.secho(
+                'The client encountered an unexpected error.\n'
+                'Try again or use --verbose flag to see more details.',
+                fg='red')
             exit(1)
 
     return wrapper
