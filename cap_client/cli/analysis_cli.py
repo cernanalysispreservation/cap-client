@@ -162,9 +162,9 @@ def create(api, jsonfile, json, type):
 @pass_api
 def publish(api, pid):
     """Publish analysis with given pid."""
-    api.publish(pid=pid)
+    pid = api.publish(pid=pid)
 
-    click.echo('Your analysis has been published')
+    click.echo('Your analysis has been published with PID: {}'.format(pid))
 
 
 @analysis.command()
