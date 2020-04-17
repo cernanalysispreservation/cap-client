@@ -2,6 +2,7 @@ import json
 from tempfile import NamedTemporaryFile
 
 import responses
+from pytest import mark
 
 from cap_client.utils import json_dumps
 
@@ -74,7 +75,7 @@ def test_analysis_schema(cli_run):
 
     res = cli_run("analysis schema --type some-type")
 
-    assert res.stripped_output == json_dumps({
+    assert json.loads(res.stripped_output) == {
         'title': 'Test',
         'properties': {
             'basic_info': {
@@ -82,7 +83,7 @@ def test_analysis_schema(cli_run):
                 'title': 'Basic Information'
             },
         }
-    })
+    }
 
 
 @responses.activate
@@ -109,7 +110,7 @@ def test_analysis_schema_when_asked_for_published_schema(cli_run):
         "analysis schema --type some-type --version 0.0.1 --for-published")
 
     assert res.exit_code == 0
-    assert res.stripped_output == json_dumps({
+    assert json.loads(res.stripped_output) == {
         'title': 'Record Test',
         'properties': {
             'basic_info': {
@@ -117,7 +118,7 @@ def test_analysis_schema_when_asked_for_published_schema(cli_run):
                 'title': 'Basic Information'
             },
         }
-    })
+    }
 
 
 @responses.activate
@@ -156,7 +157,7 @@ def test_analysis_schema_when_type_not_provided(cli_run):
 
 @responses.activate
 def test_create_method_when_success_returns_newly_created_deposit_via_basic_serializer(
-    cli_run):
+        cli_run):
     responses.add(responses.POST,
                   'https://analysispreservation-dev.cern.ch/api/deposits/',
                   json={
@@ -322,3 +323,402 @@ def test_analysis_create_when_validation_error(cli_run):
     assert ('Validation error. Try again with valid data\n'
             'Additional properties are not allowed (\'title\' was unexpected)'
             ) in res.stripped_output
+
+
+# GET
+@responses.activate
+def test_analysis_get_drafts(cli_run):
+    responses.add(responses.GET,
+                  'https://analysispreservation-dev.cern.ch/api/deposits/',
+                  json={
+                      'aggregations': {},
+                      'hits': {
+                          'hits': [{
+                              'metadata': {
+                                  'general_title': 'test-1'
+                              },
+                              'pid': 'some-pid-1',
+                          }, {
+                              'metadata': {
+                                  'general_title': 'test-2'
+                              },
+                              'pid': 'some-pid-2',
+                          }],
+                          'total': 2
+                      }
+                  },
+                  status=200)
+
+    res = cli_run('analysis get')
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert res.exit_code == 0
+    assert json.loads(res.stripped_output) == [{
+        'metadata': {
+            'general_title': 'test-1'
+        },
+        'pid': 'some-pid-1',
+    }, {
+        'metadata': {
+            'general_title': 'test-2'
+        },
+        'pid': 'some-pid-2',
+    }]
+
+
+@responses.activate
+def test_analysis_get_draft_by_pid(cli_run):
+    responses.add(
+        responses.GET,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
+        json={
+            'metadata': {
+                'basic_info': {
+                    'abstract': 'test',
+                },
+                'general_title': 'test-title'
+            },
+            'pid': 'some-pid'
+        },
+        status=200)
+
+    res = cli_run('analysis get -p some-pid')
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert res.exit_code == 0
+    assert json.loads(res.stripped_output) == {
+        'metadata': {
+            'basic_info': {
+                'abstract': 'test',
+            },
+            'general_title': 'test-title'
+        },
+        'pid': 'some-pid'
+    }
+
+
+@responses.activate
+def test_analysis_get_draft_by_pid_when_pid_not_exists(cli_run):
+    responses.add(
+        responses.GET,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
+        json={
+            'status': 404,
+            'message': 'PID does not exist.'
+        },
+        status=404)
+
+    res = cli_run('analysis get -p some-pid')
+
+    assert res.exit_code == 1
+    assert res.stripped_output == 'PID does not exist.'
+
+
+@responses.activate
+def test_analysis_get_draft_by_pid_when_no_access(cli_run):
+    responses.add(
+        responses.GET,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
+        json={
+            'message': "You don't have the permission to access the requested resource. "
+            "It is either read-protected or not readable by the server.",
+            'status': 403
+        },
+        status=403)
+
+    res = cli_run('analysis get -p some-pid')
+
+    assert res.exit_code == 1
+    assert res.stripped_output == "You don't have sufficient permissions."
+
+
+@responses.activate
+def test_analysis_get_drafts_no_access_tokens(cli_run):
+    responses.add(
+        responses.GET,
+        'https://analysispreservation-dev.cern.ch/api/deposits/',
+        json={
+            'message': "The server could not verify that you are authorized to "
+            "access the URL requested.  You either supplied the wrong credentials "
+            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
+            'status': 401
+        },
+        status=401)
+
+    res = cli_run('analysis get')
+
+    assert res.exit_code == 1
+    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'
+
+
+@responses.activate
+def test_analysis_get_published(cli_run):
+    responses.add(responses.GET,
+                  'https://analysispreservation-dev.cern.ch/api/records/',
+                  json={
+                      'aggregations': {},
+                      'hits': {
+                          'hits': [{
+                              'metadata': {
+                                  'general_title': 'test-1'
+                              },
+                              'pid': 'some-pid-1',
+                              'recid': 'some-pid-1',
+                          }, {
+                              'metadata': {
+                                  'general_title': 'test-2'
+                              },
+                              'pid': 'some-pid-2',
+                              'recid': 'some-pid-2',
+                          }],
+                          'total': 2
+                      }
+                  },
+                  status=200)
+
+    res = cli_run('analysis get-published')
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert res.exit_code == 0
+    assert json.loads(res.stripped_output) == [{
+        'metadata': {
+            'general_title': 'test-1'
+        },
+        'pid': 'some-pid-1',
+        "recid": "some-pid-1"
+    }, {
+        'metadata': {
+            'general_title': 'test-2'
+        },
+        'pid': 'some-pid-2',
+        "recid": "some-pid-2"
+    }]
+
+
+@responses.activate
+def test_analysis_get_published_by_pid(cli_run):
+    responses.add(
+        responses.GET,
+        'https://analysispreservation-dev.cern.ch/api/records/some-pid',
+        json={
+            "metadata": {
+                "general_title": "test",
+            },
+            "pid": "some-pid",
+            "recid": "some-pid",
+        },
+        status=200)
+
+    res = cli_run('analysis get-published -p some-pid')
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert res.exit_code == 0
+    assert json.loads(res.stripped_output) == {
+        "metadata": {
+            "general_title": "test",
+        },
+        "pid": "some-pid",
+        "recid": "some-pid",
+    }
+
+
+@responses.activate
+def test_analysis_get_published_by_pid_when_pid_not_exists(cli_run):
+    responses.add(
+        responses.GET,
+        'https://analysispreservation-dev.cern.ch/api/records/some-pid',
+        json={
+            'status': 404,
+            'message': 'PID does not exist.'
+        },
+        status=404)
+
+    res = cli_run('analysis get-published -p some-pid')
+
+    assert res.exit_code == 1
+    assert res.stripped_output == 'PID does not exist.'
+
+
+@responses.activate
+def test_analysis_get_published_by_pid_when_no_access(cli_run):
+    responses.add(
+        responses.GET,
+        'https://analysispreservation-dev.cern.ch/api/records/some-pid',
+        json={
+            'message': "You don't have the permission to access the requested resource. "
+            "It is either read-protected or not readable by the server.",
+            'status': 403
+        },
+        status=403)
+
+    res = cli_run('analysis get-published -p some-pid')
+
+    assert res.exit_code == 1
+    assert res.stripped_output == "You don't have sufficient permissions."
+
+
+@responses.activate
+def test_analysis_get_published_no_access_tokens(cli_run):
+    responses.add(
+        responses.GET,
+        'https://analysispreservation-dev.cern.ch/api/records/',
+        json={
+            'message': "The server could not verify that you are authorized to "
+            "access the URL requested.  You either supplied the wrong credentials "
+            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
+            'status': 401
+        },
+        status=401)
+
+    res = cli_run('analysis get-published')
+
+    assert res.exit_code == 1
+    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'
+
+
+# PUBLISH
+@responses.activate
+def test_analysis_publish(cli_run):
+    responses.add(
+        responses.POST,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/publish',
+        json={
+            'metadata': {
+                'general_title': 'test'
+            },
+            'pid': 'some-pid',
+            'recid': 'some-record-pid',
+        },
+        status=202)
+
+    res = cli_run('analysis publish -p some-pid')
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert res.exit_code == 0
+    assert 'Your analysis has been published with PID: some-record-pid' in res.stripped_output
+
+
+@responses.activate
+def test_analysis_publish_when_pid_not_exists(cli_run):
+    responses.add(
+        responses.POST,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/publish',
+        json={
+            'status': 404,
+            'message': 'PID does not exist.'
+        },
+        status=404)
+
+    res = cli_run('analysis publish -p some-pid')
+
+    assert res.exit_code == 1
+    assert res.stripped_output == 'PID does not exist.'
+
+
+@responses.activate
+def test_analysis_publish_when_no_access(cli_run):
+    responses.add(
+        responses.POST,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/publish',
+        json={
+            'message': 'Forbidden',
+            'status': 403
+        },
+        status=403)
+
+    res = cli_run('analysis publish -p some-pid')
+
+    assert res.exit_code == 1
+    assert res.stripped_output == "You don't have sufficient permissions."
+
+
+@responses.activate
+def test_analysis_publish_no_access_tokens(cli_run):
+    responses.add(
+        responses.POST,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/publish',
+        json={
+            'message': "The server could not verify that you are authorized to "
+            "access the URL requested.  You either supplied the wrong credentials "
+            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
+            'status': 401
+        },
+        status=401)
+
+    res = cli_run('analysis publish -p some-pid')
+
+    assert res.exit_code == 1
+    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'
+
+
+# DELETE
+@responses.activate
+def test_analysis_delete(cli_run):
+    responses.add(
+        responses.DELETE,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
+        body='',
+        status=204)
+
+    res = cli_run('analysis delete -p some-pid')
+
+    assert res.exit_code == 0
+    assert 'Analysis has been deleted.' in res.stripped_output
+
+
+@responses.activate
+def test_analysis_delete_when_pid_not_exists(cli_run):
+    responses.add(
+        responses.DELETE,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
+        json={
+            'status': 404,
+            'message': 'PID does not exist.'
+        },
+        status=404)
+
+    res = cli_run('analysis delete -p some-pid')
+
+    assert res.exit_code == 1
+    assert res.stripped_output == 'PID does not exist.'
+
+
+@responses.activate
+def test_analysis_delete_when_no_access(cli_run):
+    responses.add(
+        responses.DELETE,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
+        json={
+            'message': 'Forbidden',
+            'status': 403
+        },
+        status=403)
+
+    res = cli_run('analysis delete -p some-pid')
+
+    assert res.exit_code == 1
+    assert res.stripped_output == "You don't have sufficient permissions."
+
+
+@responses.activate
+def test_analysis_delete_no_access_tokens(cli_run):
+    responses.add(
+        responses.DELETE,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
+        json={
+            'message': "The server could not verify that you are authorized to "
+            "access the URL requested.  You either supplied the wrong credentials "
+            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
+            'status': 401
+        },
+        status=401)
+
+    res = cli_run('analysis delete -p some-pid')
+
+    assert res.exit_code == 1
+    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'

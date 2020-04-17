@@ -72,6 +72,37 @@ def cli_run():
     yield run
 
 
+@pytest.yield_fixture('module')
+def runner():
+    """Fixture for CLI runner function.
+
+    Returns a function accepting a single parameter (cli command as string).
+    """
+    runner = CliRunner()
+
+    def run(cmd, **kwargs):
+        """Run the command from the CLI.
+        :param cmd: command with its arguments
+        :type cmd: str
+
+        :warn: when passing your command remember
+        to not have any whitespaces inside an argument values!
+
+        :return: runner result
+        :rtype: `click.testing.Result`
+        """
+        res = runner.invoke(cli, cmd.split(), **kwargs)
+
+        if res.output:
+            res.stripped_output = res.output.strip()
+
+        return res
+
+    runner.run = run
+
+    yield runner
+
+
 @pytest.yield_fixture
 def record_data():
     data = {

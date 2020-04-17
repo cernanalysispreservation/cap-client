@@ -89,9 +89,8 @@ def upload(api, pid, url):
 @click.option(
     '--event',
     '-e',
-    required=True,
-    default='release',
     type=click.Choice(['push', 'release']),
+    default='release',
     help='Download repository tarball on every (push|release)',
 )
 @pass_api

@@ -77,6 +77,7 @@ def update(api, pid, json, jsonfile, field):
 @click.option(
     '--field',
     '-f',
+    required=True,
     help="Specify field, eg. object.nested_array.0",
 )
 @pass_api
