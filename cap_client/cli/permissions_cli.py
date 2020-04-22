@@ -54,14 +54,14 @@ def get(api, pid):
     '--user',
     '-u',
     cls=MutuallyExclusiveOption,
-    not_required_if="egroup",
+    not_required_if=["egroup"],
     help='User mail.',
 )
 @click.option(
     '--egroup',
     '-e',
     cls=MutuallyExclusiveOption,
-    not_required_if="user",
+    not_required_if=["user"],
     help='Egroup mail.',
 )
 @click.option(
@@ -91,14 +91,14 @@ def add(api, pid, rights, user, egroup):
     '--user',
     '-u',
     cls=MutuallyExclusiveOption,
-    not_required_if="egroup",
+    not_required_if=["egroup"],
     help='User mail.',
 )
 @click.option(
     '--egroup',
     '-e',
     cls=MutuallyExclusiveOption,
-    not_required_if="user",
+    not_required_if=["user"],
     help='Egroup mail.',
 )
 @click.option(

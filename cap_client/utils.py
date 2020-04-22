@@ -82,28 +82,44 @@ def load_json(ctx, param, value):
             raise BadParameter('Not a valid JSON.')
 
 
+def load_num(ctx, param, value):
+    if value is not None:
+        try:
+            return int(value)
+        except ValueError:
+            try:
+                return float(value)
+            except ValueError:
+                raise BadParameter('Not a valid number.')
+
+
 class MutuallyExclusiveOption(click.Option):
     """Click option required dependent on other options."""
     def __init__(self, *args, **kwargs):
         """Initialize."""
         self.not_required_if = kwargs.pop("not_required_if")
-        kwargs["help"] = "{} (mutually exclusive with --{})".format(
-            kwargs.get("help", ""), self.not_required_if)
+        self.not_required_options = ", ".join(
+            ['--{}'.format(option) for option in self.not_required_if])
+
+        kwargs["help"] = "{} (mutually exclusive with {})".format(
+            kwargs.get("help", ""), self.not_required_options)
+
         super(MutuallyExclusiveOption, self).__init__(*args, **kwargs)
 
     def handle_parse_result(self, ctx, opts, args):
         """Parse result handler."""
         is_option_present = self.name in opts
-        is_another_option_present = self.not_required_if in opts
+        is_another_option_present = any(item in opts
+                                        for item in self.not_required_if)
         if is_another_option_present:
             if is_option_present:
                 raise click.UsageError(
-                    "--{} is mutually exclusive with --{}".format(
-                        self.name, self.not_required_if),
+                    "--{} is mutually exclusive with {}".format(
+                        self.name, self.not_required_options),
                     ctx=ctx)
         elif not is_option_present:
-            raise click.UsageError("You need to specify --{} or --{}.".format(
-                self.name, self.not_required_if),
+            raise click.UsageError("You need to specify --{} or {}.".format(
+                self.name, self.not_required_options),
                                    ctx=ctx)
 
         return super(MutuallyExclusiveOption,

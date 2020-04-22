@@ -125,7 +125,7 @@ def get_published(api, pid, all):
     '--json',
     '-j',
     cls=MutuallyExclusiveOption,
-    not_required_if="jsonfile",
+    not_required_if=["jsonfile"],
     callback=load_json,
     help='\nJSON data from command line.',
 )
@@ -134,7 +134,7 @@ def get_published(api, pid, all):
     '-f',
     type=click.File('r'),
     cls=MutuallyExclusiveOption,
-    not_required_if="json",
+    not_required_if=["json"],
     callback=load_json_from_file,
     help='\nJSON file.',
 )
