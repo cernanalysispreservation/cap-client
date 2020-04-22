@@ -27,7 +27,7 @@ import click
 
 from cap_client.api import AnalysisAPI
 from cap_client.utils import (
-    ColoredGroup, NotRequiredIf,
+    ColoredGroup, MutuallyExclusiveOption,
     json_dumps, load_json, load_json_from_file, logger,
     pid_option, validate_version
 )
@@ -193,16 +193,17 @@ def get_published(api, pid, all, query, search, type, sort, page, size):
 @analysis.command()
 @click.option(
     '--json',
-    cls=NotRequiredIf,
-    not_required_if="jsonfile",
+    '-j',
+    cls=MutuallyExclusiveOption,
+    not_required_if=["jsonfile"],
     callback=load_json,
     help='\nJSON data from command line.',
 )
 @click.option(
     '--jsonfile',
     type=click.File('r'),
-    cls=NotRequiredIf,
-    not_required_if="json",
+    cls=MutuallyExclusiveOption,
+    not_required_if=["json"],
     callback=load_json_from_file,
     help='\nJSON file.',
 )

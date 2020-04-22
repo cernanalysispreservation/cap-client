@@ -27,7 +27,7 @@ import click
 
 from cap_client.api import PermissionsAPI
 from cap_client.utils import (
-    ColoredGroup, NotRequiredIf,
+    ColoredGroup, MutuallyExclusiveOption,
     json_dumps, logger, pid_option
 )
 
@@ -55,15 +55,15 @@ def get(api, pid):
 @click.option(
     '--user',
     '-u',
-    cls=NotRequiredIf,
-    not_required_if="egroup",
+    cls=MutuallyExclusiveOption,
+    not_required_if=["egroup"],
     help='User mail.',
 )
 @click.option(
     '--egroup',
     '-e',
-    cls=NotRequiredIf,
-    not_required_if="user",
+    cls=MutuallyExclusiveOption,
+    not_required_if=["user"],
     help='Egroup mail.',
 )
 @click.option(
@@ -92,15 +92,15 @@ def add(api, pid, rights, user, egroup):
 @click.option(
     '--user',
     '-u',
-    cls=NotRequiredIf,
-    not_required_if="egroup",
+    cls=MutuallyExclusiveOption,
+    not_required_if=["egroup"],
     help='User mail.',
 )
 @click.option(
     '--egroup',
     '-e',
-    cls=NotRequiredIf,
-    not_required_if="user",
+    cls=MutuallyExclusiveOption,
+    not_required_if=["user"],
     help='Egroup mail.',
 )
 @click.option(

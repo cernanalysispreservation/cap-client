@@ -1,7 +1,6 @@
 import json
 
 import responses
-from pytest import mark
 
 
 # GET
@@ -121,9 +120,8 @@ def test_metadata_get_no_pid_given(cli_run):
 
 
 # UPDATE
-@mark.skip
 @responses.activate
-def test_metadata_update_with_text_field_str(cli_run):
+def test_metadata_update_with_text(cli_run):
     responses.add(
         responses.PATCH,
         'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
@@ -133,7 +131,7 @@ def test_metadata_update_with_text_field_str(cli_run):
         status=200)
 
     res = cli_run(
-        "metadata update -p some-pid --field general_title -j new-test")
+        "metadata update -p some-pid --field general_title -t new-test")
 
     assert responses.calls[0].request.headers[
         'Accept'] == 'application/basic+json'
@@ -154,9 +152,8 @@ def test_metadata_update_with_text_field_str(cli_run):
     }
 
 
-@mark.skip
 @responses.activate
-def test_metadata_update_with_text_field_int(cli_run):
+def test_metadata_update_with_num_int(cli_run):
     responses.add(
         responses.PATCH,
         'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
@@ -165,7 +162,7 @@ def test_metadata_update_with_text_field_int(cli_run):
         }},
         status=200)
 
-    res = cli_run("metadata update -p some-pid --field myfield --json 10")
+    res = cli_run("metadata update -p some-pid --field myfield -n 10")
 
     assert responses.calls[0].request.headers[
         'Accept'] == 'application/basic+json'
@@ -182,9 +179,8 @@ def test_metadata_update_with_text_field_int(cli_run):
     assert json.loads(res.stripped_output) == {'metadata': {'myfield': 10}}
 
 
-@mark.skip
 @responses.activate
-def test_metadata_update_with_text_field_float(cli_run):
+def test_metadata_update_with_num_float(cli_run):
     responses.add(
         responses.PATCH,
         'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
@@ -193,7 +189,7 @@ def test_metadata_update_with_text_field_float(cli_run):
         }},
         status=200)
 
-    res = cli_run("metadata update -p some-pid --field myfield --json 1.2")
+    res = cli_run("metadata update -p some-pid --field myfield -n 1.2")
 
     assert responses.calls[0].request.headers[
         'Accept'] == 'application/basic+json'
@@ -211,7 +207,7 @@ def test_metadata_update_with_text_field_float(cli_run):
 
 
 @responses.activate
-def test_metadata_update_with_json_field(cli_run):
+def test_metadata_update_with_json(cli_run):
     responses.add(
         responses.PUT,
         'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
@@ -315,19 +311,39 @@ def test_metadata_update_no_pid_given(cli_run):
     assert "Error: Missing option '--pid' / '-p'." in res.output
 
 
-def test_metadata_update_no_json_given(cli_run):
+def test_metadata_update_no_input_options_given(cli_run):
     res = cli_run("metadata update -p some-pid --field field")
 
     assert res.exit_code == 2
-    assert "Error: You need to specify --json or --jsonfile." in res.output
+    assert "Error: You need to specify --json or --jsonfile, --text, --num." in res.output
 
 
-def test_metadata_update_mutually_exclusive_json_jsonfile(cli_run):
-    res = cli_run(
-        "metadata update -p some-pid --json json --jsonfile json-file")
+def test_metadata_update_mutually_exclusive_json_with_others(cli_run):
+    res = cli_run("metadata update -p some-pid -j json -f json-file")
 
     assert res.exit_code == 2
-    assert "Error: --json is mutually exclusive with --jsonfile" in res.output
+    assert "Error: --json is mutually exclusive with --jsonfile, --text, --num" in res.output
+
+
+def test_metadata_update_mutually_exclusive_jsonfile_with_others(cli_run):
+    res = cli_run("metadata update -p some-pid -f json-file -j json")
+
+    assert res.exit_code == 2
+    assert "Error: --jsonfile is mutually exclusive with --json, --text, --num" in res.output
+
+
+def test_metadata_update_mutually_exclusive_text_with_others(cli_run):
+    res = cli_run("metadata update -p some-pid -t text -f json-file")
+
+    assert res.exit_code == 2
+    assert "Error: --text is mutually exclusive with --jsonfile, --json, --num" in res.output
+
+
+def test_metadata_update_mutually_exclusive_num_with_others(cli_run):
+    res = cli_run("metadata update -p some-pid -n number -f json-file")
+
+    assert res.exit_code == 2
+    assert "Error: --num is mutually exclusive with --jsonfile, --json, --text" in res.output
 
 
 # REMOVE
