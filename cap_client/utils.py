@@ -83,42 +83,47 @@ def load_json(ctx, param, value):
             raise BadParameter('Not a valid JSON.')
 
 
-class NotRequiredIf(click.Option):
-    """
-    Mutually exclusive REQUIRED arguments.
+def load_num(ctx, param, value):
+    """Load integer from parameter."""
+    if value is not None:
+        try:
+            return int(value)
+        except ValueError:
+            try:
+                return float(value)
+            except ValueError:
+                raise BadParameter('Not a valid number.')
 
-    Supports 2 arguments, 1 of which is required to be present in the command.
-    """
+
+class MutuallyExclusiveOption(click.Option):
+    """Click option required dependent on other options."""
 
     def __init__(self, *args, **kwargs):
         """Initialize."""
         self.not_required_if = kwargs.pop("not_required_if")
-        self.help = kwargs.get('help', '')
+        self.not_required_options = ", ".join(
+            ['--{}'.format(option) for option in self.not_required_if])
 
-        kwargs["help"] = '{} (mutually exclusive with --{})'.format(
-            self.help, self.not_required_if)
+        kwargs["help"] = "{} (mutually exclusive with {})".format(
+            kwargs.get("help", ""), self.not_required_options)
 
-        super(NotRequiredIf, self).__init__(*args, **kwargs)
+        super(MutuallyExclusiveOption, self).__init__(*args, **kwargs)
 
     def handle_parse_result(self, ctx, opts, args):
         """Parse result handler."""
         is_option_present = self.name in opts
-        is_another_option_present = self.not_required_if in opts
-
+        is_another_option_present = any(item in opts
+                                        for item in self.not_required_if)
         if is_another_option_present:
             if is_option_present:
                 raise click.UsageError(
-                    "--{} is mutually exclusive with --{}".format(
-                        self.name, self.not_required_if),
+                    "--{} is mutually exclusive with {}".format(
+                        self.name, self.not_required_options),
                     ctx=ctx)
 
         elif not is_option_present:
-            raise click.UsageError(
-                "You need to specify --{} or --{}.".format(
-                    self.name, self.not_required_if),
-                ctx=ctx)
-
-        return super(NotRequiredIf, self).handle_parse_result(ctx, opts, args)
+            raise click.UsageError("You need to specify --{} or {}.".format(
+                self.name, self.not_required_options), ctx=ctx)
 
 
 class MultipleMutuallyExclusiveOptions(click.Option):

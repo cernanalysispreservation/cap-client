@@ -26,10 +26,9 @@
 import click
 
 from cap_client.api.metadata_api import MetadataAPI
-from cap_client.utils import (
-    ColoredGroup, NotRequiredIf, json_dumps, load_json,
-    load_json_from_file, logger, pid_option
-)
+from cap_client.utils import (ColoredGroup, MutuallyExclusiveOption,
+                              json_dumps, load_json, load_json_from_file,
+                              load_num, logger, pid_option)
 
 pass_api = click.make_pass_decorator(MetadataAPI, ensure=True)
 
@@ -47,26 +46,46 @@ def metadata():
 )
 @click.option(
     '--json',
-    cls=NotRequiredIf,
-    not_required_if="jsonfile",
+    '-j',
+    cls=MutuallyExclusiveOption,
+    not_required_if=["jsonfile", "text", "num"],
     callback=load_json,
-    help='\nJSON data or text.',
+    help='\nJSON data.',
 )
 @click.option(
     '--jsonfile',
     type=click.File('r'),
-    cls=NotRequiredIf,
-    not_required_if="json",
+    cls=MutuallyExclusiveOption,
+    not_required_if=["json", "text", "num"],
     callback=load_json_from_file,
     help='\nJSON file.',
 )
+@click.option(
+    '--text',
+    '-t',
+    cls=MutuallyExclusiveOption,
+    not_required_if=["jsonfile", "json", "num"],
+    help='\nText data.',
+)
+@click.option(
+    '--num',
+    '-n',
+    cls=MutuallyExclusiveOption,
+    not_required_if=["jsonfile", "json", "text"],
+    callback=load_num,
+    help='\nNumeric data.',
+)
 @pass_api
 @logger
-def update(api, pid, json, jsonfile, field):
+def update(api, pid, json, jsonfile, text, num, field):
     """Update analysis metadata."""
+    value = [
+        option for option in [json, jsonfile, text, num] if option is not None
+    ][0]
+
     res = api.set(
         pid=pid,
-        value=jsonfile if json is None else json,
+        value=value,
         field=field,
     )
 
