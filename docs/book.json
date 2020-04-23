@@ -4,11 +4,24 @@
   "plugins": [
     "insert-logo",
     "back-to-top-button",
-    "copy-code-button",
     "anchorjs",
-    "collapsible-menu",
-    "github"
+    "github",
+    "-sharing",
+    "codeblock-filename",
+    "terminal",
+    "richquotes"
   ],
+  "variables": {
+    "themeFexa": {
+      "nav": [
+        {
+          "url": "https://github.com/cernanalysispreservation/cap-client",
+          "target": "_blank",
+          "name": "Github"
+        }
+      ]
+    }
+  },
   "pluginsConfig": {
     "insert-logo": {
       "url": "https://awesome-workshop.github.io/cap-cms/fig/banner.png",
@@ -18,12 +31,32 @@
       "placement": "left",
       "visible": "always"
     },
-    "sharing": {
-      "twitter": true,
-      "facebook": false
-    },
     "github": {
       "url": "https://github.com/cernanalysispreservation/cap-client"
+    },
+    "theme-api": {
+      "languages": [
+        {
+          "lang": "python",
+          "name": "Python"
+        }
+      ]
+    },
+    "terminal": {
+      "copyButtons": true,
+      "fade": true,
+      "style": "flat"
+    },
+    "theme-fexa": {
+      "search-placeholder": "Search the docs",
+      "logo": "./cap-logo-dark.png",
+      "favicon": "./favicon.ico"
+    },
+    "richquotes": {
+      "star": {
+        "alert": "warning",
+        "picto": "fa-star"
+      }
     }
   }
 }

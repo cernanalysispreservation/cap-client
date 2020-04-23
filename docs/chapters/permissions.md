@@ -1,110 +1,165 @@
-# Permissions
+## Permissions
 
+The `permissions` command group allows the user to access, retrieve, and change the permissions of a specified analysis.
 
-### Get
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client permissions --help]
+Usage: cap-client permissions [OPTIONS] COMMAND [ARGS]...
 
-You can get existing analysis user permissions only if you have at least read access to it. You need to specify:
+  Manage analysis permissions.
 
-`--pid | the PID of an analysis`
+Options:
+  --help  Show this message and exit.
 
-    $ cap-client permissions get --pid/p <existing pid>
-
-```json
-{
-    "updated": "2018-02-12T15:57:31.824619+00:00",
-    "metadata": {
-        "deposit-admin": {
-            "user": [],
-            "roles": []
-        },
-        "deposit-update": {
-            "user": [],
-            "roles": []
-        },
-        "deposit-read": {
-            "user": [
-                "alice@inveniosoftware.org"
-            ],
-            "roles": []
-            }
-        },
-    "created": "2018-02-12T15:15:40.697516+00:00"
-}
+Commands:
+  add     Add user/egroup permissions for your analysis.
+  get     List analysis permissions.
+  remove  Remove user/egroup permissions for your analysis.
 ```
 
 
-### Set
+#### Retrieve the permissions of an analysis
 
-You can set existing analysis user permissions only if you have at least read access to it. You need to specify:
+**Description:**
 
-`--rights | the permission rights. You can choose between read, update and admin`
+Allows the user to retrieve the permissions of a specified analysis.
 
-`--user   | the email of the user to grant permissions`
+**Usage:**
 
-`--pid    | the PID of an analysis you want to set permissions`
-
-    $ cap-client permissions add --rights/-r [read | update | admin] --user/-u <email> --pid/p <existing pid>
-    e.g.
-    $ cap-client permissions add -r update -u alice@inveniosoftware.org -p 0af85220ef0c492889658539d8b3d4e2
-
-```json
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client permissions get --pid <analysis-pid>]
 {
-    "updated": "2018-02-12T15:57:31.824619+00:00",
-    "metadata": {
-        "deposit-admin": {
-            "user": [],
-            "roles": []
-        },
-        "deposit-update": {
-            "user": [
-                "alice@inveniosoftware.org"
-            ],
-            "roles": []
-        },
-        "deposit-read": {
-            "user": [
-                "alice@inveniosoftware.org"
-            ],
-            "roles": []
-            }
-        },
-    "created": "2018-02-12T15:15:40.697516+00:00"
+    'deposit-admin': {
+        'roles': [],
+        'users': ['user@inveniosoftware.org']
+    },
+    'deposit-read': {
+        'roles': [],
+        'users': ['user@inveniosoftware.org']
+    },
+    'deposit-update': {
+        'roles': [],
+        'users': ['user@inveniosoftware.org']
+    }
 }
 ```
 
-### Remove
+**Options:**
 
-You can remove existing analysis user permissions only if you have at least read access to it. You need to specify:
+| Name        | Type   | Desc                                                  |
+| :---------- | :----- | :---------------------------------------------------- |
+| --pid / -p  | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
 
-`--rights | the permission rights. You can choose between read, update and admin`
 
-`--user   | the email of the user to grant permissions`
+#### Add user/e-group permissions to an analysis
 
-`--pid    | the PID of an analysis you want to set permissions`
+**Description:**
 
-    $ cap-client permissions remove --rights/-r [read | update | admin] --user/-u <email> --pid/p <existing pid>
-    e.g.
-    $ cap-client permissions remove -r update -u alice@inveniosoftware.org -p 0af85220ef0c492889658539d8b3d4e2
+Allows the user to add permissions of a specified analysis. The user can add permissions to a specific user or a whole e-group.
 
-```json
+**Usage:**
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client permissions add --pid <analysis-pid> --user info@inveniosoftware.org --rights read|update]
 {
-    "updated": "2018-02-12T15:57:31.824619+00:00",
-    "metadata": {
-        "deposit-admin": {
-            "user": [],
-            "roles": []
-        },
-        "deposit-update": {
-            "user": [],
-            "roles": []
-        },
-        "deposit-read": {
-            "user": [
-                "alice@inveniosoftware.org"
-            ],
-            "roles": []
-            }
-        },
-    "created": "2018-02-12T15:15:40.697516+00:00"
+    'deposit-admin': {
+        'roles': [],
+        'users': ['user@inveniosoftware.org']
+    },
+    'deposit-read': {
+        'roles': [],
+        'users': ['user@inveniosoftware.org', info@inveniosoftware.org]
+    },
+    'deposit-update': {
+        'roles': [],
+        'users': ['user@inveniosoftware.org', info@inveniosoftware.org]
+    }
 }
 ```
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client permissions add --pid <analysis-pid> --egroup egroup@inveniosoftware.org --rights read]
+{
+        "deposit-admin": {
+            "roles": [],
+            "users": ["info@inveniosoftware.org"]
+        },
+        "deposit-read": {
+            "roles": ['egroup@inveniosoftware.org'],
+            "users": ["info@inveniosoftware.org"]
+        },
+        "deposit-update": {
+            "roles": [],
+            "users": ["info@inveniosoftware.org"]
+        }
+    }
+```
+
+**Options:**
+
+| Name          | Type   | Desc                                                  |
+| :------------ | :----- | :---------------------------------------------------- |
+| --pid / -p    | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
+| --user / -u   | TEXT   | User mail. (mutually exclusive with --egroup)         |
+| --egroup / -e | TEXT   | Egroup mail. (mutually exclusive with --user)         |
+| --rights / -r | TEXT   | Options: read / update / admin  [required]            |
+
+
+#### Remove user/e-group permissions from an analysis
+
+**Description:**
+
+Allows the user to remove permissions from a specified analysis. The user can remove permissions from a specific user or a whole e-group.
+
+**Usage:**
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client permissions remove --pid <analysis-pid> --user info@inveniosoftware.org --rights read]
+{
+    'deposit-admin': {
+        'roles': [],
+        'users': ['user@inveniosoftware.org']
+    },
+    'deposit-read': {
+        'roles': [],
+        'users': ['user@inveniosoftware.org']
+    },
+    'deposit-update': {
+        'roles': [],
+        'users': ['user@inveniosoftware.org']
+    }
+}
+```
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client permissions add --pid <analysis-pid> --egroup egroup@inveniosoftware.org --rights read]
+{
+        "deposit-admin": {
+            "roles": [],
+            "users": ["info@inveniosoftware.org"]
+        },
+        "deposit-read": {
+            "roles": [],
+            "users": ["info@inveniosoftware.org"]
+        },
+        "deposit-update": {
+            "roles": [],
+            "users": ["info@inveniosoftware.org"]
+        }
+    }
+```
+
+**Options:**
+
+| Name          | Type   | Desc                                                  |
+| :------------ | :----- | :---------------------------------------------------- |
+| --pid / -p    | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
+| --user / -u   | TEXT   | User mail. (mutually exclusive with --egroup)         |
+| --egroup / -e | TEXT   | Egroup mail. (mutually exclusive with --user)         |
+| --rights / -r | TEXT   | Options: read / update / admin  [required]            |
