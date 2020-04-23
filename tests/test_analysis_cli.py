@@ -2,9 +2,8 @@ import json
 from tempfile import NamedTemporaryFile
 
 import responses
-from pytest import mark
-
 from cap_client.utils import json_dumps
+from pytest import mark
 
 
 @responses.activate
@@ -73,7 +72,7 @@ def test_analysis_schema(cli_run):
         },
     )
 
-    res = cli_run("analysis schema --type some-type")
+    res = cli_run("analysis schema some-type")
 
     assert json.loads(res.stripped_output) == {
         'title': 'Test',
@@ -106,8 +105,7 @@ def test_analysis_schema_when_asked_for_published_schema(cli_run):
             }
         })
 
-    res = cli_run(
-        "analysis schema --type some-type --version 0.0.1 --for-published")
+    res = cli_run("analysis schema some-type --version 0.0.1 --for-published")
 
     assert res.exit_code == 0
     assert json.loads(res.stripped_output) == {
@@ -133,26 +131,26 @@ def test_analysis_schema_when_schema_with_this_type_does_not_exist(cli_run):
         status=404,
     )
 
-    res = cli_run("analysis schema --type non-existing-type")
+    res = cli_run("analysis schema non-existing-type")
 
     assert res.exit_code == 1
     assert res.stripped_output == 'Schema non-existing-type does not exist.'
 
 
 def test_analysis_schema_when_invalid_version_format(cli_run):
-    res = cli_run("analysis schema --type some-type --version 0a0b0c")
+    res = cli_run("analysis schema some-type --version 0a0b0c")
 
     assert res.exit_code == 2
-    assert ("Error: Invalid value for '--version' / '-v': "
+    assert ("Error: Invalid value for '--version': "
             "Version has to be passed as string <major>.<minor>.<patch>"
-            ) in res.singlequotes_output
+            ) in res.stripped_output
 
 
 def test_analysis_schema_when_type_not_provided(cli_run):
     res = cli_run("analysis schema --version 0.0.1")
 
     assert res.exit_code == 2
-    assert "Error: Missing option '--type' / '-t'" in res.singlequotes_output
+    assert "Error: Missing argument 'ANALYSIS_TYPE'." in res.stripped_output
 
 
 @responses.activate
@@ -257,7 +255,7 @@ def test_analysis_create_when_json_with_not_json_data_provided(cli_run):
     res = cli_run('analysis create --json {a')
 
     assert res.exit_code == 2
-    assert "Error: Invalid value for '--json' / '-j': Not a valid JSON." in res.singlequotes_output
+    assert "Error: Invalid value for '--json': Not a valid JSON." in res.stripped_output
 
 
 def test_analysis_create_when_json_with_not_json_object_provided(cli_run):
@@ -272,7 +270,7 @@ def test_analysis_create_when_jsonfile_with_not_json_data_provided(cli_run):
         res = cli_run('analysis create --jsonfile {}'.format(f.name))
 
     assert res.exit_code == 2
-    assert "Error: Invalid value for '--jsonfile' / '-f': Not a valid JSON." in res.singlequotes_output
+    assert "Error: Invalid value for '--jsonfile': Not a valid JSON." in res.stripped_output
 
 
 @responses.activate

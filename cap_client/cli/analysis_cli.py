@@ -50,14 +50,7 @@ def types(api):
 
 @analysis.command()
 @click.option(
-    '--type',
-    '-t',
-    required=True,
-    help='Analysis type',
-)
-@click.option(
     '--version',
-    '-v',
     callback=validate_version,
     help='Version of the schema',
 )
@@ -68,12 +61,13 @@ def types(api):
     help="Show schema for published analysis"
     "(may be different than draft schema)",
 )
+@click.argument('analysis_type')
 @logger
 @pass_api
-def schema(api, type, version, for_published):
+def schema(api, analysis_type, version, for_published):
     """Get JSON schema for analysis metadata."""
     res = api.get_schema(
-        type_=type,
+        type_=analysis_type,
         version=version,
         record_schema=for_published,
     )
@@ -123,7 +117,6 @@ def get_published(api, pid, all):
 @analysis.command()
 @click.option(
     '--json',
-    '-j',
     cls=MutuallyExclusiveOption,
     not_required_if="jsonfile",
     callback=load_json,
@@ -131,7 +124,6 @@ def get_published(api, pid, all):
 )
 @click.option(
     '--jsonfile',
-    '-f',
     type=click.File('r'),
     cls=MutuallyExclusiveOption,
     not_required_if="json",

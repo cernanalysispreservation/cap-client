@@ -90,25 +90,6 @@ def test_permissions_get_no_access(cli_run):
     assert res.stripped_output == "You don't have sufficient permissions."
 
 
-@responses.activate
-def test_permissions_get_no_access_tokens(cli_run):
-    responses.add(
-        responses.GET,
-        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
-        json={
-            'message': "The server could not verify that you are authorized to "
-            "access the URL requested.  You either supplied the wrong credentials "
-            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
-            'status': 401
-        },
-        status=401)
-
-    res = cli_run('permissions get -p some-pid')
-
-    assert res.exit_code == 1
-    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'
-
-
 # ADD
 @responses.activate
 def test_permissions_add(cli_run):
@@ -314,26 +295,6 @@ def test_permissions_add_no_access(cli_run):
     assert res.stripped_output == "You don't have sufficient permissions."
 
 
-@responses.activate
-def test_permissions_add_no_access_tokens(cli_run):
-    responses.add(
-        responses.POST,
-        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions',
-        json={
-            'message': "The server could not verify that you are authorized to "
-            "access the URL requested.  You either supplied the wrong credentials "
-            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
-            'status': 401
-        },
-        status=401)
-
-    res = cli_run(
-        'permissions add -p some-pid -u cms@inveniosoftware.com -r read')
-
-    assert res.exit_code == 1
-    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'
-
-
 # REMOVE
 @responses.activate
 def test_permissions_remove(cli_run):
@@ -483,24 +444,6 @@ def test_permissions_remove_mutually_exclusive_user_egroup(cli_run):
 
 
 @responses.activate
-def test_permissions_remove_pid_not_exists(cli_run):
-    responses.add(
-        responses.POST,
-        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions',
-        json={
-            'status': 404,
-            'message': 'PID does not exist.'
-        },
-        status=404)
-
-    res = cli_run(
-        "permissions remove -p some-pid -u cms@inveniosoftware.com -r read")
-
-    assert res.exit_code == 1
-    assert res.stripped_output == 'PID does not exist.'
-
-
-@responses.activate
 def test_permissions_remove_user_not_exists(cli_run):
     responses.add(
         responses.POST,
@@ -535,23 +478,3 @@ def test_permissions_remove_no_access(cli_run):
 
     assert res.exit_code == 1
     assert res.stripped_output == "You don't have sufficient permissions."
-
-
-@responses.activate
-def test_permissions_remove_no_access_tokens(cli_run):
-    responses.add(
-        responses.POST,
-        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions',
-        json={
-            'message': "The server could not verify that you are authorized to "
-            "access the URL requested.  You either supplied the wrong credentials "
-            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
-            'status': 401
-        },
-        status=401)
-
-    res = cli_run(
-        'permissions remove -p some-pid -u cms@inveniosoftware.com -r read')
-
-    assert res.exit_code == 1
-    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'

@@ -56,15 +56,15 @@ def get(api, pid):
     '-o',
     help='Upload file as..',
 )
-@click.argument(
-    'file',
-    type=click.Path(exists=True),
-)
 @click.option(
     '--yes-i-know',
     is_flag=True,
     default=False,
     help="Bypasses prompts..Say YES to everything",
+)
+@click.argument(
+    'file',
+    type=click.Path(exists=True),
 )
 @logger
 @pass_api
