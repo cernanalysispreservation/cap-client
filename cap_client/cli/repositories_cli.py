@@ -59,12 +59,7 @@ def get(api, pid, with_snapshots):
 
 @repositories.command()
 @pid_option(required=True)
-@click.option(
-    '--url',
-    '-u',
-    required=True,
-    help='URL of repository.',
-)
+@click.argument('url')
 @pass_api
 @logger
 def upload(api, pid, url):
@@ -81,18 +76,12 @@ def upload(api, pid, url):
 @repositories.command()
 @pid_option(required=True)
 @click.option(
-    '--url',
-    '-u',
-    required=True,
-    help='URL of repository.',
-)
-@click.option(
     '--event',
-    '-e',
     type=click.Choice(['push', 'release']),
     default='release',
     help='Download repository tarball on every (push|release)',
 )
+@click.argument('url')
 @pass_api
 @logger
 def connect(api, pid, url, event):

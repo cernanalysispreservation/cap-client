@@ -40,11 +40,12 @@ def metadata():
 
 @metadata.command()
 @pid_option(required=True)
-@click.option('--field',
-              help="Specify an EXISTING field\n eg. object.nested_array.0")
+@click.option(
+    '--field',
+    help="Specify an EXISTING field\n eg. object.nested_array.0",
+)
 @click.option(
     '--json',
-    '-j',
     cls=MutuallyExclusiveOption,
     not_required_if="jsonfile",
     callback=load_json,
@@ -52,7 +53,6 @@ def metadata():
 )
 @click.option(
     '--jsonfile',
-    '-f',
     type=click.File('r'),
     cls=MutuallyExclusiveOption,
     not_required_if="json",
@@ -76,7 +76,6 @@ def update(api, pid, json, jsonfile, field):
 @pid_option(required=True)
 @click.option(
     '--field',
-    '-f',
     required=True,
     help="Specify field, eg. object.nested_array.0",
 )
@@ -96,7 +95,6 @@ def remove(api, pid, field):
 @pid_option(required=True)
 @click.option(
     '--field',
-    '-f',
     help="Specify field, eg. object.nested_array.0",
 )
 @pass_api

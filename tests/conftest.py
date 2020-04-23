@@ -63,9 +63,7 @@ def cli_run():
         res = runner.invoke(cli, cmd.split(), **kwargs)
 
         if res.output:
-            res.stripped_output = res.output.strip(
-            )  # helpful as click adds some \n
-            res.singlequotes_output = res.output.replace('"', '\'')
+            res.stripped_output = res.output.strip()
 
         return res
 

@@ -1,5 +1,5 @@
-import sys
 import json
+import sys
 
 import responses
 from mock import patch
@@ -35,7 +35,7 @@ def test_metadata_get_field(cli_run):
         }},
         status=200)
 
-    res = cli_run("metadata get -p some-pid -f general_title")
+    res = cli_run("metadata get -p some-pid --field general_title")
 
     assert responses.calls[0].request.headers[
         'Accept'] == 'application/basic+json'
@@ -72,7 +72,7 @@ def test_metadata_get_index_not_exists(cli_run):
             }
         }},
         status=200)
-    res = cli_run("metadata get -p some-pid -f basic_info.ana_notes.3")
+    res = cli_run("metadata get -p some-pid --field basic_info.ana_notes.3")
 
     assert responses.calls[0].request.headers[
         'Accept'] == 'application/basic+json'
@@ -113,25 +113,6 @@ def test_metadata_no_access(cli_run):
 
     assert res.exit_code == 1
     assert res.stripped_output == "You don't have sufficient permissions."
-
-
-@responses.activate
-def test_metadata_no_access_tokens(cli_run):
-    responses.add(
-        responses.GET,
-        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
-        json={
-            'message': "The server could not verify that you are authorized to "
-            "access the URL requested.  You either supplied the wrong credentials "
-            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
-            'status': 401
-        },
-        status=401)
-
-    res = cli_run('metadata get -p some-pid')
-
-    assert res.exit_code == 1
-    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'
 
 
 def test_metadata_get_no_pid_given(cli_run):
@@ -186,7 +167,7 @@ def test_metadata_update_with_text_field_int(cli_run):
         }},
         status=200)
 
-    res = cli_run("metadata update -p some-pid --field myfield -j 10")
+    res = cli_run("metadata update -p some-pid --field myfield --json 10")
 
     assert responses.calls[0].request.headers[
         'Accept'] == 'application/basic+json'
@@ -214,7 +195,7 @@ def test_metadata_update_with_text_field_float(cli_run):
         }},
         status=200)
 
-    res = cli_run("metadata update -p some-pid --field myfield -j 1.2")
+    res = cli_run("metadata update -p some-pid --field myfield --json 1.2")
 
     assert responses.calls[0].request.headers[
         'Accept'] == 'application/basic+json'
@@ -344,7 +325,8 @@ def test_metadata_update_no_json_given(cli_run):
 
 
 def test_metadata_update_mutually_exclusive_json_jsonfile(cli_run):
-    res = cli_run("metadata update -p some-pid -j json -f json-file")
+    res = cli_run(
+        "metadata update -p some-pid --json json --jsonfile json-file")
 
     assert res.exit_code == 2
     assert "Error: --json is mutually exclusive with --jsonfile" in res.output
@@ -359,7 +341,7 @@ def test_metadata_remove(cli_run):
         json={'metadata': {}},
         status=200)
 
-    res = cli_run("metadata remove -p some-pid -f general_title")
+    res = cli_run("metadata remove -p some-pid --field general_title")
 
     assert responses.calls[0].request.headers[
         'Accept'] == 'application/basic+json'
@@ -386,7 +368,7 @@ def test_metadata_remove_pid_not_exists(cli_run):
         },
         status=404)
 
-    res = cli_run("metadata remove -p some-pid -f general-title")
+    res = cli_run("metadata remove -p some-pid --field general-title")
 
     assert res.exit_code == 1
     assert res.stripped_output == 'PID does not exist.'
@@ -404,29 +386,10 @@ def test_metadata_remove_no_access(cli_run):
         },
         status=403)
 
-    res = cli_run("metadata remove -p some-pid -f general-title")
+    res = cli_run("metadata remove -p some-pid --field general-title")
 
     assert res.exit_code == 1
     assert res.stripped_output == "You don't have sufficient permissions."
-
-
-@responses.activate
-def test_metadata_remove_no_access_tokens(cli_run):
-    responses.add(
-        responses.PATCH,
-        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
-        json={
-            'message': "The server could not verify that you are authorized to "
-            "access the URL requested.  You either supplied the wrong credentials "
-            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
-            'status': 401
-        },
-        status=401)
-
-    res = cli_run('metadata remove -p some-pid -f general-title')
-
-    assert res.exit_code == 1
-    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'
 
 
 def test_metadata_remove_no_pid_given(cli_run):
@@ -440,4 +403,4 @@ def test_metadata_remove_no_field_given(cli_run):
     res = cli_run("metadata remove -p some-pid")
 
     assert res.exit_code == 2
-    assert "Error: Missing option '--field' / '-f'." in res.output
+    assert "Error: Missing option '--field'." in res.output

@@ -1,5 +1,5 @@
-import os
 import json
+import os
 
 import responses
 from pytest import mark
@@ -69,25 +69,6 @@ def test_files_get_no_access(cli_run):
 
     assert res.exit_code == 1
     assert res.stripped_output == "You don't have sufficient permissions."
-
-
-@responses.activate
-def test_files_get_no_access_tokens(cli_run):
-    responses.add(
-        responses.GET,
-        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/files',
-        json={
-            'message': "The server could not verify that you are authorized to "
-            "access the URL requested.  You either supplied the wrong credentials "
-            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
-            'status': 401
-        },
-        status=401)
-
-    res = cli_run('files get -p some-pid')
-
-    assert res.exit_code == 1
-    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'
 
 
 @responses.activate

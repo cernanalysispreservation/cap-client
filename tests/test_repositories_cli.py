@@ -113,25 +113,6 @@ def test_repositories_get_no_access(cli_run):
     assert res.stripped_output == "You don't have sufficient permissions."
 
 
-@responses.activate
-def test_repositories_get_no_access_tokens(cli_run):
-    responses.add(
-        responses.GET,
-        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
-        json={
-            'message': "The server could not verify that you are authorized to "
-            "access the URL requested.  You either supplied the wrong credentials "
-            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
-            'status': 401
-        },
-        status=401)
-
-    res = cli_run('repositories get -p some-pid')
-
-    assert res.exit_code == 1
-    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'
-
-
 # UPLOAD
 @responses.activate
 def test_repositories_upload(cli_run):
@@ -141,7 +122,7 @@ def test_repositories_upload(cli_run):
         status=201)
 
     res = cli_run(
-        "repositories upload -p some-pid -u https://github.com/test-user/test-repo"
+        "repositories upload -p some-pid https://github.com/test-user/test-repo"
     )
 
     assert responses.calls[0].request.headers[
@@ -172,7 +153,7 @@ def test_repositories_upload_repo_does_not_exist(cli_run):
         status=400)
 
     res = cli_run(
-        "repositories upload -p some-pid -u https://github.com/test-user/no-exist-repo"
+        "repositories upload -p some-pid https://github.com/test-user/no-exist-repo"
     )
 
     assert res.exit_code == 1
@@ -191,7 +172,7 @@ def test_repositories_upload_repo_not_valid(cli_run):
         status=400)
 
     res = cli_run(
-        "repositories upload -p some-pid -u https://hubhub.com/test-user/test-repo"
+        "repositories upload -p some-pid https://hubhub.com/test-user/test-repo"
     )
 
     assert res.exit_code == 1
@@ -199,7 +180,7 @@ def test_repositories_upload_repo_not_valid(cli_run):
 
 
 def test_repositories_upload_no_pid_given(cli_run):
-    res = cli_run("repositories upload")
+    res = cli_run("repositories upload http://some-url")
 
     assert res.exit_code == 2
     assert "Error: Missing option '--pid' / '-p'." in res.output
@@ -209,26 +190,7 @@ def test_repositories_upload_no_url_given(cli_run):
     res = cli_run("repositories upload -p some-pid")
 
     assert res.exit_code == 2
-    assert "Error: Missing option '--url' / '-u'." in res.output
-
-
-@responses.activate
-def test_repositories_upload_pid_not_exists(cli_run):
-    responses.add(
-        responses.POST,
-        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload',
-        json={
-            'status': 404,
-            'message': 'PID does not exist.'
-        },
-        status=404)
-
-    res = cli_run(
-        "repositories upload -p some-pid -u https://github.com/test-user/no-exist-repo"
-    )
-
-    assert res.exit_code == 1
-    assert res.stripped_output == 'PID does not exist.'
+    assert "Error: Missing argument 'URL'." in res.output
 
 
 @responses.activate
@@ -244,30 +206,10 @@ def test_repositories_upload_no_access(cli_run):
         status=403)
 
     res = cli_run(
-        "repositories upload -p some-pid -u https://github.com/test-user/repo")
+        "repositories upload -p some-pid https://github.com/test-user/repo")
 
     assert res.exit_code == 1
     assert res.stripped_output == "You don't have sufficient permissions."
-
-
-@responses.activate
-def test_repositories_upload_no_access_tokens(cli_run):
-    responses.add(
-        responses.POST,
-        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload',
-        json={
-            'message': "The server could not verify that you are authorized to "
-            "access the URL requested.  You either supplied the wrong credentials "
-            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
-            'status': 401
-        },
-        status=401)
-
-    res = cli_run(
-        'repositories upload -p some-pid -u https://github.com/test-user/repo')
-
-    assert res.exit_code == 1
-    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'
 
 
 # CONNECT
@@ -279,7 +221,7 @@ def test_repositories_connect(cli_run):
         status=201)
 
     res = cli_run(
-        "repositories connect -p some-pid -u https://github.com/test-user/test-repo -e release"
+        "repositories connect -p some-pid https://github.com/test-user/test-repo --event release"
     )
 
     assert responses.calls[0].request.headers[
@@ -306,7 +248,7 @@ def test_repositories_connect_default_release(cli_run):
         status=201)
 
     res = cli_run(
-        "repositories connect -p some-pid -u https://github.com/test-user/test-repo"
+        "repositories connect -p some-pid https://github.com/test-user/test-repo"
     )
 
     assert responses.calls[0].request.headers[
@@ -337,7 +279,7 @@ def test_repositories_connect_repo_not_valid(cli_run):
         status=400)
 
     res = cli_run(
-        "repositories connect -p some-pid -u https://hubhub.com/test-user/test-repo -e release"
+        "repositories connect -p some-pid https://hubhub.com/test-user/test-repo --event release"
     )
 
     assert res.exit_code == 1
@@ -356,7 +298,7 @@ def test_repositories_connect_repo_already_connected(cli_run):
         status=400)
 
     res = cli_run(
-        "repositories connect -p some-pid -u https://github.com/test-user/test-repo -e release"
+        "repositories connect -p some-pid https://github.com/test-user/test-repo --event release"
     )
 
     assert res.exit_code == 1
@@ -364,7 +306,7 @@ def test_repositories_connect_repo_already_connected(cli_run):
 
 
 def test_repositories_connect_no_pid_given(cli_run):
-    res = cli_run("repositories connect")
+    res = cli_run("repositories connect http://some-url")
 
     assert res.exit_code == 2
     assert "Error: Missing option '--pid' / '-p'." in res.output
@@ -374,7 +316,7 @@ def test_repositories_connect_no_url_given(cli_run):
     res = cli_run("repositories connect -p some-pid")
 
     assert res.exit_code == 2
-    assert "Error: Missing option '--url' / '-u'." in res.output
+    assert "Error: Missing argument 'URL'." in res.output
 
 
 @responses.activate
@@ -389,7 +331,7 @@ def test_repositories_connect_pid_not_exists(cli_run):
         status=404)
 
     res = cli_run(
-        "repositories connect -p some-pid -u https://github.com/test-user/no-exist-repo -e release"
+        "repositories connect -p some-pid https://github.com/test-user/no-exist-repo --event release"
     )
 
     assert res.exit_code == 1
@@ -409,29 +351,8 @@ def test_repositories_connect_no_access(cli_run):
         status=403)
 
     res = cli_run(
-        "repositories connect -p some-pid -u https://github.com/test-user/repo -e release"
+        "repositories connect -p some-pid https://github.com/test-user/repo --event release"
     )
 
     assert res.exit_code == 1
     assert res.stripped_output == "You don't have sufficient permissions."
-
-
-@responses.activate
-def test_repositories_upload_no_access_tokens(cli_run):
-    responses.add(
-        responses.POST,
-        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/upload',
-        json={
-            'message': "The server could not verify that you are authorized to "
-            "access the URL requested.  You either supplied the wrong credentials "
-            "(e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
-            'status': 401
-        },
-        status=401)
-
-    res = cli_run(
-        'repositories connect -p some-pid -u https://github.com/test-user/no-exist-repo -e release'
-    )
-
-    assert res.exit_code == 1
-    assert res.stripped_output == 'You are not authorized to access the server (invalid access token?)'
