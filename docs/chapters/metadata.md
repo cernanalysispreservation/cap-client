@@ -1,82 +1,157 @@
-# Metadata
+## Metadata
 
-For all the metadata-related commands, you will need to define the pid needed:
+The `metadata` command group allows the user to access, retrieve, and change the metadata of a specified analysis.
 
-`--pid  | the PID as a parameter.`
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata --help]
+Usage: cap-client metadata [OPTIONS] COMMAND [ARGS]...
 
+  Manage analysis metadata.
 
-### Get
+Options:
+  --help  Show this message and exit.
 
-You can get existing analysis metadata only if you have at least read access to it.
-
-    $ cap-client metadata get <field> --pid/-p <existing pid>
-    e.g.
-    $ cap-client metadata get --pid 4b2924db6c32467bb2de6221f4faf167
-
-```json
-{
-    "$ana_type": "lhcb",
-    "$schema": "https://macbook-trzcinska.cern.ch:5000/schemas/deposits/records/lhcb-v0.0.1.json"
-}
+Commands:
+  get     Get analysis metadata.
+  remove  Remove from analysis metadata.
+  update  Update analysis metadata.
 ```
 
-You can also request more specific information, if you know the schema model:
 
-    $ cap-client metadata get basic_info.description --pid 4b2924db6c32467bb2de6221f4faf167
-    with response:
-    $ "Very Interesting Description"
+#### Retrieve analysis metadata
 
+**Description:**
 
-### Edit
+Allows the user to retrieve the metadata of a specified analysis. The user can retrieve the whole JSON object, or select a specific field to be returned. In addition, the command supports the dot operator (e.g. `basic_info.abstract`), in order to define nested fields or list indices, allowing the user to retrieve every piece of metadata autonomously, if needed.
 
-You can edit and change existing metadata details if you have at least read access to it.
+**Usage:**
 
-    $ cap-client metadata set <field> <new value> --pid/p <existing pid>
-    e.g.
-    $ cap-client metadata set basic_info.description "Very Interesting Description" --pid 4b2924db6c32467bb2de6221f4faf167
-
-```json
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata get --pid <analysis-pid>]
 {
-    "$ana_type": "lhcb",
-    "$schema": "https://macbook-trzcinska.cern.ch:5000/schemas/deposits/records/lhcb-v0.0.1.json",
     "basic_info": {
-        "description": "Very Interesting Description"
-    }
+        "abstract": "test abstract",
+        "ana_notes": [
+            "AN-1234/123",
+            "AN-3456/789"
+        ]
+    },
+    "general_title": "test"
 }
 ```
 
-Ypou can also add more information, by providing the exact location that you want to save it.
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata get --pid <analysis-pid> --field general_title]
+"test"
+```
 
-    $ cap-client --verbose metadata append basic_info.my_array "New element" --pid 0af85220ef0c492889658539d8b3d4e2
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata get --pid <analysis-pid> --field basic_info.ana_notes.0]
+"AN-1234/123"
+```
 
-```json
+**Options:**
+
+| Name        | Type   | Desc                                                  |
+| :---------- | :----- | :---------------------------------------------------- |
+| --pid / -p  | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
+| --field     | TEXT   | Specify field, eg. object.nested_array.0              |
+
+
+#### Update an analysis
+
+**Description:**
+
+Allows the user to update the metadata of an analysis, or a specific field only, using a valid JSON.
+
+**Usage:**
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata update --pid <analysis-pid> --field basic_info --json '{"abstract": "new abstract"}']
 {
-    "$ana_type": "lhcb",
-    "$schema": "https://macbook-trzcinska.cern.ch:5000/schemas/deposits/records/lhcb-v0.0.1.json",
-    "basic_info": {
-        "my_array": [
-            "New element"
-        ],
-        "description": "Very Interesting Description"
-    }
+    "created": "2020-04-23T14:24:44.068071+00:00",
+    "metadata": {
+        "basic_info": {
+            "abstract": "new abstract"
+        },
+        "general_title": "test"
+    },
+    "pid": "796be0cc6d314e25b9c11dc0864e8d32",
+    "updated": "2020-04-23T14:36:45.175490+00:00"
 }
 ```
 
-### Remove
-
-You can remove existing metadata details if you have at least read access to it.
-
-    $ cap-client metadata remove <field> -p 0af85220ef0c492889658539d8b3d4e2
-    e.g.
-    $ cap-client metadata remove basic_info.my_array.0 -p 0af85220ef0c492889658539d8b3d4e2
-
-```json
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata get --pid <analysis-pid> --field basic_info.abstract --json \"new abstract\"]
 {
-    "$ana_type": "lhcb",
-    "$schema": "https://macbook-trzcinska.cern.ch:5000/schemas/deposits/records/lhcb-v0.0.1.json",
-    "basic_info": {
-        "my_array": [],
-        "description": "Very Interesting Description"
-    }
+    "created": "2020-04-23T14:24:44.068071+00:00",
+    "metadata": {
+        "basic_info": {
+            "abstract": "new abstract"
+        },
+        "general_title": "test"
+    },
+    "pid": "796be0cc6d314e25b9c11dc0864e8d32",
+    "updated": "2020-04-23T14:36:45.175490+00:00"
 }
 ```
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata get --pid <analysis-pid> --jsonfile JSONFILE]
+{
+    "created": "2020-04-23T14:24:44.068071+00:00",
+    "metadata": {
+        "basic_info": {
+            "abstract": "new abstract"
+        },
+        "general_title": "test"
+    },
+    "pid": "796be0cc6d314e25b9c11dc0864e8d32",
+    "updated": "2020-04-23T14:36:45.175490+00:00"
+}
+```
+
+**Extended Description:**
+
+The JSON object can be passed as-is through the cli, or by passing the file name of the JSON file that contains it. It is important to keep in mind that single numbers, or even text in quotes (that need escaping, e.g. `\"`), is considered valid JSON, which allows the user to also update text/numeric fields easily.
+
+**Options:**
+
+| Name       | Type     | Desc                                                    |
+| :--------- | :------- | :------------------------------------------------------ |
+| --pid / -p | TEXT     | Your analysis PID (Persistent Identifier)  [required]   |
+| --field    | TEXT     | Specify an existing field, eg. object.nested_array.0    |
+| --json     | TEXT     | JSON data or text. (mutually exclusive with --jsonfile) |
+| --jsonfile | FILENAME | JSON file. (mutually exclusive with --json)             |
+
+
+#### Remove a metadata field
+
+**Description:**
+
+Allows the user to remove a specified metadata field from an analysis.
+
+**Usage:**
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata remove --pid <analysis-pid> --field basic_info.abstract]
+{
+    "basic_info": {},
+    "general_title": "test"
+}
+```
+
+**Options:**
+
+| Name       | Type     | Desc                                                            |
+| :--------- | :------- | :-------------------------------------------------------------- |
+| --pid / -p | TEXT     | Your analysis PID (Persistent Identifier)  [required]           |
+| --field    | TEXT     | Specify an existing field, eg. object.nested_array.0 [required] |

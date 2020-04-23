@@ -1,68 +1,132 @@
-# Files
+## Files
 
-For all the file commands you will need to specify
+The `files` command group allows the user to manage files attached to their analyses, as well as upload local files and attach them to an analysis.
 
-`--pid | the PID of an analysis you want to list all the contained files.`
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client files --help]
+Usage: cap-client files [OPTIONS] COMMAND [ARGS]...
 
-In case of additional arguments, they will be explained.
+  Manage analysis files.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  download  Download file uploaded with given deposit.
+  get       Get list of files attached to analysis with given PID.
+  remove    Removefile from deposit with given pid.
+  upload    Upload a file to your analysis.
+```
 
 
-### List
+#### Download a file from an analysis
 
-You can list all the files from an analysis only if you have at least read access to it.
+**Description:**
 
-    $ cap-client files list --pid/-p <existing pid>
-    e.g.
-    $ cap-client files list -p 89b593c498874ec8bcafc88944c458a7
+Allows the user to download a file, that was previously attached to a specified analysis.
 
-```json
+**Usage:**
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client files download --pid <analysis-pid> FILENAME]
+File saved as FILENAME.
+```
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client files download --pid <analysis-pid> --output-file dir/NEWFILE FILENAME]
+File saved as dir/NEWFILE.
+```
+
+**Options:**
+
+| Name               | Type   | Desc                                                  |
+| :----------------- | :----- | :---------------------------------------------------- |
+| FILENAME           | TEXT   | The name of the file to be downloaded  [required]     |
+| --pid / -p         | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
+| --output-file / -o | PATH   | Download file as                                      |
+
+
+#### Retrieve all the files of an analysis
+
+**Description:**
+
+Allows the user to get a list of the files, attached to an analysis with a given PID.
+
+**Usage:**
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client files get --pid <analysis-pid>]
 [
     {
-        "checksum": "md5:f0428126e7cf7b0d4af7091c68ae2a9f",
-        "filename": "file.json",
-        "filesize": 25,
-        "id": "25852e50-be6d-47a5-897b-1f3df015fac7"
-    },
-    {
-        "checksum": "md5:926fb9c44251d70614ee42d34c5365b6",
-        "filename": "Receipt.pdf",
-        "filesize": 160898,
-        "id": "89743c9b-106d-4235-8e96-23a164c7b1f4"
+        "id": "c033caa6-a97e-4f10-92e8-50193eebb6c5",
+        "filename": "FILENAME",
+        "filesize": 10,
+        "checksum": "md5:5065fe1d609d403918ac99b172b88ace"
     }
 ]
 ```
 
+**Options:**
 
-### Upload
-
-You can upload a file to an analysis only if you have at least read access to it.
-
-    $ cap-client files upload <file path> --pid/-p <existing pid>
-    e.g.
-    $ cap-client files upload file.json -p 89b593c498874ec8bcafc88944c458a7
-
-    $ File uploaded successfully.
+| Name               | Type   | Desc                                                  |
+| :----------------- | :----- | :---------------------------------------------------- |
+| --pid / -p         | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
 
 
-### Download
+#### Remove a file from an analysis
 
-You can download a file of an analysis only if you have at least read access to it. You need to specify (in addition to pid):
+**Description:**
 
-`--output-file | save the downloaded file as <desired file name>`
+Allows the user to get a list of the files, attached to an analysis with a given PID.
 
-    $ cap-client files download <file key> --output-file/-o <file name> --pid/-p <existing pid>
-    e.g.
-    $ cap-client files download file.json -o local_file.json -p 89b593c498874ec8bcafc88944c458a7
+**Usage:**
 
-    $ File saved as local_file.json
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client files remove --pid <analysis-pid> FILENAME]
+File FILENAME removed.
+```
+
+**Options:**
+
+| Name               | Type   | Desc                                                  |
+| :----------------- | :----- | :---------------------------------------------------- |
+| --pid / -p         | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
 
 
-### Remove
+#### Upload a file to an analysis
 
-You can remove a file of an analysis only if you have at least read access to it.
+**Description:**
 
-    $ cap-client files remove <file path> --pid/-p <existing pid>
-    e.g.
-    $ cap-client files upload file.json -p 89b593c498874ec8bcafc88944c458a7
+Allows the user to upload and attach a file to an analysis, or a whole directory as a tar.gz file.
 
-    $ File file.json removed.
+**Usage:**
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client files upload --pid <analysis-pid> FILE]
+File uploaded successfully.
+```
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client files upload --pid <analysis-pid> --yes-i-know DIR]
+File uploaded successfully.
+```
+
+**Extended Description:**
+
+The command enables the user to upload a single file of any type, as well as a whole directory. After a prompt asks the user for confirmation, the directory will be zipped and uploaded as a `.tar.gz` file. In order to avoid the prompt, and enable the usage of CAP-Client inside a cli script, the flag `--yes-i-know` can be added.
+
+**Options:**
+
+| Name                   | Type   | Desc                                                  |
+| :--------------------- | :----- | :---------------------------------------------------- |
+| FILE                   | TEXT   | The name of the file to be downloaded  [required]     |
+| --pid / -p             | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
+| --output-filename / -o | PATH   | Upload file as                                        |
+| --yes-i-know           | FLAG   | Bypasses prompts..Say YES to everything               |
