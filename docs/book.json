@@ -2,37 +2,51 @@
   "title": "CERN Analysis Preservation Client",
   "description": "API for cap-client, the CLI tool of CERN Analysis Preservation",
   "plugins": [
-    "insert-logo",
     "back-to-top-button",
+    "github", "github-buttons", "toggle-chapters",
     "anchorjs",
     "github",
-    "-sharing",
+    "-fontsettings", "-sharing",
+    "folding-menu",
     "codeblock-filename",
+    "theme-cap@git+https://github.com/cernanalysispreservation/gitbook-plugin-theme-cap.git",
     "terminal",
     "richquotes"
   ],
   "variables": {
-    "themeFexa": {
+    "toc_title": "CLI Client Documentation",
+    "themeCAP": {
       "nav": [
         {
-          "url": "https://github.com/cernanalysispreservation/cap-client",
-          "target": "_blank",
-          "name": "Github"
+          "url": "https://analysispreservation.cern.ch/docs/general",
+          "name": "General"
+        },
+        {
+          "url": "https://analysispreservation.cern.ch/docs/cli",
+          "name": "CLI client"
+        },
+        {
+          "url": "https://analysispreservation.cern.ch/docs/api",
+          "name": "REST API"
         }
       ]
     }
   },
   "pluginsConfig": {
-    "insert-logo": {
-      "url": "https://awesome-workshop.github.io/cap-cms/fig/banner.png",
-      "style": "width: 100%;"
-    },
     "anchorjs": {
-      "placement": "left",
-      "visible": "always"
+      "placement": "right"
     },
     "github": {
       "url": "https://github.com/cernanalysispreservation/cap-client"
+    },
+    "github-buttons": {
+      "buttons": [{
+        "user": "cernanalysispreservation",
+        "repo": "cap-client",
+        "type": "star",
+        "size": "small",
+        "count": true
+      }]
     },
     "theme-api": {
       "languages": [
@@ -47,10 +61,11 @@
       "fade": true,
       "style": "flat"
     },
-    "theme-fexa": {
+    "theme-cap": {
       "search-placeholder": "Search the docs",
       "logo": "./cap-logo-dark.png",
-      "favicon": "./favicon.ico"
+      "favicon": "./favicon.ico",
+      "anchor-selector": "h1, h2, h3"
     },
     "richquotes": {
       "star": {
