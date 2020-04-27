@@ -21,13 +21,17 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
 """CAP client tests."""
 
 from __future__ import absolute_import, print_function
 
 
-def test_version():
+def test_version(cli_run):
     """Test version import."""
     from cap_client import __version__
     assert __version__
+
+    res = cli_run("--version")
+
+    assert res.exit_code == 0
+    assert res.stripped_output == __version__

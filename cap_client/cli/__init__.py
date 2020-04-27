@@ -28,6 +28,7 @@ import sys
 
 import click
 
+from cap_client.version import __version__
 from cap_client.cli.analysis_cli import analysis
 from cap_client.cli.files_cli import files
 from cap_client.cli.metadata_cli import metadata
@@ -51,6 +52,7 @@ from cap_client.utils import ColoredGroup
     type=click.Choice(['error', 'debug', 'info']),
     default='info',
 )
+@click.version_option(__version__, message='%(version)s')
 @click.pass_context
 def cli(ctx, loglevel, verbose):
     """CAP command line interface."""
