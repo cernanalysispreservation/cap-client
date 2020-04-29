@@ -11,15 +11,15 @@ def test_permissions_get(cli_run):
         "https://analysispreservation-dev.cern.ch/api/deposits/some-pid",
         json={
             'permissions': {
-                'deposit-admin': {
+                'admin': {
                     'roles': [],
                     'users': ['cms@inveniosoftware.org']
                 },
-                'deposit-read': {
+                'read': {
                     'roles': [],
                     'users': ['cms@inveniosoftware.org']
                 },
-                'deposit-update': {
+                'update': {
                     'roles': [],
                     'users': ['cms@inveniosoftware.org']
                 }
@@ -33,15 +33,15 @@ def test_permissions_get(cli_run):
         'Accept'] == 'application/permissions+json'
     assert res.exit_code == 0
     assert json.loads(res.stripped_output) == {
-        'deposit-admin': {
+        'admin': {
             'roles': [],
             'users': ['cms@inveniosoftware.org']
         },
-        'deposit-read': {
+        'read': {
             'roles': [],
             'users': ['cms@inveniosoftware.org']
         },
-        'deposit-update': {
+        'update': {
             'roles': [],
             'users': ['cms@inveniosoftware.org']
         }
@@ -98,17 +98,17 @@ def test_permissions_add(cli_run):
         "https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions",
         json={
             'permissions': {
-                "deposit-admin": {
+                "admin": {
                     "roles": [],
                     "users": ["info@inveniosoftware.org"]
                 },
-                "deposit-read": {
+                "read": {
                     "roles": [],
                     "users": [
                         "info@inveniosoftware.org", "cms@inveniosoftware.org"
                     ]
                 },
-                "deposit-update": {
+                "update": {
                     "roles": [],
                     "users": ["info@inveniosoftware.org"]
                 }
@@ -133,15 +133,15 @@ def test_permissions_add(cli_run):
 
     assert res.exit_code == 0
     assert json.loads(res.stripped_output) == {
-        "deposit-admin": {
+        "admin": {
             "roles": [],
             "users": ["info@inveniosoftware.org"]
         },
-        "deposit-read": {
+        "read": {
             "roles": [],
             "users": ["info@inveniosoftware.org", "cms@inveniosoftware.org"]
         },
-        "deposit-update": {
+        "update": {
             "roles": [],
             "users": ["info@inveniosoftware.org"]
         }
@@ -155,15 +155,15 @@ def test_permissions_add_egroup(cli_run):
         "https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions",
         json={
             'permissions': {
-                "deposit-admin": {
+                "admin": {
                     "roles": [],
                     "users": ["info@inveniosoftware.org"]
                 },
-                "deposit-read": {
+                "read": {
                     "roles": ['egroup@inveniosoftware.org'],
                     "users": ["info@inveniosoftware.org"]
                 },
-                "deposit-update": {
+                "update": {
                     "roles": [],
                     "users": ["info@inveniosoftware.org"]
                 }
@@ -188,15 +188,15 @@ def test_permissions_add_egroup(cli_run):
 
     assert res.exit_code == 0
     assert json.loads(res.stripped_output) == {
-        "deposit-admin": {
+        "admin": {
             "roles": [],
             "users": ["info@inveniosoftware.org"]
         },
-        "deposit-read": {
+        "read": {
             "roles": ['egroup@inveniosoftware.org'],
             "users": ["info@inveniosoftware.org"]
         },
-        "deposit-update": {
+        "update": {
             "roles": [],
             "users": ["info@inveniosoftware.org"]
         }
@@ -303,15 +303,15 @@ def test_permissions_remove(cli_run):
         "https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions",
         json={
             'permissions': {
-                'deposit-admin': {
+                'admin': {
                     'roles': [],
                     'users': ['cms@inveniosoftware.org']
                 },
-                'deposit-read': {
+                'read': {
                     'roles': [],
                     'users': ['cms@inveniosoftware.org']
                 },
-                'deposit-update': {
+                'update': {
                     'roles': [],
                     'users': ['cms@inveniosoftware.org']
                 }
@@ -336,15 +336,15 @@ def test_permissions_remove(cli_run):
 
     assert res.exit_code == 0
     assert json.loads(res.stripped_output) == {
-        'deposit-admin': {
+        'admin': {
             'roles': [],
             'users': ['cms@inveniosoftware.org']
         },
-        'deposit-read': {
+        'read': {
             'roles': [],
             'users': ['cms@inveniosoftware.org']
         },
-        'deposit-update': {
+        'update': {
             'roles': [],
             'users': ['cms@inveniosoftware.org']
         }
@@ -358,15 +358,15 @@ def test_permissions_remove_egroup(cli_run):
         "https://analysispreservation-dev.cern.ch/api/deposits/some-pid/actions/permissions",
         json={
             'permissions': {
-                'deposit-admin': {
+                'admin': {
                     'roles': [],
                     'users': ['cms@inveniosoftware.org']
                 },
-                'deposit-read': {
+                'read': {
                     'roles': [],
                     'users': ['cms@inveniosoftware.org']
                 },
-                'deposit-update': {
+                'update': {
                     'roles': [],
                     'users': ['cms@inveniosoftware.org']
                 }
@@ -391,15 +391,15 @@ def test_permissions_remove_egroup(cli_run):
 
     assert res.exit_code == 0
     assert json.loads(res.stripped_output) == {
-        'deposit-admin': {
+        'admin': {
             'roles': [],
             'users': ['cms@inveniosoftware.org']
         },
-        'deposit-read': {
+        'read': {
             'roles': [],
             'users': ['cms@inveniosoftware.org']
         },
-        'deposit-update': {
+        'update': {
             'roles': [],
             'users': ['cms@inveniosoftware.org']
         }
