@@ -35,7 +35,7 @@ from .base import CapAPI
 
 class AnalysisAPI(CapAPI):
     """Interface for CAP analysis methods."""
-    def get_drafts(self, all=False):
+    def get_drafts(self, all=False, query=None, search=None):
         """Get list of user's draft analyses.
 
         :param all: show all (not only created by user)
@@ -43,8 +43,14 @@ class AnalysisAPI(CapAPI):
         :return: list of analyses
         :rtype: list
         """
+        q = query if query else ''
+        url = 'deposits/?q={}'.format(q) if all \
+            else 'deposits/?q={}&by_me=True'.format(q)
+        if search:
+            url = '{}&{}'.format(url, search)
+
         response = self._make_request(
-            url='deposits/' if all else 'deposits/?q=&by_me=True',
+            url=url,
             headers={'Accept': 'application/basic+json'},
         )
 
@@ -65,7 +71,7 @@ class AnalysisAPI(CapAPI):
 
         return response
 
-    def get_published(self, all=False):
+    def get_published(self, all=False, query=None, search=None):
         """Get list of user's published analyses.
 
         :param all: show all (not only created by user)
@@ -73,8 +79,14 @@ class AnalysisAPI(CapAPI):
         :return: list of analysis
         :rtype: list
         """
+        q = query if query else ''
+        url = 'records/?q={}'.format(q) if all \
+            else 'records/?q={}&by_me=True'.format(q)
+        if search:
+            url = '{}&{}'.format(url, search)
+
         response = self._make_request(
-            url='records/' if all else 'records/?q=&by_me=True',
+            url=url,
             headers={'Accept': 'application/basic+json'},
         )
 

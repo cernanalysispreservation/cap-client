@@ -398,6 +398,82 @@ def test_analysis_get_draft_by_pid(cli_run):
 
 
 @responses.activate
+def test_analysis_get_draft_by_query(cli_run):
+    responses.add(
+        responses.GET,
+        'https://analysispreservation-dev.cern.ch/api/deposits/?q=test',
+        json={
+            'aggregations': {},
+            'hits': {
+                'hits': [{
+                    'metadata': {
+                        'basic_info': {
+                            'abstract': 'test',
+                        },
+                        'general_title': 'test-title'
+                    },
+                    'pid': 'some-pid'
+                }],
+                'total': 2
+            }
+        },
+        status=200)
+
+    res = cli_run('analysis get -q test --all')
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert res.exit_code == 0
+    assert json.loads(res.stripped_output) == [{
+        'metadata': {
+            'basic_info': {
+                'abstract': 'test',
+            },
+            'general_title': 'test-title'
+        },
+        'pid': 'some-pid'
+    }]
+
+
+@responses.activate
+def test_analysis_get_draft_by_search(cli_run):
+    responses.add(
+        responses.GET,
+        'https://analysispreservation-dev.cern.ch/api/deposits/?q=&type=alice-analysis',
+        json={
+            'aggregations': {},
+            'hits': {
+                'hits': [{
+                    'metadata': {
+                        'basic_info': {
+                            'abstract': 'test',
+                        },
+                        'general_title': 'test-title'
+                    },
+                    'pid': 'some-pid'
+                }],
+                'total': 2
+            }
+        },
+        status=200)
+
+    res = cli_run('analysis get -s type=alice-analysis --all')
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert res.exit_code == 0
+    assert json.loads(res.stripped_output) == [{
+        'metadata': {
+            'basic_info': {
+                'abstract': 'test',
+            },
+            'general_title': 'test-title'
+        },
+        'pid': 'some-pid'
+    }]
+
+
+@responses.activate
 def test_analysis_get_draft_by_pid_when_pid_not_exists(cli_run):
     responses.add(
         responses.GET,
@@ -522,6 +598,86 @@ def test_analysis_get_published_by_pid(cli_run):
         "pid": "some-pid",
         "recid": "some-pid",
     }
+
+
+@responses.activate
+def test_analysis_get_published_by_query(cli_run):
+    responses.add(
+        responses.GET,
+        'https://analysispreservation-dev.cern.ch/api/records/?q=test',
+        json={
+            'aggregations': {},
+            'hits': {
+                'hits': [{
+                    'metadata': {
+                        'basic_info': {
+                            'abstract': 'test',
+                        },
+                        'general_title': 'test-title'
+                    },
+                    'pid': 'some-pid',
+                    'recid': 'some-pid'
+                }],
+                'total': 2
+            }
+        },
+        status=200)
+
+    res = cli_run('analysis get-published -q test --all')
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert res.exit_code == 0
+    assert json.loads(res.stripped_output) == [{
+        'metadata': {
+            'basic_info': {
+                'abstract': 'test',
+            },
+            'general_title': 'test-title'
+        },
+        'pid': 'some-pid',
+        'recid': 'some-pid'
+    }]
+
+
+@responses.activate
+def test_analysis_get_published_by_search(cli_run):
+    responses.add(
+        responses.GET,
+        'https://analysispreservation-dev.cern.ch/api/records/?q=&type=alice-analysis',
+        json={
+            'aggregations': {},
+            'hits': {
+                'hits': [{
+                    'metadata': {
+                        'basic_info': {
+                            'abstract': 'test',
+                        },
+                        'general_title': 'test-title'
+                    },
+                    'pid': 'some-pid',
+                    'recid': 'some-pid'
+                }],
+                'total': 2
+            }
+        },
+        status=200)
+
+    res = cli_run('analysis get-published -s type=alice-analysis --all')
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert res.exit_code == 0
+    assert json.loads(res.stripped_output) == [{
+        'metadata': {
+            'basic_info': {
+                'abstract': 'test',
+            },
+            'general_title': 'test-title'
+        },
+        'pid': 'some-pid',
+        'recid': 'some-pid'
+    }]
 
 
 @responses.activate

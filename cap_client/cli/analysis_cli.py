@@ -26,9 +26,11 @@
 import click
 
 from cap_client.api import AnalysisAPI
-from cap_client.utils import (ColoredGroup, MutuallyExclusiveOption,
-                              json_dumps, load_json, load_json_from_file,
-                              logger, pid_option, validate_version)
+from cap_client.utils import (
+    ColoredGroup, MultipleMutuallyExclusiveOptions, NotRequiredIf,
+    json_dumps, load_json, load_json_from_file, logger,
+    pid_option, validate_version
+)
 
 pass_api = click.make_pass_decorator(AnalysisAPI, ensure=True)
 
@@ -80,16 +82,28 @@ def schema(api, analysis_type, version, for_published):
 @click.option(
     '--all',
     is_flag=True,
-    help="Show all (not only yours).",
+    help="Show all (not only yours)."
+)
+@click.option(
+    '--query', '-q',
+    cls=MultipleMutuallyExclusiveOptions,
+    mutually_exclusive=["search"],
+    help='A free text query (e.g `test` or `basic_info.analysis_title:test`).'
+)
+@click.option(
+    '--search', '-s',
+    cls=MultipleMutuallyExclusiveOptions,
+    mutually_exclusive=["query"],
+    help='Search through facets (e.g. `type=my-analysis`).'
 )
 @logger
 @pass_api
-def get(api, pid, all):
+def get(api, pid, all, query, search):
     """List your draft analysis."""
     if pid:
         res = api.get_draft_by_pid(pid)
     else:
-        res = api.get_drafts(all=all)
+        res = api.get_drafts(all=all, query=query, search=search)
 
     click.echo(json_dumps(res))
 
@@ -100,16 +114,28 @@ def get(api, pid, all):
     '--all',
     is_flag=True,
     default=False,
-    help="Show all (not only yours).",
+    help="Show all (not only yours)."
+)
+@click.option(
+    '--query', '-q',
+    cls=MultipleMutuallyExclusiveOptions,
+    mutually_exclusive=["search"],
+    help='A free text query (e.g `test` or `basic_info.analysis_title:test`).'
+)
+@click.option(
+    '--search', '-s',
+    cls=MultipleMutuallyExclusiveOptions,
+    mutually_exclusive=["query"],
+    help='Search through facets (e.g. `type=my-analysis`).'
 )
 @logger
 @pass_api
-def get_published(api, pid, all):
+def get_published(api, pid, all, query, search):
     """List your published analysis."""
     if pid:
         res = api.get_published_by_pid(pid)
     else:
-        res = api.get_published(all=all)
+        res = api.get_published(all=all, query=query, search=search)
 
     click.echo(json_dumps(res))
 
@@ -117,7 +143,7 @@ def get_published(api, pid, all):
 @analysis.command()
 @click.option(
     '--json',
-    cls=MutuallyExclusiveOption,
+    cls=NotRequiredIf,
     not_required_if="jsonfile",
     callback=load_json,
     help='\nJSON data from command line.',
@@ -125,7 +151,7 @@ def get_published(api, pid, all):
 @click.option(
     '--jsonfile',
     type=click.File('r'),
-    cls=MutuallyExclusiveOption,
+    cls=NotRequiredIf,
     not_required_if="json",
     callback=load_json_from_file,
     help='\nJSON file.',
