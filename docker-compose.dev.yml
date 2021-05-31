@@ -1,0 +1,13 @@
+version: "2.3"
+services:
+  docs:
+    build:
+      context: ./docs
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4000:4000"
+      - "35729:35729"
+    volumes:
+      - ./docs:/opt/docs
+      - /opt/docs/node_modules
+    command: npm run serve
