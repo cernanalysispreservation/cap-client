@@ -26,9 +26,10 @@
 import click
 
 from cap_client.api.metadata_api import MetadataAPI
-from cap_client.utils import (ColoredGroup, MutuallyExclusiveOption,
-                              json_dumps, load_json, load_json_from_file,
-                              logger, pid_option)
+from cap_client.utils import (
+    ColoredGroup, NotRequiredIf, json_dumps, load_json,
+    load_json_from_file, logger, pid_option
+)
 
 pass_api = click.make_pass_decorator(MetadataAPI, ensure=True)
 
@@ -46,7 +47,7 @@ def metadata():
 )
 @click.option(
     '--json',
-    cls=MutuallyExclusiveOption,
+    cls=NotRequiredIf,
     not_required_if="jsonfile",
     callback=load_json,
     help='\nJSON data or text.',
@@ -54,7 +55,7 @@ def metadata():
 @click.option(
     '--jsonfile',
     type=click.File('r'),
-    cls=MutuallyExclusiveOption,
+    cls=NotRequiredIf,
     not_required_if="json",
     callback=load_json_from_file,
     help='\nJSON file.',

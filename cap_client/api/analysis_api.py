@@ -26,7 +26,7 @@
 import json
 
 from click import UsageError
-from future.moves.urllib.parse import urljoin
+from future.moves.urllib.parse import urljoin, urlencode
 
 from cap_client.errors import BadStatusCode
 
@@ -36,16 +36,54 @@ from .base import CapAPI
 class AnalysisAPI(CapAPI):
     """Interface for CAP analysis methods."""
 
-    def get_drafts(self, all=False):
+    def _param_encoder(self, all, query, search, type):
+        """Return the encoded string of parameters.
+
+        :param all: show all (not only created by user)
+        :type all: bool
+        :param type: type of analysis
+        :type type: string
+        :param query: free text query in analyses
+        :type query: string
+        :param search: search in facets
+        :type search: string
+        :return: string of encoded parameters
+        :rtype: string
+        """
+        params = {}
+        if not all:
+            params["by_me"] = True
+        if type:
+            params["type"] = type
+        if query:
+            params["q"] = query
+        if search:
+            for search_param in search:
+                _search = search_param.split('=')
+                params[_search[0]] = _search[-1]
+        return urlencode(params)
+
+    def get_drafts(self, all=False, query='', search=None, type=None):
         """Get list of user's draft analyses.
 
         :param all: show all (not only created by user)
         :type all: bool
+        :param type: type of analysis
+        :type type: string
+        :param query: free text query in analyses
+        :type query: string
+        :param search: search in facets
+        :type search: string
         :return: list of analyses
         :rtype: list
         """
         response = self._make_request(
-            url='deposits/' if all else 'deposits/?q=&by_me=True',
+            url='deposits/?{}'.format(
+                self._param_encoder(
+                    all,
+                    query,
+                    search,
+                    type)),
             headers={'Accept': 'application/basic+json'},
         )
 
@@ -66,16 +104,27 @@ class AnalysisAPI(CapAPI):
 
         return response
 
-    def get_published(self, all=False):
+    def get_published(self, all=False, query='', search=None, type=None):
         """Get list of user's published analyses.
 
         :param all: show all (not only created by user)
         :type all: bool
+        :param type: type of analysis
+        :type type: string
+        :param query: free text query in analyses
+        :type query: string
+        :param search: search in facets
+        :type search: string
         :return: list of analysis
         :rtype: list
         """
         response = self._make_request(
-            url='records/' if all else 'records/?q=&by_me=True',
+            url='records/?{}'.format(
+                self._param_encoder(
+                    all,
+                    query,
+                    search,
+                    type)),
             headers={'Accept': 'application/basic+json'},
         )
 
