@@ -1,7 +1,8 @@
 FROM python:3.8-slim-buster
 
+# Add sources to `/code` and work there
 COPY . /code
+WORKDIR /code
 
-RUN pip3 install --no-cache-dir -e /code
-
-ENTRYPOINT [ "cap-client" ]
+# Install cap-client
+RUN pip3 install --no-cache-dir -e '.[all]'

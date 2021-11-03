@@ -91,7 +91,7 @@ class CapAPI(object):
         endpoint = urljoin(self.api, url)
         method_obj = getattr(requests, method)
         headers.update(
-            {'Authorization': 'OAuth2 {}'.format(self.access_token)})
+            {'Authorization': 'Bearer {}'.format(self.access_token)})
 
         response = method_obj(url=endpoint,
                               verify=False,
