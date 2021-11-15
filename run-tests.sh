@@ -23,8 +23,54 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-#isort -rc -c -df **/*.py && \
-#check-manifest --ignore ".travis-*" && \
-#sphinx-build -qnNW docs docs/_build/html && \
-python setup.py test
-#sphinx-build -qnNW -b doctest docs docs/_build/doctest
+# Quit on errors
+set -o errexit
+
+# Quit on unbound symbols
+set -o nounset
+
+check_script () {
+    shellcheck run-tests.sh
+}
+
+check_pydocstyle () {
+    pydocstyle cap_client
+}
+
+check_flake8 () {
+    flake8 .
+}
+
+check_manifest () {
+    check-manifest
+}
+
+check_pytest_unit () {
+    python setup.py test
+}
+
+check_pytest_e2e () {
+    pytest tests/e2e
+}
+
+if [ $# -eq 0 ]; then
+    check_script
+    check_pydocstyle
+    check_flake8
+    check_manifest
+    check_pytest_unit
+    check_pytest_e2e
+fi
+
+for arg in "$@"
+do
+    case $arg in
+        --check-shellscript) check_script;;
+        --check-pydocstyle) check_pydocstyle;;
+        --check-flake8) check_flake8;;
+        --check-manifest) check_manifest;;
+        --check-pytest-unit) check_pytest_unit;;
+        --check-pytest-e2e) check_pytest_e2e;;
+        *)
+    esac
+done

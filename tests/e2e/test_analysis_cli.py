@@ -22,7 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-import json, os
+import json
 
 
 def test_analysis_get_drafts_e2e(cli_run, user_tokens):

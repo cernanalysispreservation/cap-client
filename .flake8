@@ -1,0 +1,17 @@
+[flake8]
+max-line-length = 89
+
+exclude =
+    build
+    dist
+    docs
+    coverage.xml
+    cap_client.egg-info
+    .*/
+    env/
+    .git
+    __pycache__
+
+ignore = E501
+
+max-complexity = 18

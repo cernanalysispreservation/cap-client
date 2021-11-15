@@ -24,15 +24,13 @@
 """E2E testing configuration."""
 
 import os
-import json
 
 import pytest
-from unittest.mock import patch
-from future.moves.urllib.parse import urljoin
 
 from click.testing import CliRunner
 
 from cap_client.cli import cli
+
 
 @pytest.fixture(autouse=True)
 def env_e2e():
@@ -40,12 +38,12 @@ def env_e2e():
     os.environ['CAP_SERVER_URL'] = os.environ.get('TESTS_SERVER_HOST',
                                                   'https://nginx')
 
+
 @pytest.fixture()
 def user_tokens():
     """Set environment."""
     def _f(user=None):
-        file_path = os.environ.get('TESTS_E2E_TOKEN_FILE',
-                                '/test_data/test_tokens')
+        file_path = os.environ.get('TESTS_E2E_TOKEN_FILE', '/test_data/test_tokens')
         with open(file_path, 'r') as f:
             tokens = f.read()
             tokens = tokens.split("\n")

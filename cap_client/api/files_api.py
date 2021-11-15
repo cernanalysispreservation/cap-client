@@ -35,6 +35,7 @@ from .base import CapAPI
 
 class FilesAPI(CapAPI):
     """Interface for CAP files methods."""
+
     def get(self, pid):
         """Get list of files attached to analysis.
 

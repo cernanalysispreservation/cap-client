@@ -32,6 +32,7 @@ from .base import CapAPI
 
 class RepositoriesAPI(CapAPI):
     """Interface for CAP repositories/webhooks methods."""
+
     def get(self, pid, with_snapshots=False):
         """Get list of repositories attached to analysis with given PID.
 
@@ -67,8 +68,7 @@ class RepositoriesAPI(CapAPI):
                            method='post',
                            headers={
                                'Content-Type': 'application/json',
-                               'Accept': 'application/repositories+json'
-                           },
+                               'Accept': 'application/repositories+json'},
                            data=json.dumps({
                                'url': url,
                                'webhook': True if event_type else False,

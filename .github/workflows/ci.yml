@@ -7,6 +7,51 @@ on:
     branches: master
 
 jobs:
+  lint-pydocstyle:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Check compliance with Python docstring conventions
+        run: |
+          pip install pydocstyle
+          ./run-tests.sh --check-pydocstyle
+
+  lint-flake8:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Check compliance with pep8, pyflakes and circular complexity
+        run: |
+          pip install flake8
+          ./run-tests.sh --check-flake8
+
+  lint-check-manifest:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Check Python manifest completeness
+        run: |
+          pip install check-manifest
+          ./run-tests.sh --check-manifest
+
   python-tests:
     runs-on: ubuntu-20.04
     strategy:
@@ -26,5 +71,11 @@ jobs:
           pip install --upgrade pip setuptools wheel
           pip install -e .[all]
 
-      - name: Run unit tests
-        run: pytest tests/unit
+      - name: Run pytest
+        run: ./run-tests.sh --check-pytest-unit
+
+      - name: Codecov Coverage
+        if: matrix.python-version == 3.8
+        uses: codecov/codecov-action@v1
+        with:
+          files: coverage.xml

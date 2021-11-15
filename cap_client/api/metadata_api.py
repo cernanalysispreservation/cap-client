@@ -33,6 +33,7 @@ from .base import CapAPI
 
 class MetadataAPI(CapAPI):
     """Interface for CAP metadata methods."""
+
     def get(self, pid, field=None):
         """Get metadata for analysis with given PID.
 

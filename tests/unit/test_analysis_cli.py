@@ -3,7 +3,6 @@ from tempfile import NamedTemporaryFile
 
 import responses
 from cap_client.utils import json_dumps
-from pytest import mark
 
 
 @responses.activate

@@ -23,8 +23,6 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 """Cap cli API module."""
 
-from __future__ import absolute_import, print_function
-
 from .analysis_api import AnalysisAPI
 from .files_api import FilesAPI
 from .metadata_api import MetadataAPI

@@ -1,8 +1,6 @@
 import json
-import sys
 
 import responses
-from mock import patch
 from pytest import mark
 
 

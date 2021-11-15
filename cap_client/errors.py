@@ -30,6 +30,7 @@ from click import ClickException, secho
 
 class CLIError(ClickException):
     """Base CAP cli exception class."""
+
     def __str__(self):
         """Error details."""
         return self.message
@@ -41,6 +42,7 @@ class CLIError(ClickException):
 
 class BadStatusCode(CLIError):
     """Response status code not as expected."""
+
     def __init__(self,
                  message='',
                  expected_status_code=None,

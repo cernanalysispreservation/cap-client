@@ -32,6 +32,7 @@ from .base import CapAPI
 
 class PermissionsAPI(CapAPI):
     """Interface for CAP permissions methods."""
+
     def get(self, pid):
         """List permissions for analysis.
 

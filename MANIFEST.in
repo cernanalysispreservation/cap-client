@@ -23,16 +23,16 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
  
 include COPYING
-include *.md
-include .coveragerc
 include LICENSE
 include *.rst
 include *.sh
-include *.txt
-include *.yaml
+include *.yml
+include .flake8
+include Dockerfile
 include pytest.ini
-# recursive-include docs *.py
-# recursive-include docs *.png
-recursive-include docs *.rst
+include docs/Dockerfile
+recursive-include docs *.md
+recursive-include docs *.json
+recursive-include docs *.conf
 recursive-include tests *.py
 recursive-include cap_client *.py

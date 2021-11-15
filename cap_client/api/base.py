@@ -36,7 +36,7 @@ from cap_client.errors import BadStatusCode
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 status_code_to_msg = {
-    500: 'The server encountered an unexpected error. Try again soon.\n' +
+    500: 'The server encountered an unexpected error. Try again soon.'
     'In case the error persists, please contact the server administrators.',
     401: 'You are not authorized to access the server (invalid access token?)',
     403: 'You don\'t have sufficient permissions.'
@@ -48,6 +48,7 @@ class CapAPI(object):
 
     Build your own API class on top of it, to handle requests to CAP server.
     """
+
     def __init__(self):
         """Initialize."""
         server_url = os.environ.get('CAP_SERVER_URL',

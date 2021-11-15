@@ -35,6 +35,7 @@ from .base import CapAPI
 
 class AnalysisAPI(CapAPI):
     """Interface for CAP analysis methods."""
+
     def get_drafts(self, all=False):
         """Get list of user's draft analyses.
 

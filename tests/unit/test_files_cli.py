@@ -2,7 +2,6 @@ import json
 import os
 
 import responses
-from pytest import mark
 
 
 @responses.activate

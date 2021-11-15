@@ -23,8 +23,6 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 """CAP client"""
 
-from __future__ import absolute_import, print_function
-
 import os
 import re
 
@@ -36,13 +34,11 @@ history = open('CHANGES.rst').read()
 tests_require = [
     'check-manifest>=0.25',
     'coverage>=4.0',
-    'isort>=4.2.2',
     'mock>=2.0.0',
     'pydocstyle>=1.0.0',
     'pytest-cache>=1.0',
     'pytest-cov>=1.8.0',
-    'flake8==3.9.2',
-    'pytest-flake8',
+    'flake8',
     'pytest>=2.8.0',
     'responses>=0.10.6',
 ]

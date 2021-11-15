@@ -39,6 +39,7 @@ from click_help_colors import HelpColorsGroup
 
 class ColoredGroup(HelpColorsGroup):
     """CAP command group with predefined colors."""
+
     def __init__(self, *args, **kwargs):
         """Initialize."""
         kwargs.setdefault('help_headers_color', 'bright_cyan')
@@ -84,6 +85,7 @@ def load_json(ctx, param, value):
 
 class MutuallyExclusiveOption(click.Option):
     """Click option required dependent on other options."""
+
     def __init__(self, *args, **kwargs):
         """Initialize."""
         self.not_required_if = kwargs.pop("not_required_if")
@@ -102,9 +104,11 @@ class MutuallyExclusiveOption(click.Option):
                         self.name, self.not_required_if),
                     ctx=ctx)
         elif not is_option_present:
-            raise click.UsageError("You need to specify --{} or --{}.".format(
-                self.name, self.not_required_if),
-                                   ctx=ctx)
+            raise click.UsageError(
+                "You need to specify --{} or --{}.".format(
+                    self.name,
+                    self.not_required_if),
+                ctx=ctx)
 
         return super(MutuallyExclusiveOption,
                      self).handle_parse_result(ctx, opts, args)
