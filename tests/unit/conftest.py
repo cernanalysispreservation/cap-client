@@ -70,7 +70,7 @@ def cli_run():
     yield run
 
 
-@pytest.yield_fixture('module')
+@pytest.yield_fixture()
 def runner():
     """Fixture for CLI runner function.
 

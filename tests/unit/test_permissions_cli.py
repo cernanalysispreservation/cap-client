@@ -229,8 +229,7 @@ def test_permissions_add_wrong_rights_given(cli_run):
         "permissions remove -p some-pid -u cms@inveniosoftware.com -r RAND")
 
     assert res.exit_code == 2
-    assert "Error: Invalid value for '--rights' / '-r': " \
-           "invalid choice: RAND. (choose from read, update, admin)" in res.output
+    assert "Error: Invalid value for '--rights' / '-r':" in res.output
 
 
 def test_permissions_add_mutually_exclusive_user_egroup(cli_run):
@@ -432,8 +431,7 @@ def test_permissions_remove_wrong_rights_given(cli_run):
         "permissions remove -p some-pid -u cms@inveniosoftware.com -r RAND")
 
     assert res.exit_code == 2
-    assert "Error: Invalid value for '--rights' / '-r': " \
-           "invalid choice: RAND. (choose from read, update, admin)" in res.output
+    assert "Error: Invalid value for '--rights' / '-r':" in res.output
 
 
 def test_permissions_remove_mutually_exclusive_user_egroup(cli_run):
