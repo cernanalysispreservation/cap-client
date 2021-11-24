@@ -167,4 +167,4 @@ def delete(api, pid):
     """Delete your analysis."""
     api.delete(pid=pid)
 
-    click.echo('Analysis has been deleted.'.format(pid))
+    click.echo('Analysis "{}" has been deleted.'.format(pid))

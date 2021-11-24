@@ -666,7 +666,7 @@ def test_analysis_delete(cli_run):
     res = cli_run('analysis delete -p some-pid')
 
     assert res.exit_code == 0
-    assert 'Analysis has been deleted.' in res.stripped_output
+    assert 'Analysis "some-pid" has been deleted.' in res.stripped_output
 
 
 @responses.activate

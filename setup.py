@@ -41,7 +41,8 @@ tests_require = [
     'pydocstyle>=1.0.0',
     'pytest-cache>=1.0',
     'pytest-cov>=1.8.0',
-    'pytest-pep8>=1.0.6',
+    'flake8==3.9.2',
+    'pytest-flake8',
     'pytest>=2.8.0',
     'responses>=0.10.6',
 ]
@@ -76,7 +77,7 @@ packages = find_packages()
 
 # Get the version string. Cannot be done with import!
 with open(os.path.join('cap_client', 'version.py'), 'rt') as f:
-    version = re.search('__version__\s*=\s*"(?P<version>.*)"\n',
+    version = re.search('__version__\\s*=\\s*"(?P<version>.*)"\\n',
                         f.read()).group('version')
 
 setup(
