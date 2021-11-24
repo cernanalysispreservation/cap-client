@@ -26,5 +26,5 @@ jobs:
           pip install --upgrade pip setuptools wheel
           pip install -e .[all]
 
-      - name: Run pytest
-        run: ./run-tests.sh
+      - name: Run unit tests
+        run: pytest tests/unit
