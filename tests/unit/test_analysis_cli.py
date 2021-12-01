@@ -365,6 +365,47 @@ def test_analysis_get_drafts(cli_run):
 
 
 @responses.activate
+def test_analysis_get_drafts_with_page(cli_run):
+    responses.add(responses.GET,
+                  'https://analysispreservation-dev.cern.ch/api/deposits/',
+                  json={
+                      'aggregations': {},
+                      'hits': {
+                          'hits': [{
+                              'metadata': {
+                                  'general_title': 'test-1'
+                              },
+                              'pid': 'some-pid-1',
+                          }, {
+                              'metadata': {
+                                  'general_title': 'test-2'
+                              },
+                              'pid': 'some-pid-2',
+                          }],
+                          'total': 2
+                      }
+                  },
+                  status=200)
+
+    res = cli_run('analysis get --page 1')
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert res.exit_code == 0
+    assert json.loads(res.stripped_output) == [{
+        'metadata': {
+            'general_title': 'test-1'
+        },
+        'pid': 'some-pid-1',
+    }, {
+        'metadata': {
+            'general_title': 'test-2'
+        },
+        'pid': 'some-pid-2',
+    }]
+
+
+@responses.activate
 def test_analysis_get_draft_by_pid(cli_run):
     responses.add(
         responses.GET,

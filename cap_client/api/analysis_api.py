@@ -36,7 +36,7 @@ from .base import CapAPI
 class AnalysisAPI(CapAPI):
     """Interface for CAP analysis methods."""
 
-    def _param_encoder(self, all, query, search, type):
+    def _param_encoder(self, all, query, search, type, sort, page, size):
         """Return the encoded string of parameters.
 
         :param all: show all (not only created by user)
@@ -47,6 +47,12 @@ class AnalysisAPI(CapAPI):
         :type query: string
         :param search: search in facets
         :type search: string
+        :param sort: sort analysis
+        :type sort: string
+        :param page: show results on specified page
+        :type page: integer
+        :param size: number of results on a page
+        :type size: integer
         :return: string of encoded parameters
         :rtype: string
         """
@@ -57,13 +63,27 @@ class AnalysisAPI(CapAPI):
             params["type"] = type
         if query:
             params["q"] = query
+        if sort:
+            params["sort"] = sort
+        if page:
+            params["page"] = page
+        if size:
+            params["size"] = size
         if search:
             for search_param in search:
                 _search = search_param.split('=')
                 params[_search[0]] = _search[-1]
         return urlencode(params)
 
-    def get_drafts(self, all=False, query='', search=None, type=None):
+    def get_drafts(
+            self,
+            all=False,
+            query='',
+            search=None,
+            type=None,
+            sort=None,
+            page=None,
+            size=None):
         """Get list of user's draft analyses.
 
         :param all: show all (not only created by user)
@@ -74,16 +94,17 @@ class AnalysisAPI(CapAPI):
         :type query: string
         :param search: search in facets
         :type search: string
+        :param sort: sort analysis
+        :type sort: string
+        :param page: show results on specified page
+        :type page: integer
+        :param size: number of results on a page
+        :type size: integer
         :return: list of analyses
         :rtype: list
         """
         response = self._make_request(
-            url='deposits/?{}'.format(
-                self._param_encoder(
-                    all,
-                    query,
-                    search,
-                    type)),
+            url='deposits/?{}'.format(self._param_encoder(all, query, search, type, sort, page, size)),
             headers={'Accept': 'application/basic+json'},
         )
 
@@ -104,7 +125,15 @@ class AnalysisAPI(CapAPI):
 
         return response
 
-    def get_published(self, all=False, query='', search=None, type=None):
+    def get_published(
+            self,
+            all=False,
+            query='',
+            search=None,
+            type=None,
+            sort=None,
+            page=None,
+            size=None):
         """Get list of user's published analyses.
 
         :param all: show all (not only created by user)
@@ -115,16 +144,17 @@ class AnalysisAPI(CapAPI):
         :type query: string
         :param search: search in facets
         :type search: string
+        :param sort: sort analysis
+        :type sort: string
+        :param page: show results on specified page
+        :type page: integer
+        :param size: number of results on a page
+        :type size: integer
         :return: list of analysis
         :rtype: list
         """
         response = self._make_request(
-            url='records/?{}'.format(
-                self._param_encoder(
-                    all,
-                    query,
-                    search,
-                    type)),
+            url='records/?{}'.format(self._param_encoder(all, query, search, type, sort, page, size)),
             headers={'Accept': 'application/basic+json'},
         )
 

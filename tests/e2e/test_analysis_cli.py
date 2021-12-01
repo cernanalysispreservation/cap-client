@@ -28,9 +28,10 @@ import pytest
 
 @pytest.mark.vcr
 def test_analysis_get_drafts_e2e(cli_run, user_tokens, vcr_config):
-    # create a draft analysis
-    user_tokens("info@inveniosoftware.org")
+    # apply the token
+    user_tokens('info@inveniosoftware.org')
 
+    # create a draft analysis
     create_draft_res = cli_run('analysis create --json {} --type cms-analysis')
 
     # get the pid of the draft
@@ -43,3 +44,83 @@ def test_analysis_get_drafts_e2e(cli_run, user_tokens, vcr_config):
 
     # delete the draft
     cli_run(f'analysis delete -p {draft_pid}')
+
+
+@pytest.mark.vcr
+def test_analysis_get_drafts_with_page_without_results(cli_run, user_tokens, vcr_config):
+    # apply the token
+    user_tokens('info@inveniosoftware.org')
+
+    # create draft analyses
+    create_draft_res_one = cli_run('analysis create --json {} --type alice-analysis')
+    create_draft_res_two = cli_run('analysis create --json {} --type cms-analysis')
+    draft_pid_one = json.loads(create_draft_res_one.output).get('pid')
+    draft_pid_two = json.loads(create_draft_res_two.output).get('pid')
+
+    # test `analysis get --page`
+    res = cli_run('analysis get --page 2')
+    assert res.exit_code == 0
+    assert len(json.loads(res.output)) == 0
+
+    cli_run(f'analysis delete -p {draft_pid_one}')
+    cli_run(f'analysis delete -p {draft_pid_two}')
+
+
+@pytest.mark.vcr
+def test_analysis_get_drafts_with_page_with_results(cli_run, user_tokens, vcr_config):
+    # apply the token
+    user_tokens('info@inveniosoftware.org')
+
+    # create draft analyses
+    create_draft_res_one = cli_run('analysis create --json {} --type alice-analysis')
+    create_draft_res_two = cli_run('analysis create --json {} --type cms-analysis')
+    draft_pid_one = json.loads(create_draft_res_one.output).get('pid')
+    draft_pid_two = json.loads(create_draft_res_two.output).get('pid')
+
+    # test `analysis get --page`
+    res = cli_run('analysis get --size 1 --page 2')
+    assert res.exit_code == 0
+    assert len(json.loads(res.output)) >= 1
+
+    cli_run(f'analysis delete -p {draft_pid_one}')
+    cli_run(f'analysis delete -p {draft_pid_two}')
+
+
+@pytest.mark.vcr
+def test_analysis_get_drafts_with_size(cli_run, user_tokens, vcr_config):
+    # apply the token
+    user_tokens('info@inveniosoftware.org')
+
+    # create draft analyses
+    create_draft_res_one = cli_run('analysis create --json {} --type alice-analysis')
+    create_draft_res_two = cli_run('analysis create --json {} --type cms-analysis')
+    draft_pid_one = json.loads(create_draft_res_one.output).get('pid')
+    draft_pid_two = json.loads(create_draft_res_two.output).get('pid')
+
+    # test `analysis get --size`
+    res = cli_run('analysis get --size 1')
+    assert res.exit_code == 0
+    assert len(json.loads(res.output)) == 1
+
+    cli_run(f'analysis delete -p {draft_pid_one}')
+    cli_run(f'analysis delete -p {draft_pid_two}')
+
+
+@pytest.mark.vcr
+def test_analysis_get_drafts_with_sort(cli_run, user_tokens, vcr_config):
+    # apply the token
+    user_tokens('info@inveniosoftware.org')
+
+    # create draft analyses
+    create_draft_res_one = cli_run('analysis create --json {} --type alice-analysis')
+    create_draft_res_two = cli_run('analysis create --json {} --type cms-analysis')
+    draft_pid_one = json.loads(create_draft_res_one.output).get('pid')
+    draft_pid_two = json.loads(create_draft_res_two.output).get('pid')
+
+    # test `analysis get --sort`
+    res = cli_run('analysis get --sort mostrecent')
+    assert res.exit_code == 0
+    assert json.loads(res.output)[0].get('pid') == draft_pid_two
+
+    cli_run(f'analysis delete -p {draft_pid_one}')
+    cli_run(f'analysis delete -p {draft_pid_two}')

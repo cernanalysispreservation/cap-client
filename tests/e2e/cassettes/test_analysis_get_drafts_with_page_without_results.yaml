@@ -1,0 +1,427 @@
+interactions:
+- request:
+    body: '{"$ana_type": "alice-analysis"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '31'
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: POST
+    uri: https://localhost/api/deposits/
+  response:
+    body:
+      string: '{"access":{"deposit-admin":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]},"deposit-read":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]},"deposit-update":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]}},"created":"2021-12-07T12:22:56.005037+00:00","created_by":{"email":"info@inveniosoftware.org","profile":{}},"experiment":"ALICE","files":[],"id":"3a85e6e9ad5544adb8f34d936284424d","is_owner":true,"labels":[],"links":{"bucket":"https://localhost/api/files/09bbaede-dbb9-4fc0-816e-623a1d7a4c3b","clone":"https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/clone","discard":"https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/discard","disconnect_webhook":"https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/disconnect_webhook","edit":"https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/edit","files":"https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/files","html":"https://localhost/drafts/3a85e6e9ad5544adb8f34d936284424d","permissions":"https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/permissions","publish":"https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/publish","self":"https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d","upload":"https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/upload"},"metadata":{},"revision":0,"schema":{"fullname":"ALICE
+        Analysis","name":"alice-analysis","version":"0.0.1"},"status":"draft","type":"deposit","updated":"2021-12-07T12:22:56.005056+00:00"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Type, ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1642'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 07 Dec 2021 12:22:56 GMT
+      ETag:
+      - '"0"'
+      Last-Modified:
+      - Tue, 07 Dec 2021 12:22:56 GMT
+      Link:
+      - <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d>; rel="self",
+        <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/files>; rel="files",
+        <https://localhost/drafts/3a85e6e9ad5544adb8f34d936284424d>; rel="html", <https://localhost/api/files/09bbaede-dbb9-4fc0-816e-623a1d7a4c3b>;
+        rel="bucket", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/clone>;
+        rel="clone", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/discard>;
+        rel="discard", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/disconnect_webhook>;
+        rel="disconnect_webhook", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/edit>;
+        rel="edit", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/permissions>;
+        rel="permissions", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/publish>;
+        rel="publish", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/upload>;
+        rel="upload"
+      Retry-After:
+      - '3287'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=15768000
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4987'
+      X-RateLimit-Reset:
+      - '1638883064'
+      location:
+      - https://localhost/deposits/3a85e6e9ad5544adb8f34d936284424d
+    status:
+      code: 201
+      message: CREATED
+- request:
+    body: '{}'
+    headers:
+      Accept:
+      - application/basic+json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: PUT
+    uri: https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d
+  response:
+    body:
+      string: '{"created":"2021-12-07T12:22:56.005037+00:00","metadata":{},"pid":"3a85e6e9ad5544adb8f34d936284424d","updated":"2021-12-07T12:22:56.343365+00:00"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Type, ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '146'
+      Content-Type:
+      - application/basic+json
+      Date:
+      - Tue, 07 Dec 2021 12:22:56 GMT
+      ETag:
+      - '"1"'
+      Last-Modified:
+      - Tue, 07 Dec 2021 12:22:56 GMT
+      Link:
+      - <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d>; rel="self",
+        <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/files>; rel="files",
+        <https://localhost/drafts/3a85e6e9ad5544adb8f34d936284424d>; rel="html", <https://localhost/api/files/09bbaede-dbb9-4fc0-816e-623a1d7a4c3b>;
+        rel="bucket", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/clone>;
+        rel="clone", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/discard>;
+        rel="discard", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/disconnect_webhook>;
+        rel="disconnect_webhook", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/edit>;
+        rel="edit", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/permissions>;
+        rel="permissions", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/publish>;
+        rel="publish", <https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d/actions/upload>;
+        rel="upload"
+      Retry-After:
+      - '3287'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=15768000
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4977'
+      X-RateLimit-Reset:
+      - '1638883064'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"$ana_type": "cms-analysis"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '29'
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: POST
+    uri: https://localhost/api/deposits/
+  response:
+    body:
+      string: '{"access":{"deposit-admin":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]},"deposit-read":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]},"deposit-update":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]}},"created":"2021-12-07T12:22:56.518614+00:00","created_by":{"email":"info@inveniosoftware.org","profile":{}},"experiment":"CMS","files":[],"id":"db2fcdce76214d94bdef8062995d3d8a","is_owner":true,"labels":[],"links":{"bucket":"https://localhost/api/files/463ae8d0-afb4-47fb-8e07-bed8444de5d2","clone":"https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/clone","discard":"https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/discard","disconnect_webhook":"https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/disconnect_webhook","edit":"https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/edit","files":"https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/files","html":"https://localhost/drafts/db2fcdce76214d94bdef8062995d3d8a","permissions":"https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/permissions","publish":"https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/publish","self":"https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a","upload":"https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/upload"},"metadata":{},"revision":0,"schema":{"fullname":"CMS
+        Analysis","name":"cms-analysis","version":"0.0.1"},"status":"draft","type":"deposit","updated":"2021-12-07T12:22:56.518633+00:00"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Type, ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1636'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 07 Dec 2021 12:22:56 GMT
+      ETag:
+      - '"0"'
+      Last-Modified:
+      - Tue, 07 Dec 2021 12:22:56 GMT
+      Link:
+      - <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a>; rel="self",
+        <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/files>; rel="files",
+        <https://localhost/drafts/db2fcdce76214d94bdef8062995d3d8a>; rel="html", <https://localhost/api/files/463ae8d0-afb4-47fb-8e07-bed8444de5d2>;
+        rel="bucket", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/clone>;
+        rel="clone", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/discard>;
+        rel="discard", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/disconnect_webhook>;
+        rel="disconnect_webhook", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/edit>;
+        rel="edit", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/permissions>;
+        rel="permissions", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/publish>;
+        rel="publish", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/upload>;
+        rel="upload"
+      Retry-After:
+      - '3286'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=15768000
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4986'
+      X-RateLimit-Reset:
+      - '1638883063'
+      location:
+      - https://localhost/deposits/db2fcdce76214d94bdef8062995d3d8a
+    status:
+      code: 201
+      message: CREATED
+- request:
+    body: '{}'
+    headers:
+      Accept:
+      - application/basic+json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: PUT
+    uri: https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a
+  response:
+    body:
+      string: '{"created":"2021-12-07T12:22:56.518614+00:00","metadata":{},"pid":"db2fcdce76214d94bdef8062995d3d8a","updated":"2021-12-07T12:22:56.842991+00:00"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Type, ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '146'
+      Content-Type:
+      - application/basic+json
+      Date:
+      - Tue, 07 Dec 2021 12:22:56 GMT
+      ETag:
+      - '"1"'
+      Last-Modified:
+      - Tue, 07 Dec 2021 12:22:56 GMT
+      Link:
+      - <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a>; rel="self",
+        <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/files>; rel="files",
+        <https://localhost/drafts/db2fcdce76214d94bdef8062995d3d8a>; rel="html", <https://localhost/api/files/463ae8d0-afb4-47fb-8e07-bed8444de5d2>;
+        rel="bucket", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/clone>;
+        rel="clone", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/discard>;
+        rel="discard", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/disconnect_webhook>;
+        rel="disconnect_webhook", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/edit>;
+        rel="edit", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/permissions>;
+        rel="permissions", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/publish>;
+        rel="publish", <https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a/actions/upload>;
+        rel="upload"
+      Retry-After:
+      - '3286'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=15768000
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4976'
+      X-RateLimit-Reset:
+      - '1638883063'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/basic+json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://localhost/api/deposits/?by_me=True&page=2
+  response:
+    body:
+      string: '{"aggregations":{"facet_accelerator_parameters":{"buckets":[],"doc_count_error_upper_bound":0,"sum_other_doc_count":0},"facet_cadi_status":{"buckets":[],"doc_count_error_upper_bound":0,"sum_other_doc_count":0},"facet_cms_working_group":{"buckets":[],"doc_count_error_upper_bound":0,"meta":{"title":"CMS
+        Working Group"},"sum_other_doc_count":0},"facet_collection":{"buckets":[{"__display_name__":"ALICE
+        Analysis","doc_count":1,"facet_collection_version":{"buckets":[{"doc_count":1,"key":"0.0.1"}],"doc_count_error_upper_bound":0,"sum_other_doc_count":0},"key":"alice-analysis"}],"doc_count_error_upper_bound":0,"meta":{"order":1},"sum_other_doc_count":0},"facet_collision_system":{"buckets":[],"doc_count_error_upper_bound":0,"sum_other_doc_count":0},"facet_final_states":{"buckets":[],"doc_count_error_upper_bound":0,"sum_other_doc_count":0},"facet_further_search_categorisation":{"buckets":[],"doc_count_error_upper_bound":0,"meta":{"title":"Further
+        Search Categorization"},"sum_other_doc_count":0},"facet_further_search_categorisation_heavy_ion":{"buckets":[],"doc_count_error_upper_bound":0,"meta":{"title":"Further
+        Search Categorization Heavy Ion"},"sum_other_doc_count":0},"facet_interpretation":{"buckets":[],"doc_count_error_upper_bound":0,"sum_other_doc_count":0},"facet_next_deadline_date":{"buckets":[],"meta":{"title":"Next
+        Deadline Date","type":"range"}},"facet_physics_theme":{"buckets":[],"doc_count_error_upper_bound":0,"sum_other_doc_count":0},"facet_sm_analysis_characteristics":{"buckets":[],"doc_count_error_upper_bound":0,"meta":{"title":"SM
+        Analysis Characteristics"},"sum_other_doc_count":0},"particles":{"doc_count":0,"facet_physics_objects":{"buckets":[],"doc_count_error_upper_bound":0,"sum_other_doc_count":0}}},"hits":{"hits":[],"total":1},"links":{"prev":"https://localhost/api/deposits/?page=1&size=10","self":"https://localhost/api/deposits/?page=2&size=10"}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Type, ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1889'
+      Content-Type:
+      - application/basic+json
+      Date:
+      - Tue, 07 Dec 2021 12:22:56 GMT
+      Link:
+      - <https://localhost/deposits/?page=2&size=10>; rel="self", <https://localhost/deposits/?page=1&size=10>;
+        rel="prev"
+      Retry-After:
+      - '3286'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=15768000
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4985'
+      X-RateLimit-Reset:
+      - '1638883063'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: DELETE
+    uri: https://localhost/api/deposits/3a85e6e9ad5544adb8f34d936284424d
+  response:
+    body:
+      string: ''
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Type, ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=utf-8
+      Date:
+      - Tue, 07 Dec 2021 12:22:57 GMT
+      Retry-After:
+      - '3286'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=15768000
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4975'
+      X-RateLimit-Reset:
+      - '1638883064'
+    status:
+      code: 204
+      message: NO CONTENT
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: DELETE
+    uri: https://localhost/api/deposits/db2fcdce76214d94bdef8062995d3d8a
+  response:
+    body:
+      string: ''
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Type, ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=utf-8
+      Date:
+      - Tue, 07 Dec 2021 12:22:57 GMT
+      Retry-After:
+      - '3286'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=15768000
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4974'
+      X-RateLimit-Reset:
+      - '1638883064'
+    status:
+      code: 204
+      message: NO CONTENT
+version: 1

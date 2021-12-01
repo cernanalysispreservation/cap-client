@@ -101,14 +101,34 @@ def schema(api, analysis_type, version, for_published):
     default=None,
     help='Type of analysis',
 )
+@click.option(
+    '--sort',
+    'sort',
+    type=click.Choice(['bestmatch', 'mostrecent']),
+    help='Sort analysis.'
+    'The available values are "bestmatch", "mostrecent".'
+    '[default=mostrecent]',
+)
+@click.option(
+    '--page',
+    'page',
+    type=click.INT,
+    help='Shows results on the specified page. [default=1]',
+)
+@click.option(
+    '--size',
+    'size',
+    type=click.INT,
+    help='Number of results on a page. [default=10]',
+)
 @logger
 @pass_api
-def get(api, pid, all, query, search, type):
+def get(api, pid, all, query, search, type, sort, page, size):
     """List your draft analysis."""
     if pid:
         res = api.get_draft_by_pid(pid)
     else:
-        res = api.get_drafts(all=all, query=query, search=search, type=type)
+        res = api.get_drafts(all=all, query=query, search=search, type=type, sort=sort, page=page, size=size)
 
     click.echo(json_dumps(res))
 
@@ -138,14 +158,34 @@ def get(api, pid, all, query, search, type):
     default=None,
     help='Type of analysis',
 )
+@click.option(
+    '--sort',
+    'sort',
+    type=click.Choice(['bestmatch', 'mostrecent']),
+    help='Sort analysis.'
+    'The available values are "bestmatch", "mostrecent".'
+    '[default=mostrecent]',
+)
+@click.option(
+    '--page',
+    'page',
+    type=click.INT,
+    help='Shows results on the specified page. [default=1]',
+)
+@click.option(
+    '--size',
+    'size',
+    type=click.INT,
+    help='Number of results on a page. [default=10]',
+)
 @logger
 @pass_api
-def get_published(api, pid, all, query, search, type):
+def get_published(api, pid, all, query, search, type, sort, page, size):
     """List your published analysis."""
     if pid:
         res = api.get_published_by_pid(pid)
     else:
-        res = api.get_published(all=all, query=query, search=search, type=type)
+        res = api.get_published(all=all, query=query, search=search, type=type, sort=sort, page=page, size=size)
 
     click.echo(json_dumps(res))
 
