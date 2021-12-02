@@ -50,7 +50,11 @@ check_pytest_unit () {
 }
 
 check_pytest_e2e () {
-    pytest tests/e2e
+    pytest tests/e2e --vcr-record=all
+}
+
+check_pytest_e2e_vcr () {
+    pytest tests/e2e --vcr-record=none
 }
 
 if [ $# -eq 0 ]; then
@@ -71,6 +75,7 @@ do
         --check-manifest) check_manifest;;
         --check-pytest-unit) check_pytest_unit;;
         --check-pytest-e2e) check_pytest_e2e;;
+        --check-pytest-e2e-vcr) check_pytest_e2e_vcr;;
         *)
     esac
 done

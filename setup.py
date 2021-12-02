@@ -41,6 +41,7 @@ tests_require = [
     'flake8',
     'pytest>=2.8.0',
     'responses>=0.10.6',
+    'pytest-vcr',
 ]
 
 extras_require = {

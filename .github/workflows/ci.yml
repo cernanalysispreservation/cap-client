@@ -52,7 +52,7 @@ jobs:
           pip install check-manifest
           ./run-tests.sh --check-manifest
 
-  python-tests:
+  python-unit-tests:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -79,3 +79,24 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           files: coverage.xml
+
+  python-e2e-vcr-tests:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -e .[all]
+
+      - name: Run pytest
+        env:
+          TESTS_SERVER_HOST: 'https://localhost'
+          TEST_E2E_TOKEN: 'token'
+        run: ./run-tests.sh --check-pytest-e2e-vcr

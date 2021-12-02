@@ -23,9 +23,11 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 import json
+import pytest
 
 
-def test_analysis_get_drafts_e2e(cli_run, user_tokens):
+@pytest.mark.vcr
+def test_analysis_get_drafts_e2e(cli_run, user_tokens, vcr_config):
     # create a draft analysis
     user_tokens("info@inveniosoftware.org")
 

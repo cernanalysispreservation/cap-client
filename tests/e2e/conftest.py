@@ -35,26 +35,27 @@ from cap_client.cli import cli
 @pytest.fixture(autouse=True)
 def env_e2e():
     """Set environment."""
-    os.environ['CAP_SERVER_URL'] = os.environ.get('TESTS_SERVER_HOST',
-                                                  'https://nginx')
+    os.environ['CAP_SERVER_URL'] = os.environ.get('TESTS_SERVER_HOST', 'https://nginx')
 
 
 @pytest.fixture()
 def user_tokens():
     """Set environment."""
     def _f(user=None):
-        file_path = os.environ.get('TESTS_E2E_TOKEN_FILE', '/test_data/test_tokens')
-        with open(file_path, 'r') as f:
-            tokens = f.read()
-            tokens = tokens.split("\n")
-            _tokens = {}
+        if os.environ.get('TEST_E2E_TOKEN'):
+            os.environ['CAP_ACCESS_TOKEN'] = os.environ.get('TEST_E2E_TOKEN')
+        else:
+            file_path = os.environ.get('TESTS_E2E_TOKEN_FILE', '/test_data/test_tokens')
+            with open(file_path, 'r') as f:
+                tokens = f.read()
+                tokens = tokens.split("\n")
+                _tokens = {}
 
-            for t in tokens:
-                _t = t.split(":")
-                if len(_t) == 2:
-                    email, token = _t
-                    _tokens[email] = token
-
+                for t in tokens:
+                    _t = t.split(":")
+                    if len(_t) == 2:
+                        email, token = _t
+                        _tokens[email] = token
             os.environ['CAP_ACCESS_TOKEN'] = _tokens.get(user, 'token')
     return _f
 
@@ -83,3 +84,10 @@ def cli_run():
         return res
 
     yield run
+
+
+@pytest.fixture(scope='module')
+def vcr_config():
+    return {
+        "filter_headers": [('authorization', 'DUMMY')],
+    }
