@@ -223,7 +223,7 @@ def test_analysis_create_when_no_json_nor_jsonfile_provided(cli_run):
     res = cli_run("analysis create --type some-type")
 
     assert res.exit_code == 2
-    assert 'Error: You need to specify --json or --jsonfile.' in res.output
+    assert 'Error: You need to specify one of --json, --jsonfile.' in res.output
 
 
 def test_analysis_create_when_both_json_and_jsonfile_provided(cli_run):
@@ -254,7 +254,7 @@ def test_analysis_create_when_json_with_not_json_data_provided(cli_run):
     res = cli_run('analysis create --json {a')
 
     assert res.exit_code == 2
-    assert "Error: Invalid value for '--json': Not a valid JSON." in res.stripped_output
+    assert "Error: Invalid value for '--json' / '-j': Not a valid JSON." in res.stripped_output
 
 
 def test_analysis_create_when_json_with_not_json_object_provided(cli_run):
@@ -269,7 +269,7 @@ def test_analysis_create_when_jsonfile_with_not_json_data_provided(cli_run):
         res = cli_run('analysis create --jsonfile {}'.format(f.name))
 
     assert res.exit_code == 2
-    assert "Error: Invalid value for '--jsonfile': Not a valid JSON." in res.stripped_output
+    assert "Error: Invalid value for '--jsonfile' / '-f': Not a valid JSON." in res.stripped_output
 
 
 @responses.activate

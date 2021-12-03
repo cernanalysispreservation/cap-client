@@ -214,7 +214,7 @@ def test_permissions_add_no_user_given(cli_run):
     res = cli_run("permissions add -p some-pid -r read")
 
     assert res.exit_code == 2
-    assert "Error: You need to specify --user or --egroup." in res.output
+    assert "Error: You need to specify one of --user, --egroup." in res.output
 
 
 def test_permissions_add_no_rights_given(cli_run):
@@ -416,7 +416,7 @@ def test_permissions_remove_no_user_given(cli_run):
     res = cli_run("permissions remove -p some-pid -r read")
 
     assert res.exit_code == 2
-    assert "Error: You need to specify --user or --egroup." in res.output
+    assert "Error: You need to specify one of --user, --egroup." in res.output
 
 
 def test_permissions_remove_no_rights_given(cli_run):

@@ -1,6 +1,7 @@
 import json
 
 import responses
+from pytest import mark
 
 
 # GET
@@ -120,6 +121,38 @@ def test_metadata_get_no_pid_given(cli_run):
 
 
 # UPDATE
+@mark.skip
+@responses.activate
+def test_metadata_update_with_text_field_str(cli_run):
+    responses.add(
+        responses.PATCH,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
+        json={'metadata': {
+            "general_title": "new-test"
+        }},
+        status=200)
+
+    res = cli_run(
+        "metadata update -p some-pid --field general_title --json new-test")
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert responses.calls[0].request.headers[
+        'Content-Type'] == 'application/json-patch+json'
+
+    assert json.loads(responses.calls[0].request.body) == [{
+        'op': 'replace',
+        'path': '/general_title',
+        'value': 'new-test'
+    }]
+    assert res.exit_code == 0
+    assert json.loads(res.stripped_output) == {
+        'metadata': {
+            "general_title": "new-test"
+        }
+    }
+
+
 @responses.activate
 def test_metadata_update_with_text(cli_run):
     responses.add(
@@ -152,6 +185,32 @@ def test_metadata_update_with_text(cli_run):
     }
 
 
+@mark.skip
+@responses.activate
+def test_metadata_update_with_text_field_int(cli_run):
+    responses.add(
+        responses.PATCH,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
+        json={'metadata': {
+            "myfield": 10
+        }},
+        status=200)
+
+    res = cli_run("metadata update -p some-pid --field myfield --json 10")
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert responses.calls[0].request.headers[
+        'Content-Type'] == 'application/json-patch+json'
+    assert json.loads(responses.calls[0].request.body) == [{
+        'op': 'replace',
+        'path': '/myfield',
+        'value': 10
+    }]
+    assert res.exit_code == 0
+    assert json.loads(res.stripped_output) == {'metadata': {'myfield': 10}}
+
+
 @responses.activate
 def test_metadata_update_with_num_int(cli_run):
     responses.add(
@@ -177,6 +236,32 @@ def test_metadata_update_with_num_int(cli_run):
 
     assert res.exit_code == 0
     assert json.loads(res.stripped_output) == {'metadata': {'myfield': 10}}
+
+
+@mark.skip
+@responses.activate
+def test_metadata_update_with_text_field_float(cli_run):
+    responses.add(
+        responses.PATCH,
+        'https://analysispreservation-dev.cern.ch/api/deposits/some-pid',
+        json={'metadata': {
+            "myfield": 1.2
+        }},
+        status=200)
+
+    res = cli_run("metadata update -p some-pid --field myfield --json 1.2")
+
+    assert responses.calls[0].request.headers[
+        'Accept'] == 'application/basic+json'
+    assert responses.calls[0].request.headers[
+        'Content-Type'] == 'application/json-patch+json'
+    assert json.loads(responses.calls[0].request.body) == [{
+        'op': 'replace',
+        'path': '/myfield',
+        'value': 1.2
+    }]
+    assert res.exit_code == 0
+    assert json.loads(res.stripped_output) == {'metadata': {'myfield': 1.2}}
 
 
 @responses.activate
@@ -315,7 +400,7 @@ def test_metadata_update_no_input_options_given(cli_run):
     res = cli_run("metadata update -p some-pid --field field")
 
     assert res.exit_code == 2
-    assert "Error: You need to specify --json or --jsonfile, --text, --num." in res.output
+    assert "Error: You need to specify one of --json, --jsonfile, --text, --num." in res.output
 
 
 def test_metadata_update_mutually_exclusive_json_with_others(cli_run):
