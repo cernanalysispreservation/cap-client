@@ -1,0 +1,460 @@
+interactions:
+- request:
+    body: '{"$ana_type": "cms-analysis"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '29'
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: POST
+    uri: https://localhost/api/deposits/
+  response:
+    body:
+      string: '{"access":{"deposit-admin":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]},"deposit-read":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]},"deposit-update":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]}},"created":"2022-01-05T12:53:03.682753+00:00","created_by":{"email":"info@inveniosoftware.org","profile":{}},"experiment":"CMS","files":[],"id":"4f1de5e79ad84a89a352184cdc38749b","is_owner":true,"labels":[],"links":{"bucket":"https://localhost/api/files/2d444b03-65c6-4662-b91a-c25fc24e78bf","clone":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/clone","discard":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/discard","disconnect_webhook":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/disconnect_webhook","edit":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/edit","files":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/files","html":"https://localhost/drafts/4f1de5e79ad84a89a352184cdc38749b","permissions":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/permissions","publish":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/publish","self":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b","upload":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/upload"},"metadata":{},"revision":0,"schema":{"fullname":"CMS
+        Analysis","name":"cms-analysis","version":"0.0.1"},"status":"draft","type":"deposit","updated":"2022-01-05T12:53:03.682770+00:00"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Type, ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1636'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 05 Jan 2022 12:53:03 GMT
+      ETag:
+      - '"0"'
+      Last-Modified:
+      - Wed, 05 Jan 2022 12:53:03 GMT
+      Link:
+      - <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b>; rel="self",
+        <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/files>; rel="files",
+        <https://localhost/drafts/4f1de5e79ad84a89a352184cdc38749b>; rel="html", <https://localhost/api/files/2d444b03-65c6-4662-b91a-c25fc24e78bf>;
+        rel="bucket", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/clone>;
+        rel="clone", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/discard>;
+        rel="discard", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/disconnect_webhook>;
+        rel="disconnect_webhook", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/edit>;
+        rel="edit", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/permissions>;
+        rel="permissions", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/publish>;
+        rel="publish", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/upload>;
+        rel="upload"
+      Retry-After:
+      - '3529'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=15768000
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4998'
+      X-RateLimit-Reset:
+      - '1641390713'
+      location:
+      - https://localhost/deposits/4f1de5e79ad84a89a352184cdc38749b
+    status:
+      code: 201
+      message: CREATED
+- request:
+    body: '{}'
+    headers:
+      Accept:
+      - application/basic+json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: PUT
+    uri: https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b
+  response:
+    body:
+      string: '{"created":"2022-01-05T12:53:03.682753+00:00","metadata":{},"pid":"4f1de5e79ad84a89a352184cdc38749b","updated":"2022-01-05T12:53:03.989478+00:00"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Type, ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '146'
+      Content-Type:
+      - application/basic+json
+      Date:
+      - Wed, 05 Jan 2022 12:53:04 GMT
+      ETag:
+      - '"1"'
+      Last-Modified:
+      - Wed, 05 Jan 2022 12:53:03 GMT
+      Link:
+      - <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b>; rel="self",
+        <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/files>; rel="files",
+        <https://localhost/drafts/4f1de5e79ad84a89a352184cdc38749b>; rel="html", <https://localhost/api/files/2d444b03-65c6-4662-b91a-c25fc24e78bf>;
+        rel="bucket", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/clone>;
+        rel="clone", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/discard>;
+        rel="discard", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/disconnect_webhook>;
+        rel="disconnect_webhook", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/edit>;
+        rel="edit", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/permissions>;
+        rel="permissions", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/publish>;
+        rel="publish", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/upload>;
+        rel="upload"
+      Retry-After:
+      - '3512'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=15768000
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4993'
+      X-RateLimit-Reset:
+      - '1641390697'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b
+  response:
+    body:
+      string: '{"access":{"deposit-admin":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]},"deposit-read":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]},"deposit-update":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]}},"created":"2022-01-05T12:53:03.682753+00:00","created_by":{"email":"info@inveniosoftware.org","profile":{}},"experiment":"CMS","files":[],"id":"4f1de5e79ad84a89a352184cdc38749b","is_owner":true,"labels":[],"links":{"bucket":"https://localhost/api/files/2d444b03-65c6-4662-b91a-c25fc24e78bf","clone":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/clone","discard":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/discard","disconnect_webhook":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/disconnect_webhook","edit":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/edit","files":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/files","html":"https://localhost/drafts/4f1de5e79ad84a89a352184cdc38749b","permissions":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/permissions","publish":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/publish","self":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b","upload":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/upload"},"metadata":{},"revision":1,"schema":{"fullname":"CMS
+        Analysis","name":"cms-analysis","version":"0.0.1"},"status":"draft","type":"deposit","updated":"2022-01-05T12:53:03.989478+00:00"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Type, ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1636'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 05 Jan 2022 12:53:04 GMT
+      ETag:
+      - '"1"'
+      Last-Modified:
+      - Wed, 05 Jan 2022 12:53:03 GMT
+      Link:
+      - <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b>; rel="self",
+        <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/files>; rel="files",
+        <https://localhost/drafts/4f1de5e79ad84a89a352184cdc38749b>; rel="html", <https://localhost/api/files/2d444b03-65c6-4662-b91a-c25fc24e78bf>;
+        rel="bucket", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/clone>;
+        rel="clone", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/discard>;
+        rel="discard", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/disconnect_webhook>;
+        rel="disconnect_webhook", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/edit>;
+        rel="edit", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/permissions>;
+        rel="permissions", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/publish>;
+        rel="publish", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/upload>;
+        rel="upload"
+      Retry-After:
+      - '3512'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=15768000
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4992'
+      X-RateLimit-Reset:
+      - '1641390697'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: !!python/object/new:_io.BytesIO
+      state: !!python/tuple
+      - !!binary |
+        SGVsbG8gd29ybGQ=
+      - 0
+      - null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '11'
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: PUT
+    uri: https://localhost/api/files/2d444b03-65c6-4662-b91a-c25fc24e78bf/file.txt
+  response:
+    body:
+      string: '{"size": 11, "links": {"self": "https://localhost/api/files/2d444b03-65c6-4662-b91a-c25fc24e78bf/file.txt",
+        "version": "https://localhost/api/files/2d444b03-65c6-4662-b91a-c25fc24e78bf/file.txt?versionId=3e941b15-948a-4b48-8e08-a07ad7fc1fb4",
+        "uploads": "https://localhost/api/files/2d444b03-65c6-4662-b91a-c25fc24e78bf/file.txt?uploads"},
+        "delete_marker": false, "mimetype": "text/plain", "is_head": true, "tags":
+        {}, "updated": "2022-01-05T12:53:04.298752+00:00", "created": "2022-01-05T12:53:04.292059+00:00",
+        "key": "file.txt", "version_id": "3e941b15-948a-4b48-8e08-a07ad7fc1fb4", "checksum":
+        "md5:3e25960a79dbc69b674cd4ec67a72c62"}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '637'
+      Content-Security-Policy:
+      - 'default-src ''self'' data: ''unsafe-inline'' ''unsafe-eval''; img-src ''self''
+        data: ''unsafe-inline'' ''unsafe-eval'''
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 05 Jan 2022 12:53:04 GMT
+      ETag:
+      - '"md5:3e25960a79dbc69b674cd4ec67a72c62"'
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Retry-After:
+      - '3529'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=31556926; includeSubDomains
+      - max-age=15768000
+      X-Content-Security-Policy:
+      - 'default-src ''self'' data: ''unsafe-inline'' ''unsafe-eval''; img-src ''self''
+        data: ''unsafe-inline'' ''unsafe-eval'''
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - sameorigin
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4997'
+      X-RateLimit-Reset:
+      - '1641390714'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b
+  response:
+    body:
+      string: '{"access":{"deposit-admin":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]},"deposit-read":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]},"deposit-update":{"roles":[],"users":[{"email":"info@inveniosoftware.org","profile":{}}]}},"created":"2022-01-05T12:53:03.682753+00:00","created_by":{"email":"info@inveniosoftware.org","profile":{}},"experiment":"CMS","files":[{"bucket":"2d444b03-65c6-4662-b91a-c25fc24e78bf","checksum":"md5:3e25960a79dbc69b674cd4ec67a72c62","key":"file.txt","size":11,"version_id":"3e941b15-948a-4b48-8e08-a07ad7fc1fb4"}],"id":"4f1de5e79ad84a89a352184cdc38749b","is_owner":true,"labels":[],"links":{"bucket":"https://localhost/api/files/2d444b03-65c6-4662-b91a-c25fc24e78bf","clone":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/clone","discard":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/discard","disconnect_webhook":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/disconnect_webhook","edit":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/edit","files":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/files","html":"https://localhost/drafts/4f1de5e79ad84a89a352184cdc38749b","permissions":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/permissions","publish":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/publish","self":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b","upload":"https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/upload"},"metadata":{},"revision":1,"schema":{"fullname":"CMS
+        Analysis","name":"cms-analysis","version":"0.0.1"},"status":"draft","type":"deposit","updated":"2022-01-05T12:53:03.989478+00:00"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Type, ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1814'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 05 Jan 2022 12:53:04 GMT
+      ETag:
+      - '"1"'
+      Last-Modified:
+      - Wed, 05 Jan 2022 12:53:03 GMT
+      Link:
+      - <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b>; rel="self",
+        <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/files>; rel="files",
+        <https://localhost/drafts/4f1de5e79ad84a89a352184cdc38749b>; rel="html", <https://localhost/api/files/2d444b03-65c6-4662-b91a-c25fc24e78bf>;
+        rel="bucket", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/clone>;
+        rel="clone", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/discard>;
+        rel="discard", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/disconnect_webhook>;
+        rel="disconnect_webhook", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/edit>;
+        rel="edit", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/permissions>;
+        rel="permissions", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/publish>;
+        rel="publish", <https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b/actions/upload>;
+        rel="upload"
+      Retry-After:
+      - '3511'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=15768000
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4991'
+      X-RateLimit-Reset:
+      - '1641390696'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://localhost/api/files/2d444b03-65c6-4662-b91a-c25fc24e78bf/file.txt
+  response:
+    body:
+      string: Hello world
+    headers:
+      Accept-Ranges:
+      - none
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - inline
+      Content-Length:
+      - '11'
+      Content-MD5:
+      - 3e25960a79dbc69b674cd4ec67a72c62
+      Content-Security-Policy:
+      - 'default-src ''self'' data: ''unsafe-inline'' ''unsafe-eval''; img-src ''self''
+        data: ''unsafe-inline'' ''unsafe-eval'''
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Wed, 05 Jan 2022 12:53:04 GMT
+      ETag:
+      - '"md5:3e25960a79dbc69b674cd4ec67a72c62"'
+      Last-Modified:
+      - Wed, 05 Jan 2022 12:53:04 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Retry-After:
+      - '3529'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=31556926; includeSubDomains
+      - max-age=15768000
+      X-Content-Security-Policy:
+      - 'default-src ''self'' data: ''unsafe-inline'' ''unsafe-eval''; img-src ''self''
+        data: ''unsafe-inline'' ''unsafe-eval'''
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - sameorigin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4996'
+      X-RateLimit-Reset:
+      - '1641390714'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Content-type:
+      - application/json
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: DELETE
+    uri: https://localhost/api/deposits/4f1de5e79ad84a89a352184cdc38749b
+  response:
+    body:
+      string: ''
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Type, ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=utf-8
+      Date:
+      - Wed, 05 Jan 2022 12:53:04 GMT
+      Retry-After:
+      - '3511'
+      Server:
+      - nginx/1.21.4
+      Strict-Transport-Security:
+      - max-age=15768000
+      X-RateLimit-Limit:
+      - '5000'
+      X-RateLimit-Remaining:
+      - '4990'
+      X-RateLimit-Reset:
+      - '1641390696'
+    status:
+      code: 204
+      message: NO CONTENT
+version: 1

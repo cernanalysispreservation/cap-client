@@ -97,11 +97,27 @@ def upload(api, pid, file, output_filename, yes_i_know):
     type=click.Path(exists=False),
     help='Download file as..',
 )
+@click.option(
+    '--yes-i-know',
+    is_flag=True,
+    default=False,
+    help="Bypasses prompts..Say YES to everything",
+)
 @click.argument('filename')
 @logger
 @pass_api
-def download(api, pid, filename, output_file):
+def download(api, pid, filename, output_file, yes_i_know):
     """Download file uploaded with given deposit."""
+    if not yes_i_know:
+        path = output_file or filename
+        if os.path.exists(path):
+            if not click.confirm(
+                    text="File already exists. Do you want to overwrite?",
+                    default=False,
+                    abort=False,
+                    show_default=True):
+                click.echo("Aborting download of {}".format(output_file or filename))
+                return
     api.download(pid, filename, output_file)
 
     click.echo("File saved as {}".format(output_file or filename))
