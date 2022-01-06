@@ -319,7 +319,7 @@ def test_files_upload_file(runner):
 
     assert responses.calls[1].request.body.name == 'dir/file.txt'
     assert res.exit_code == 0
-    assert res.stripped_output == 'File uploaded successfully.'
+    assert res.stripped_output == 'File dir/file.txt uploaded successfully.'
 
 
 @responses.activate
@@ -358,7 +358,7 @@ def test_files_upload_directory(runner):
         res = runner.run("files upload -p some-pid --yes-i-know dir")
 
     assert res.exit_code == 0
-    assert res.stripped_output == 'File uploaded successfully.'
+    assert res.stripped_output == 'Directory dir uploaded successfully.'
 
 
 def test_files_upload_no_pid_given(cli_run):
@@ -371,15 +371,14 @@ def test_files_upload_no_pid_given(cli_run):
 def test_files_upload_no_file_given(cli_run):
     res = cli_run("files upload -p some-pid")
 
-    assert res.exit_code == 2
-    assert "Error: Missing argument 'FILE'." in res.output
+    assert "Error: Missing argument 'PATH' or option 'DIR_FILES'." in res.output
 
 
 def test_files_upload_file_not_exists(cli_run):
     res = cli_run("files upload -p some-pid missing-file.txt")
 
     assert res.exit_code == 2
-    assert "Error: Invalid value for 'FILE': Path 'missing-file.txt' does not exist." in res.output
+    assert "Error: Invalid value for '[PATH]...': Path 'missing-file.txt' does not exist." in res.output
 
 
 @responses.activate
