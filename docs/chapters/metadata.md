@@ -19,13 +19,21 @@ Commands:
 ```
 
 
-#### Retrieve analysis metadata
+### Retrieve analysis metadata
 
-**Description:**
+#### Description
 
-Allows the user to retrieve the metadata of a specified analysis. The user can retrieve the whole JSON object, or select a specific field to be returned. In addition, the command supports the dot operator (e.g. `basic_info.abstract`), in order to define nested fields or list indices, allowing the user to retrieve every piece of metadata autonomously, if needed.
+- Allows the user to retrieve the metadata of a specified analysis.
+- The user can retrieve the whole JSON object, or select a specific field to be returned.
+- The command supports the dot operator (e.g. `basic_info.abstract`) to define nested fields or list indices, allowing the user to retrieve every piece of metadata autonomously.
+- The supported options are the following:
 
-**Usage:**
+| Name        | Type   | Desc                                                  |
+| :---------- | :----- | :---------------------------------------------------- |
+| --pid / -p  | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
+| --field     | TEXT   | Specify field, eg. object.nested_array.0              |
+
+#### Usage
 
 ```
 **[terminal]
@@ -54,21 +62,23 @@ Allows the user to retrieve the metadata of a specified analysis. The user can r
 "AN-1234/123"
 ```
 
-**Options:**
+### Update an analysis
 
-| Name        | Type   | Desc                                                  |
-| :---------- | :----- | :---------------------------------------------------- |
-| --pid / -p  | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
-| --field     | TEXT   | Specify field, eg. object.nested_array.0              |
+#### Description
 
+- Allows the user to update the metadata of an analysis.
+- The JSON object can be passed as it is through the cli or bypassing the file name of the JSON file that contains it.
+- The supported options are the following:
 
-#### Update an analysis
-
-**Description:**
-
-Allows the user to update the metadata of an analysis, or a specific field only, using a valid JSON.
-
-**Usage:**
+| Name            | Type     | Desc                                                              |
+| :-------------- | :------- | :---------------------------------------------------------------- |
+| --pid / -p      | TEXT     | Your analysis PID (Persistent Identifier)  [required]             |
+| --field         | TEXT     | Specify an existing field, eg. object.nested_array.0              |
+| --json / -j     | TEXT     | JSON data (mutually exclusive with --jsonfile, --text, --num)     |
+| --jsonfile / -f | FILENAME | JSON file (mutually exclusive with --json, --text, --num)         |
+| --text / -t     | TEXT     | Text data (mutually exclusive with --jsonfile, --json, --num)     |
+| --num / -n      | FILENAME | Numeric data (mutually exclusive with --json, --jsonfile, --text) |
+#### Usage
 
 ```
 **[terminal]
@@ -88,7 +98,7 @@ Allows the user to update the metadata of an analysis, or a specific field only,
 
 ```
 **[terminal]
-**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata get --pid <analysis-pid> --field basic_info.abstract --json \"new abstract\"]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata update --pid <analysis-pid> --field basic_info.abstract --json \"new abstract\"]
 {
     "created": "2020-04-23T14:24:44.068071+00:00",
     "metadata": {
@@ -104,7 +114,7 @@ Allows the user to update the metadata of an analysis, or a specific field only,
 
 ```
 **[terminal]
-**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata get --pid <analysis-pid> --jsonfile JSONFILE]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata update --pid <analysis-pid> --jsonfile JSONFILE]
 {
     "created": "2020-04-23T14:24:44.068071+00:00",
     "metadata": {
@@ -118,27 +128,48 @@ Allows the user to update the metadata of an analysis, or a specific field only,
 }
 ```
 
-**Extended Description:**
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata update --pid <analysis-pid> --field general_title --text new-test]
+{
+    "created": "2020-04-23T14:24:44.068071+00:00",
+    "metadata": {
+        "basic_info": {
+            "abstract": "new abstract"
+        },
+        "general_title": "new-test"
+    },
+    "pid": "796be0cc6d314e25b9c11dc0864e8d32",
+    "updated": "2020-04-23T14:36:45.175490+00:00"
+}
+```
 
-The JSON object can be passed as-is through the cli, or by passing the file name of the JSON file that contains it. It is important to keep in mind that single numbers, or even text in quotes (that need escaping, e.g. `\"`), is considered valid JSON, which allows the user to also update text/numeric fields easily.
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client metadata update --pid <analysis-pid> myfield  --num 1.2]
+{
+    "created": "2020-04-23T14:24:44.068071+00:00",
+    "metadata": {
+        "myfield": 1.2
+    },
+    "pid": "796be0cc6d314e25b9c11dc0864e8d32",
+    "updated": "2020-04-23T14:36:45.175490+00:00"
+}
+```
 
-**Options:**
+### Remove a metadata field
 
-| Name       | Type     | Desc                                                    |
-| :--------- | :------- | :------------------------------------------------------ |
-| --pid / -p | TEXT     | Your analysis PID (Persistent Identifier)  [required]   |
-| --field    | TEXT     | Specify an existing field, eg. object.nested_array.0    |
-| --json     | TEXT     | JSON data or text. (mutually exclusive with --jsonfile) |
-| --jsonfile | FILENAME | JSON file. (mutually exclusive with --json)             |
+#### Description
 
+- Allows the user to remove a specified metadata field from an analysis.
+- The supported options are the following:
 
-#### Remove a metadata field
+| Name       | Type     | Desc                                                            |
+| :--------- | :------- | :-------------------------------------------------------------- |
+| --pid / -p | TEXT     | Your analysis PID (Persistent Identifier)  [required]           |
+| --field    | TEXT     | Specify an existing field, eg. object.nested_array.0 [required] |
 
-**Description:**
-
-Allows the user to remove a specified metadata field from an analysis.
-
-**Usage:**
+#### Usage
 
 ```
 **[terminal]
@@ -148,10 +179,3 @@ Allows the user to remove a specified metadata field from an analysis.
     "general_title": "test"
 }
 ```
-
-**Options:**
-
-| Name       | Type     | Desc                                                            |
-| :--------- | :------- | :-------------------------------------------------------------- |
-| --pid / -p | TEXT     | Your analysis PID (Persistent Identifier)  [required]           |
-| --field    | TEXT     | Specify an existing field, eg. object.nested_array.0 [required] |
