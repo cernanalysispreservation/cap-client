@@ -66,7 +66,7 @@ Commands:
 Analysis has been deleted
 ```
 
-### Get analysis drafts
+### Get drafts analyses
 #### Description
 
 - Allows retrieving one or more drafts analyses accessible to the user.
@@ -76,10 +76,16 @@ Analysis has been deleted
     - Retrieve the draft analyses available to them (both created by them and given access to them by other users).
 - The supported options are the following:
 
-| Name        | Type     | Desc                                      |
-| :---------- | :------- | :---------------------------------------- |
-| --pid / -p  | TEXT     | Your analysis PID (Persistent Identifier) |
-| --all       | FLAG     | Show all (not only yours)                 |
+| Name            | Type     | Desc                                                                   |
+| :-----------    | :------- | :--------------------------------------------------------------------- |
+| --pid / -p      | TEXT     | Your analysis PID (Persistent Identifier)                              |
+| --all           | FLAG     | Show all (not only yours)                                              |
+| --query / -q    | TEXT     | A free text query (e.g `test` or `basic_info.analysis_title:test`)     |
+| ----search / -s | TEXT     | Search through facets (e.g. `type=my-analysis`)                        |
+| --type / -t     | TEXT     | Type of analysis                                                       |
+| --sort          | TEXT     | The available values are "bestmatch", "mostrecent" [default=mostrecent]|
+| --page          | INT      | Shows results on the specified page. [default=1]                       |
+| --size          | INT      | Number of results on a page. [default=10]                              |
 #### Usage
 
 ```
@@ -125,7 +131,43 @@ Analysis has been deleted
 ]
 ```
 
-#### Get published analyses
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client analysis get -q basic_info.analysis_title:test]
+[
+    {
+        "created": "2022-01-05T08:57:08.661809+00:00",
+        "metadata": {
+            "basic_info": {
+                "analysis_title": "Test"
+            },
+            "general_title": "Test Alice"
+        },
+        "pid": "3ec3b81e4f3643ce91e4396891dbcb03",
+        "updated": "2022-01-05T08:57:22.734703+00:00"
+    }
+]
+```
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client analysis get -s type=alice-analysis]
+[
+    {
+        "created": "2022-01-05T08:57:08.661809+00:00",
+        "metadata": {
+            "basic_info": {
+                "analysis_title": "Test"
+            },
+            "general_title": "Test Alice"
+        },
+        "pid": "3ec3b81e4f3643ce91e4396891dbcb03",
+        "updated": "2022-01-05T08:57:22.734703+00:00"
+    }
+]
+```
+
+### Get published analyses
 
 #### Description
 
@@ -136,10 +178,16 @@ Analysis has been deleted
     - Retrieve the published analyses available to them (both created by them and given access to them by other users).
 - The supported options are the following:
 
-| Name        | Type     | Desc                                      |
-| :---------- | :------- | :---------------------------------------- |
-| --pid / -p  | TEXT     | Your analysis PID (Persistent Identifier) |
-| --all       | FLAG     | Show all (not only yours)                 |
+| Name            | Type     | Desc                                                                   |
+| :-----------    | :------- | :--------------------------------------------------------------------- |
+| --pid / -p      | TEXT     | Your analysis PID (Persistent Identifier)                              |
+| --all           | FLAG     | Show all (not only yours)                                              |
+| --query / -q    | TEXT     | A free text query (e.g `test` or `basic_info.analysis_title:test`)     |
+| ----search / -s | TEXT     | Search through facets (e.g. `type=my-analysis`)                        |
+| --type / -t     | TEXT     | Type of analysis                                                       |
+| --sort          | TEXT     | The available values are "bestmatch", "mostrecent" [default=mostrecent]|
+| --page          | INT      | Shows results on the specified page. [default=1]                       |
+| --size          | INT      | Number of results on a page. [default=10]                              |
 
 #### Usage
 
