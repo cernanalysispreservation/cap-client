@@ -21,20 +21,17 @@ RUN apk add git yarn python g++ make && rm -rf /var/cache/apk/*
 ADD ./ /docs
 
 RUN git clone https://github.com/cernanalysispreservation/cap-client $WORKING_DIR/
-
 # If DEBUG mode, run form local branch, else copy repo fetch from Github
 RUN if [ "$DEBUG" = "False" ]; then cp -rf ${WORKING_DIR}/docs /docs; fi;
 
 WORKDIR /docs
 
-ENV GITBOOK_CLI_VERSION="2.3.2"
-
 # install GitBook CLI
-RUN yarn global add gitbook-cli
+RUN npm install
 
-RUN gitbook install
+RUN npm run install
 
-RUN pwd && ls && gitbook build
+RUN pwd && ls && npm run build
 
 RUN cp -rf ./_book /var/www
 RUN cp -rf ./docker/nginx.conf /etc/nginx/conf.d/default.conf
