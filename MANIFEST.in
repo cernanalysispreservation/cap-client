@@ -31,6 +31,7 @@ include .flake8
 include Dockerfile
 include pytest.ini
 include docs/Dockerfile
+include docs/Dockerfile.dev
 recursive-include docs *.md
 recursive-include docs *.json
 recursive-include docs *.conf
