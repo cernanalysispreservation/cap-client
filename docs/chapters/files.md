@@ -1,6 +1,6 @@
 ## Files
 
-The `files` command group allows the user to manage files attached to their analyses, as well as upload local files and attach them to an analysis.
+The `files` command group allows users to manage files attached to their analyses and upload local files and attach them to analysis. The supported commands are the following:
 
 ```
 **[terminal]
@@ -15,18 +15,24 @@ Options:
 Commands:
   download  Download file uploaded with given deposit.
   get       Get list of files attached to analysis with given PID.
-  remove    Removefile from deposit with given pid.
+  remove    Remove a file from deposit with given PID.
   upload    Upload a file to your analysis.
 ```
 
+### Download a file from an analysis
 
-#### Download a file from an analysis
+#### Description
 
-**Description:**
+- Allows the user to download a previously attached file to a specified analysis.
+- The supported options are the following:
 
-Allows the user to download a file, that was previously attached to a specified analysis.
+| Name               | Type   | Desc                                                  |
+| :----------------- | :----- | :---------------------------------------------------- |
+| FILENAME           | TEXT   | The name of the file to be downloaded  [required]     |
+| --pid / -p         | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
+| --output-file / -o | PATH   | Download file as                                      |
 
-**Usage:**
+#### Usage
 
 ```
 **[terminal]
@@ -40,22 +46,18 @@ File saved as FILENAME.
 File saved as dir/NEWFILE.
 ```
 
-**Options:**
+### Retrieve all the files of an analysis
+
+#### Description
+
+- Allows the user to get a list of the files attached to an analysis with a given PID.
+- The supported options are the following:
 
 | Name               | Type   | Desc                                                  |
 | :----------------- | :----- | :---------------------------------------------------- |
-| FILENAME           | TEXT   | The name of the file to be downloaded  [required]     |
 | --pid / -p         | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
-| --output-file / -o | PATH   | Download file as                                      |
 
-
-#### Retrieve all the files of an analysis
-
-**Description:**
-
-Allows the user to get a list of the files, attached to an analysis with a given PID.
-
-**Usage:**
+#### Usage
 
 ```
 **[terminal]
@@ -70,20 +72,17 @@ Allows the user to get a list of the files, attached to an analysis with a given
 ]
 ```
 
-**Options:**
+### Remove a file from an analysis
+
+#### Description
+
+- Allows the user to get a list of the files attached to an analysis with a given PID.
+- The supported options are the following:
 
 | Name               | Type   | Desc                                                  |
 | :----------------- | :----- | :---------------------------------------------------- |
 | --pid / -p         | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
-
-
-#### Remove a file from an analysis
-
-**Description:**
-
-Allows the user to get a list of the files, attached to an analysis with a given PID.
-
-**Usage:**
+#### Usage
 
 ```
 **[terminal]
@@ -91,42 +90,48 @@ Allows the user to get a list of the files, attached to an analysis with a given
 File FILENAME removed.
 ```
 
-**Options:**
+### Upload a file to an analysis
 
-| Name               | Type   | Desc                                                  |
-| :----------------- | :----- | :---------------------------------------------------- |
-| --pid / -p         | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
+#### Description
 
+- Allows the user to upload and attach a file to analysis or a whole directory as a tar.gz file.
+- The command enables the user to upload a single file of any type, as well as a whole directory. After a prompt asks the user for confirmation, the directory will be zipped and uploaded as a `.tar.gz` file.
+- To avoid the prompt and enable the usage of cap-client inside a CLI script, the flag `--yes-i-know` can be added.
+- The supported options are the following:
 
-#### Upload a file to an analysis
+| Name                   | Type   | Desc                                                         |
+| :--------------------- | :----- | :----------------------------------------------------------- |
+| FILE                   | TEXT   | The name of the file/s to be uploaded [required]             |
+| --pid / -p             | TEXT   | Your analysis PID (Persistent Identifier)  [required]        |
+| --output-filename / -o | PATH   | Upload file as..                                             |
+| --yes-i-know           | FLAG   | Bypasses prompts..Say YES to everything                      |
+| --dir-files / -df      | TEXT   | Upload all the files individually of the specified directory.|
 
-**Description:**
-
-Allows the user to upload and attach a file to an analysis, or a whole directory as a tar.gz file.
-
-**Usage:**
+#### Usage
 
 ```
 **[terminal]
-**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client files upload --pid <analysis-pid> FILE]
-File uploaded successfully.
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client files upload --pid <analysis-pid> FILE1]
+File File1 uploaded successfully.
+```
+
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client files upload --pid <analysis-pid> FILE1 FILE2]
+File File1 uploaded successfully.
+File File2 uploaded successfully.
 ```
 
 ```
 **[terminal]
 **[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client files upload --pid <analysis-pid> --yes-i-know DIR]
-File uploaded successfully.
+Directory DIR uploaded successfully.
 ```
 
-**Extended Description:**
-
-The command enables the user to upload a single file of any type, as well as a whole directory. After a prompt asks the user for confirmation, the directory will be zipped and uploaded as a `.tar.gz` file. In order to avoid the prompt, and enable the usage of CAP-Client inside a cli script, the flag `--yes-i-know` can be added.
-
-**Options:**
-
-| Name                   | Type   | Desc                                                  |
-| :--------------------- | :----- | :---------------------------------------------------- |
-| FILE                   | TEXT   | The name of the file to be downloaded  [required]     |
-| --pid / -p             | TEXT   | Your analysis PID (Persistent Identifier)  [required] |
-| --output-filename / -o | PATH   | Upload file as                                        |
-| --yes-i-know           | FLAG   | Bypasses prompts..Say YES to everything               |
+```
+**[terminal]
+**[prompt user@pc]**[path ~]**[delimiter  $ ]**[command cap-client files upload --pid <analysis-pid> --dir-files DIR]
+File DIR/File1 uploaded successfully.
+File DIR/File2 uploaded successfully.
+...
+```

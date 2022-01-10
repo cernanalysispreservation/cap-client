@@ -159,7 +159,7 @@ def download(api, pid, filename, output_file, yes_i_know):
 @logger
 @pass_api
 def remove(api, pid, filename):
-    """Removefile from deposit with given pid."""
+    """Remove a file from deposit with given pid."""
     api.remove(pid=pid, filename=filename)
 
     click.echo("File {} removed.".format(filename))
