@@ -94,7 +94,9 @@ def test_analysis_get_drafts_with_size(cli_run, user_tokens, vcr_config):
 
     # create draft analyses
     create_draft_res_one = cli_run('analysis create --json {} --type alice-analysis')
+    time.sleep(2)
     create_draft_res_two = cli_run('analysis create --json {} --type cms-analysis')
+    time.sleep(2)
     draft_pid_one = json.loads(create_draft_res_one.output).get('pid')
     draft_pid_two = json.loads(create_draft_res_two.output).get('pid')
 
