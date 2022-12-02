@@ -95,6 +95,15 @@ def load_num(ctx, param, value):
                 raise BadParameter('Not a valid number.')
 
 
+def load_file_names_from_directory(dir_path):
+    """Return the list of file names inside the directory."""
+    filenames = []
+    for root, d_names, f_names in os.walk(dir_path):
+        for f in f_names:
+            filenames.append(os.path.join(root, f))
+    return filenames
+
+
 class NotRequiredIf(click.Option):
     """
     Mutually exclusive REQUIRED arguments.

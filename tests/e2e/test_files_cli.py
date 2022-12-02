@@ -44,13 +44,70 @@ def test_files_upload_and_download(cli_run, user_tokens, vcr_config):
     # test `files upload`
     res_upload = cli_run(f'files upload -p {draft_pid} file.txt')
     assert res_upload.exit_code == 0
-    assert res_upload.stripped_output == 'File uploaded successfully.'
+    assert res_upload.stripped_output == 'File file.txt uploaded successfully.'
     os.remove('file.txt')
 
     # test `files download`
     res_download = cli_run(f'files download -p {draft_pid} file.txt')
     assert res_download.exit_code == 0
     assert res_download.stripped_output == 'File saved as file.txt'
+    os.remove('file.txt')
+
+    # delete the draft
+    cli_run(f'analysis delete -p {draft_pid}')
+
+
+@pytest.mark.vcr
+def test_files_upload_multiple_files(cli_run, user_tokens, vcr_config):
+    # apply the token
+    user_tokens('info@inveniosoftware.org')
+
+    # create a draft analysis
+    create_draft_res = cli_run('analysis create --json {} --type cms-analysis')
+
+    # get the pid of the draft
+    draft_pid = json.loads(create_draft_res.output).get('pid')
+
+    with open('file.txt', 'wb') as fp:
+        fp.write(b'Hello world')
+
+    os.mkdir('test/')
+    with open('test/file.txt', 'wb') as fp:
+        fp.write(b'Hello world')
+
+    # test `files upload <file1> <file2>`
+    res_upload = cli_run(f'files upload -p {draft_pid} file.txt test/file.txt')
+    assert res_upload.exit_code == 0
+    assert 'File file.txt uploaded successfully.' in res_upload.stripped_output
+    os.remove('file.txt')
+    os.remove('test/file.txt')
+    os.rmdir('test/')
+
+    # delete the draft
+    cli_run(f'analysis delete -p {draft_pid}')
+
+
+@pytest.mark.vcr
+def test_files_upload_files_inside_dir(cli_run, user_tokens, vcr_config):
+    # apply the token
+    user_tokens('info@inveniosoftware.org')
+
+    # create a draft analysis
+    create_draft_res = cli_run('analysis create --json {} --type cms-analysis')
+
+    # get the pid of the draft
+    draft_pid = json.loads(create_draft_res.output).get('pid')
+
+    os.mkdir('test/')
+    with open('test/file.txt', 'wb') as fp:
+        fp.write(b'Hello world')
+
+    # test `files upload --dir-files`
+    res_upload = cli_run(f'files upload -p {draft_pid} --yes-i-know --dir-files test/')
+    assert res_upload.exit_code == 0
+    assert res_upload.stripped_output == 'File test/file.txt uploaded successfully.'
+    os.remove('test/file.txt')
+    os.rmdir('test/')
 
     # delete the draft
     cli_run(f'analysis delete -p {draft_pid}')

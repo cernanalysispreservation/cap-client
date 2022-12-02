@@ -28,7 +28,7 @@ import os
 import click
 
 from cap_client.api import FilesAPI
-from cap_client.utils import ColoredGroup, json_dumps, logger, pid_option
+from cap_client.utils import ColoredGroup, json_dumps, logger, pid_option, load_file_names_from_directory
 
 pass_api = click.make_pass_decorator(FilesAPI, ensure=True)
 
@@ -62,31 +62,61 @@ def get(api, pid):
     default=False,
     help="Bypasses prompts..Say YES to everything",
 )
+@click.option(
+    '--dir-files',
+    '-df',
+    type=click.Path(exists=True),
+    help='Upload all the files individually of the specified directory.',
+)
 @click.argument(
-    'file',
+    'path',
+    nargs=-1,
     type=click.Path(exists=True),
 )
 @logger
 @pass_api
-def upload(api, pid, file, output_filename, yes_i_know):
+def upload(api, pid, path, output_filename, yes_i_know, dir_files):
     """Upload a file to your analysis."""
-    if os.path.isdir(file):
-        if yes_i_know or click.confirm(
-                '{} is a directory. Do you want to upload a tarball?'.format(
-                    file)):
-            api.upload_directory(
+    if not path and not dir_files:
+        click.echo("Error: Missing argument 'PATH' or option 'DIR_FILES'.")
+        return
+
+    file_names = list(path) if path else []
+    if dir_files:
+        file_names += load_file_names_from_directory(dir_files)
+        if file_names:
+            if not yes_i_know and not click.confirm(
+                "{} contains {} files. Do you want to upload them individually?".format(
+                    dir_files, len(file_names)
+                )
+            ):
+                click.echo("Use 'PATH' argument for uploading as tarball.")
+                return
+        else:
+            click.echo("No files found in parent directory {}.".format(dir_files))
+
+    for _file in file_names:
+        if os.path.isdir(_file):
+            if yes_i_know or click.confirm(
+                "{} is a directory. Do you want to upload a tarball?".format(_file)
+            ):
+                api.upload_directory(
+                    pid=pid,
+                    filepath=_file,
+                    output_filename=output_filename,
+                )
+                click.echo("Directory {} uploaded successfully.".format(_file))
+            else:
+                click.echo("Use --dir-files for uploading files individually.")
+                click.echo("Aborting upload of {}.".format(_file))
+                continue
+        elif os.stat(_file).st_size != 0:
+            api.upload_file(
                 pid=pid,
-                filepath=file,
+                filepath=_file,
                 output_filename=output_filename,
             )
-    else:
-        api.upload_file(
-            pid=pid,
-            filepath=file,
-            output_filename=output_filename,
-        )
-
-    click.echo("File uploaded successfully.")
+            click.echo("File {} uploaded successfully.".format(_file))
 
 
 @files.command()
@@ -129,7 +159,7 @@ def download(api, pid, filename, output_file, yes_i_know):
 @logger
 @pass_api
 def remove(api, pid, filename):
-    """Removefile from deposit with given pid."""
+    """Remove a file from deposit with given pid."""
     api.remove(pid=pid, filename=filename)
 
     click.echo("File {} removed.".format(filename))
