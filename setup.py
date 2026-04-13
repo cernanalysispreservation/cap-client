@@ -74,7 +74,7 @@ with open(os.path.join('cap_client', 'version.py'), 'rt') as f:
                         f.read()).group('version')
 
 setup(
-    name='cap-client',
+    name='cap_client',
     version=version,
     description=__doc__,
     long_description=readme + '\n\n' + history,
